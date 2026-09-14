@@ -61,21 +61,57 @@ function looksAuthenticated(response) {
 
 /**
  * Tries each auth scheme against each identity endpoint until one returns 200
- * with a JSON body. Returns null when nothing works, which usually means the
- * token is stale. Grab a fresh one and try again.
+ * with a JSON body.
+ *
+ * On failure it reports why, because the two causes need different fixes and
+ * look identical from the outside. A rejected token returns 401 or 403 and is
+ * fixed by copying a fresh one. Routes that do not exist return 404 for every
+ * scheme, and no token will ever fix that: the paths below are guesses and the
+ * real ones have to be captured from the web app. See
+ * browser/capture-api-calls.js.
  */
 export async function resolveAuthScheme({ token, base = DEFAULT_BASE, log = () => {} }) {
+  const statusCounts = {};
   for (const scheme of AUTH_SCHEMES) {
     const client = new ReadOnlyClient({ token, scheme, log });
     for (const path of IDENTITY_CANDIDATES) {
       const response = await client.get(base + path);
+      statusCounts[response.status] = (statusCounts[response.status] ?? 0) + 1;
       log(`  ${scheme.padEnd(13)} GET ${path} -> ${response.status}`);
       if (looksAuthenticated(response)) {
-        return { scheme, identityPath: path, identity: response.json };
+        return { ok: true, scheme, identityPath: path, identity: response.json };
       }
     }
   }
-  return null;
+  return { ok: false, statusCounts, diagnosis: diagnose(statusCounts, base) };
+}
+
+/** Turns a spread of response codes into the one sentence that matters. */
+export function diagnose(statusCounts, base = DEFAULT_BASE) {
+  const codes = Object.keys(statusCounts).map(Number);
+  const total = Object.values(statusCounts).reduce((a, b) => a + b, 0);
+
+  if (total === 0) return 'No requests completed. Check your network connection.';
+  if (codes.every((c) => c === 0)) {
+    return 'Every request failed at the network level. Check your connection, or whether a VPN or proxy is blocking mealime.com.';
+  }
+  if (codes.every((c) => c === 404)) {
+    return (
+      `Every route under ${base} returned 404, under every auth scheme. That means the ` +
+      'paths are wrong, not the token, and a fresh token will not help. Capture the real ' +
+      'routes with browser/capture-api-calls.js and send them in, or open an issue with the output.'
+    );
+  }
+  if (codes.some((c) => c === 401 || c === 403)) {
+    return (
+      'The server rejected the token. Copy a fresh one from the browser: it is short lived. ' +
+      'See "Getting your token" in README.md.'
+    );
+  }
+  if (codes.some((c) => c >= 500)) {
+    return 'The server is returning errors. Wait a few minutes and try again.';
+  }
+  return `Unexpected responses: ${JSON.stringify(statusCounts)}. Send this output in.`;
 }
 
 /**

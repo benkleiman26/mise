@@ -119,9 +119,14 @@ sharing or republishing.
 ## If the API does not work
 
 The API is not documented publicly, and the script probes for the right
-endpoints rather than assuming them. If `npm run discover` cannot authenticate,
-there is a manual path that uses the web app's own cache. See
-[`browser/`](browser/).
+endpoints rather than assuming them. Two fallbacks live in
+[`browser/`](browser/):
+
+- `capture-api-calls.js` records the calls the web app actually makes, so the
+  candidate routes can be corrected. Start here if `discover` returns 404 for
+  everything.
+- `collect-localstorage.js` rescues recipes straight out of the web app's own
+  cache, for when the API cannot be made to work at all.
 
 ## Troubleshooting
 
@@ -129,9 +134,15 @@ there is a manual path that uses the web app's own cache. See
 The variable is not in this shell. Run the `export` line again in the same
 terminal window.
 
-**"No auth scheme worked"**
-The token is stale or was copied incompletely. Get a fresh one. If it still
-fails, use the browser fallback in `browser/`.
+**Every route returns 404**
+The paths the script tries are guesses, and they are wrong. A fresh token will
+not help. Record the real ones with
+[`browser/capture-api-calls.js`](browser/capture-api-calls.js) and either send
+them in or fix the candidate lists in `src/discover.mjs`.
+
+**"The server rejected the token"**
+The token is stale or was copied incompletely. They are short lived, so get a
+fresh one. If it still fails, use the browser fallback in `browser/`.
 
 **Counts look too low**
 `npm run discover` prints what each endpoint returned. If your recipes are not

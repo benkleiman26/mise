@@ -14,9 +14,12 @@ Known gaps, found while building. Section 11 asks for this list to be kept.
 
 ## Mealime export
 
-- [ ] The script has never run against the real API. Endpoint and auth scheme
-      guesses in `src/discover.mjs` are unverified. Run `npm run discover`
-      first and expect to adjust the candidate lists.
+- [ ] **The guessed routes are wrong.** A first run on 2026-09-14 returned 404
+      for all six identity candidates under all five auth schemes, so neither
+      `api.mealime.com/api/v2` nor those paths are right. `mealime.com` is not
+      reachable from the cloud build environment, so the real routes have to
+      come from a browser: run `browser/capture-api-calls.js` on my.mealime.com
+      and correct `IDENTITY_CANDIDATES` and `COLLECTION_CANDIDATES`.
 - [ ] Preferences mapping in `normalizePreferences` is written against the
       preference names in section 1a, not against a real response.
 - [x] Recipe images are now downloaded by `npm run images`, so the rescue does

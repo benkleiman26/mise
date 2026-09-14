@@ -48,10 +48,27 @@ This tool only ever issues GET requests, and only to mealime.com hosts. It canno
 modify or delete anything in the account.
 `;
 
+/** Values people paste by accident instead of their actual token. */
+const PLACEHOLDER_TOKENS = new Set([
+  'paste-here',
+  'paste-it-here',
+  'your-token-here',
+  'token',
+  '<token>',
+  'xxx',
+]);
+
 function requireToken() {
   const token = process.env.MEALIME_AUTH_TOKEN;
   if (!token) {
     console.error('MEALIME_AUTH_TOKEN is not set. See README.md, section "Getting your token".');
+    process.exit(2);
+  }
+  if (PLACEHOLDER_TOKENS.has(token.trim().toLowerCase())) {
+    console.error(
+      `MEALIME_AUTH_TOKEN is set to "${token}", which is the placeholder from the README, not a real token.\n` +
+        'Copy your actual token from the browser first. See README.md, section "Getting your token".'
+    );
     process.exit(2);
   }
   return token;
@@ -88,9 +105,8 @@ async function main() {
       const token = requireToken();
       console.log('Trying auth schemes');
       const resolved = await resolveAuthScheme({ token, base: values.base, log: console.log });
-      if (!resolved) {
-        console.error('\nNothing authenticated. The token is probably stale, copy a fresh one.');
-        console.error('If it still fails, use the browser fallback in browser/.');
+      if (!resolved.ok) {
+        console.error(`\n${resolved.diagnosis}`);
         process.exit(1);
       }
       console.log(`\nAuth scheme: ${resolved.scheme} (via ${resolved.identityPath})\n`);

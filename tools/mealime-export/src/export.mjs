@@ -88,12 +88,7 @@ export async function runExport({ token, outDir, base = DEFAULT_BASE, scheme, fo
   let resolvedScheme = scheme;
   if (!resolvedScheme) {
     const resolved = await resolveAuthScheme({ token, base, log });
-    if (!resolved) {
-      throw new Error(
-        'No auth scheme worked. The token is probably stale. Copy a fresh one from the browser, ' +
-          'or use the browser fallback in tools/mealime-export/browser/.'
-      );
-    }
+    if (!resolved.ok) throw new Error(resolved.diagnosis);
     resolvedScheme = resolved.scheme;
     identity = resolved.identity;
     log(`Auth scheme: ${resolvedScheme} via ${resolved.identityPath}`);

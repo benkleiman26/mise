@@ -2,7 +2,7 @@ import { strict as assert } from 'node:assert';
 import { test, describe } from 'node:test';
 
 import { ReadOnlyClient, ReadOnlyViolation, authHeaders, backoffMs, retryAfterMs } from '../src/http.mjs';
-import { extractCollection, nextPage, summarize } from '../src/discover.mjs';
+import { diagnose, extractCollection, nextPage, summarize } from '../src/discover.mjs';
 import { chooseCandidate, recipeId } from '../src/export.mjs';
 
 describe('read only guards', () => {
@@ -119,5 +119,31 @@ describe('summarize', () => {
     assert.equal(summarize({ status: 200, json: [1, 2] }).count, 2);
     assert.equal(summarize({ status: 200, json: { a: 1, b: 2 } }).count, null);
     assert.equal(summarize({ status: 401, json: null }).ok, false);
+  });
+});
+
+describe('diagnose', () => {
+  test('blames the routes, not the token, when everything is a 404', () => {
+    const message = diagnose({ 404: 30 });
+    assert.match(message, /paths are wrong, not the token/);
+    assert.match(message, /capture-api-calls/);
+  });
+
+  test('blames the token when the server actively rejects it', () => {
+    assert.match(diagnose({ 401: 6, 404: 24 }), /rejected the token/);
+    assert.match(diagnose({ 403: 30 }), /rejected the token/);
+  });
+
+  test('calls out a network problem', () => {
+    assert.match(diagnose({ 0: 30 }), /network level/);
+    assert.match(diagnose({}), /No requests completed/);
+  });
+
+  test('calls out a server problem', () => {
+    assert.match(diagnose({ 503: 30 }), /returning errors/);
+  });
+
+  test('asks for the output when it cannot tell', () => {
+    assert.match(diagnose({ 302: 30 }), /Send this output in/);
   });
 });

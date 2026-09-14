@@ -1,0 +1,15 @@
+{
+  "name": "mealime-export",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "One time, read only export of a Mealime account. Rescues recipes before Mealime deletes account data on 2026-10-21.",
+  "engines": { "node": ">=20" },
+  "bin": { "mealime-export": "./src/cli.mjs" },
+  "scripts": {
+    "discover": "node src/cli.mjs discover",
+    "export": "node src/cli.mjs export",
+    "normalize": "node src/cli.mjs normalize",
+    "test": "node --test"
+  }
+}

@@ -23,13 +23,16 @@ Full requirements live in the build spec, linked from `SPEC.md`. Decisions made 
 | `Mise/MiseTests` | XCTest target. |
 | `tools/mealime-export` | One time, read only export of the owner's Mealime data. |
 | `tools/nyt-export` | One time, read only export of the owner's NYT Cooking Recipe Box. |
+| `tools/bulk-import` | Bookmarks parsing and inventory, ahead of the in-app bulk URL import. |
 | `data/` | Rescued personal data. Git ignored, never committed. |
 
 ## Status
 
-Phase 0a is written and tested, but has not been run against a live Mealime
-account yet. That needs the owner's auth token and must happen before Mealime
-deletes account data on October 21, 2026.
+Phase 0a is done for Mealime: the rescue ran on 2026-09-14 and the data is in
+`data/mealime/`, which is git ignored.
+
+`tools/nyt-export` and `tools/bulk-import` are written and tested but have not
+been run against the real NYT Cooking site or a real bookmarks file yet.
 
 Phase 0b has not started. See `TODO.md`.
 

@@ -7,7 +7,12 @@ Known gaps, found while building. Section 11 asks for this list to be kept.
 - [x] Mealime rescue ran on 2026-09-14 from the owner's signed-in Chrome. No
       token was needed. See DECISIONS.md.
 - [ ] **Chrome bookmarks export** (`bookmarks.html`) of the open recipe tabs, to
-      keep in `data/`. Section 12, Phase 0a.
+      keep in `data/`. Section 12, Phase 0a. Once it is there, run
+      `cd tools/bulk-import && npm run inventory` for the counts.
+- [ ] **Run the NYT Recipe Box export.** `tools/nyt-export/` is written and
+      tested but has never run against the real site. Start with
+      `__nyt.probe()`, and if all three extraction strategies return zero, send
+      that output back rather than guessing at the markup.
 - [ ] Bundle identifier and Apple Developer team ID. Section 12, Phase 0b.
 - [ ] Confirm iOS 17 as the minimum. Section 12, Phase 0b.
 
@@ -42,6 +47,25 @@ Known gaps, found while building. Section 11 asks for this list to be kept.
 - [ ] Nothing announces the tool to Mealime users yet. A post in the places
       section 12 mentions (Reddit, the Mealime support community) would need to
       go up well before 2026-10-21 to be useful to anyone.
+
+## NYT export
+
+- [ ] The Recipe Box page structure is assumed, not observed. The three
+      extraction strategies are tested against stubbed markup only.
+- [ ] `crawl()` fetches folder pages directly, which is faster than visiting
+      them but can miss lazily loaded rows. Any folder whose count looks short
+      needs `scan()` run on it in the browser instead.
+- [ ] Nothing fetches the recipes themselves. That is Phase 4, by design: the
+      app runs each URL through the JSON-LD pipeline, so the export only carries
+      URLs, folders and the cooked flag.
+
+## Bulk import
+
+- [ ] The `looksLikeRecipe` heuristic is deliberately generous and has only been
+      run against the test fixture. Check its calls against the real bookmarks
+      file before trusting the "not recipes" count.
+- [ ] `src/bookmarks.mjs` is the reference implementation for Phase 4's Swift
+      port. Keep the fixture in step with whatever the app ends up handling.
 
 ## Environment
 

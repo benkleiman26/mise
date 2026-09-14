@@ -1,0 +1,9 @@
+{
+  "name": "bulk-import",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Bookmarks parsing and inventory, ahead of the in-app bulk URL import.",
+  "engines": { "node": ">=20" },
+  "scripts": { "inventory": "node src/cli.mjs inventory", "test": "node --test" }
+}

@@ -1,0 +1,12 @@
+{
+  "name": "nyt-export",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "One time, read only export of a NYT Cooking Recipe Box to nyt_recipe_box.json.",
+  "engines": { "node": ">=20" },
+  "scripts": {
+    "convert": "node src/cli.mjs convert",
+    "test": "node --test"
+  }
+}

@@ -150,3 +150,44 @@ lookup tables live only in the app bundle. The settings page for this account
 showed Pescetarian, olives, 4 servings, US units on 2026-09-14, so
 `convert.mjs` carries exactly those id to name pairs and leaves any other id
 labeled as an id rather than guessing.
+
+## The NYT export collects in the browser and converts in Node
+
+Same split as the Mealime rescue, for the same reason: the collecting depends on
+a page structure nobody has verified, and the converting does not. When NYT's
+markup turns out to differ from what was assumed, only `browser/collect.js`
+changes, and `src/convert.mjs` keeps its tests.
+
+The collector tries three strategies in order and reports which fired: the
+Next.js hydration payload, the rendered DOM, and raw matching of
+`/recipes/<id>-<slug>` anywhere in the markup. That last one is crude and will
+work even if the first two are wrong, which is the point. `__nyt.probe()` exists
+so the first move on an unknown page is to look rather than to guess, which is
+the lesson from spending a day on a Mealime API that did not exist.
+
+## Recipe Box folders become tags, but status folders do not
+
+Section 5.6a asks for folders to be mapped to tags. Some folder names describe a
+status rather than a topic: Cooked Recipes, Recipe Box, Saved. Those become the
+`cooked` flag or nothing at all, never a tag, because a tag named "cooked" would
+compete with the real cooked count the app keeps.
+
+Filler words are dropped too, so "Easy Kid-Friendly Recipes" becomes
+"kid friendly" rather than "easy kid friendly recipes". Tags are flat and
+lowercase per section 5.1.
+
+## The bookmarks parser lives in tools, not just in the app
+
+Section 8 lists two tools, and this adds a third, `tools/bulk-import/`. The
+bulk URL import is an app feature and stays one; what lives here is the Netscape
+bookmarks parser and an inventory built on it.
+
+The format is awkward (invalid HTML, missing closing tags, folders implied by
+nesting) and getting it wrong is silent: a mis-parsed folder stack quietly files
+recipes under the wrong tag. Writing it in Node first means it is tested
+exhaustively where tests are cheap, and Phase 4 ports known-good logic against
+the same fixture rather than starting from the spec.
+
+The inventory also answers a planning question that cannot wait for Phase 4: how
+many of the bookmarks sit on hosts without JSON-LD, which is what sizes the AI
+extraction work in Phase 4b.

@@ -19,12 +19,13 @@ Known gaps, found while building. Section 11 asks for this list to be kept.
       first and expect to adjust the candidate lists.
 - [ ] Preferences mapping in `normalizePreferences` is written against the
       preference names in section 1a, not against a real response.
-- [ ] Recipe images are referenced by URL, not downloaded. If Mealime's image
-      CDN goes down with the rest of the service, the URLs die too. Worth adding
-      an image download pass before the deadline.
-- [ ] Publish `tools/mealime-export/` to a public repository with the README as
-      written. Section 9, Phase 0a, asks for this so other Mealime users can run
-      it. The `mise` repository itself is private.
+- [x] Recipe images are now downloaded by `npm run images`, so the rescue does
+      not depend on Mealime's CDN outliving the service.
+- [x] The `mise` repository is public, so the export tool is already runnable by
+      any Mealime user. Section 9, Phase 0a.
+- [ ] Nothing announces the tool to Mealime users yet. A post in the places
+      section 12 mentions (Reddit, the Mealime support community) would need to
+      go up well before 2026-10-21 to be useful to anyone.
 
 ## Environment
 

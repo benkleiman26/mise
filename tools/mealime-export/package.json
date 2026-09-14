@@ -10,6 +10,7 @@
     "discover": "node src/cli.mjs discover",
     "export": "node src/cli.mjs export",
     "normalize": "node src/cli.mjs normalize",
+    "images": "node src/cli.mjs images",
     "test": "node --test"
   }
 }

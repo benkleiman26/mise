@@ -64,6 +64,27 @@ files before the shutdown and import them months later, so the reader has to be
 able to recognize an old file. Changes to a field's meaning bump the version
 rather than being made in place.
 
+## Images are downloaded, not just referenced
+
+The spec does not ask for this. The rescued JSON references images by URL on
+Mealime's servers, and those URLs stop working when the service does, so a
+rescue that keeps only links loses every photo on 2026-10-21.
+
+`npm run images` is a separate command rather than part of the export, because
+it is slow, it is the part most likely to be interrupted, and it should be
+resumable on its own. No auth header is sent when fetching images: they sit on
+third party hosts, including blogs a user imported from, and the Mealime token
+has no business going there.
+
+## The tool ships in the main repository rather than its own
+
+Section 9 asks for the export script to be public so other Mealime users can run
+it before the shutdown. The `mise` repository is public, so the script is
+already public at `tools/mealime-export/` and a second repository would be one
+more thing to keep in sync for no gain.
+
+If Mise later needs to go private, the tool moves out then.
+
 ## Dependencies
 
 None so far. The export tool is plain Node with the built in test runner, and

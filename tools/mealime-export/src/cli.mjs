@@ -14,6 +14,7 @@ import path from 'node:path';
 import { ReadOnlyClient } from './http.mjs';
 import { DEFAULT_BASE, probeCollections, resolveAuthScheme } from './discover.mjs';
 import { runExport } from './export.mjs';
+import { runImages } from './images.mjs';
 import { runNormalize } from './normalize.mjs';
 
 const USAGE = `
@@ -26,12 +27,15 @@ Commands:
   discover    Probe the API and report which endpoints answer. Safe to run first.
   export      Fetch everything and write it raw to <out>/raw.
   normalize   Reshape <out>/raw into the format the app importer reads. Offline.
+  images      Download the recipe images referenced by the export. Do this
+              before the shutdown: the image URLs die with the service.
 
 Options:
   --out <dir>      Output directory. Default ../../data/mealime
   --base <url>     API base. Default ${DEFAULT_BASE}
   --scheme <name>  Skip auth detection: bearer, token, x-auth-token, x-user-token, query
   --limit <n>      Stop after n recipe detail fetches. Use for a smoke test.
+  --concurrency <n>  Parallel image downloads. Default 4.
   --force          Re-fetch recipes already saved. Default is to resume.
   --include-mealime-content
                    Keep the full text of Mealime's own recipes in
@@ -61,6 +65,7 @@ async function main() {
       base: { type: 'string', default: DEFAULT_BASE },
       scheme: { type: 'string' },
       limit: { type: 'string' },
+      concurrency: { type: 'string' },
       force: { type: 'boolean', default: false },
       'include-mealime-content': { type: 'boolean', default: false },
       help: { type: 'boolean', default: false },
@@ -100,6 +105,15 @@ async function main() {
       console.log(`Writing to ${outDir}\n`);
       await runExport({ token, outDir, base: values.base, scheme: values.scheme, force: values.force, limit });
       console.log('\nNext: npm run normalize');
+      break;
+    }
+    case 'images': {
+      console.log(`Reading ${outDir}\n`);
+      await runImages({
+        outDir,
+        concurrency: values.concurrency ? Number(values.concurrency) : 4,
+        force: values.force,
+      });
       break;
     }
     case 'normalize': {

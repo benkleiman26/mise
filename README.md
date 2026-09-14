@@ -23,7 +23,7 @@ Full requirements live in the build spec, linked from `SPEC.md`. Decisions made 
 | `Mise/MiseTests` | XCTest target. |
 | `tools/mealime-export` | One time, read only export of the owner's Mealime data. |
 | `tools/nyt-export` | One time, read only export of the owner's NYT Cooking Recipe Box. |
-| `data/` | Rescued personal data. Git ignored by default. |
+| `data/` | Rescued personal data. Git ignored, never committed. |
 
 ## Status
 

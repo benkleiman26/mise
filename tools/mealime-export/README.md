@@ -36,8 +36,13 @@ Mealime's web app keeps your session token in the browser.
    `localStorage` for a similar key:
 
    ```js
-   Object.keys(localStorage).filter(k => /token|auth/i.test(k))
+   Object.keys(localStorage).filter(k => /token|auth|jwt|session/i.test(k))
    ```
+
+   Still nothing? Open the **Network** tab, reload the page, click any request
+   to `api.mealime.com`, and read the `Authorization` request header. That shows
+   both the token and the scheme the API expects, which is the most reliable
+   way to find it.
 
 4. Put it in your shell. Do not paste it into a file in this repository.
 
@@ -62,6 +67,9 @@ npm run export
 
 # 3. Turn the raw responses into the import file.
 npm run normalize
+
+# 4. Download the recipe photos. Do this before the shutdown.
+npm run images
 ```
 
 By default everything lands in `data/mealime/` at the repository root. Use
@@ -79,8 +87,15 @@ data/mealime/
   recipes/<id>.json       one file per recipe
   favorites.json          your favorited recipe ids
   manual_items.json       grocery items you added by hand
+  images/<id>/0.jpg       downloaded recipe photos
   raw/                    untouched API responses, kept on purpose
 ```
+
+Run `npm run images` before the shutdown. The export stores image URLs, and
+those URLs point at Mealime's servers, so they will almost certainly stop
+working when the service does. The download step saves the actual files and
+records their paths in `mealime-export.json`. It skips anything already on disk,
+so re-running it only retries what failed.
 
 `raw/` is the important one. The script saves every response exactly as the
 server sent it before interpreting any of it. If it turns out something was

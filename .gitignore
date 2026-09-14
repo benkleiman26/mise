@@ -1,0 +1,29 @@
+# macOS
+.DS_Store
+
+# Xcode
+xcuserdata/
+*.xcuserstate
+*.xcscmblueprint
+build/
+DerivedData/
+*.moved-aside
+*.hmap
+*.ipa
+*.dSYM.zip
+*.dSYM
+
+# Swift Package Manager
+.build/
+.swiftpm/
+
+# Node (tools/ and proxy/)
+node_modules/
+.env
+.env.local
+npm-debug.log*
+
+# Rescued personal data. Recipe exports and auth tokens stay off GitHub.
+# See tools/mealime-export/README.md.
+/data/**
+!/data/README.md

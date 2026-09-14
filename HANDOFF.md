@@ -1,5 +1,26 @@
 # Handoff: finish the Mealime rescue
 
+## How to start
+
+Repository: <https://github.com/benkleiman26/mise>, public. Clone it, or pull if
+you already have it:
+
+```sh
+git clone https://github.com/benkleiman26/mise && cd mise
+# or: cd ~/mise && git pull
+```
+
+Then give your agent this:
+
+> Read `HANDOFF.md` and finish the Mealime rescue. I am signed in to Mealime in
+> Chrome, so drive that session yourself over the DevTools protocol rather than
+> asking me to paste things into a console. The deadline is October 21, when
+> Mealime deletes everything. Ask me only if you are truly blocked.
+
+The rest of this file is the brief.
+
+---
+
 You are picking up a task that is blocked and has a hard external deadline. Read
 this whole file before touching anything. Everything here was learned the hard
 way; do not re-derive it.

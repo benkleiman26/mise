@@ -168,6 +168,29 @@
     return total;
   }
 
+  // The CDN sits behind S3 or CloudFront, which answers 403 rather than 404 for
+  // an object you cannot list. So a 403 means either "this id is not a recipe"
+  // or "this request was not credentialed the way the app credentials it", and
+  // the two are indistinguishable from the status alone. Try each credential
+  // mode before believing the id is bad.
+  const CREDENTIAL_MODES = ['omit', 'same-origin', 'include'];
+
+  async function fetchRecipe(id) {
+    let last = 'no attempt';
+    for (const credentials of CREDENTIAL_MODES) {
+      try {
+        const response = await fetch(`${CDN}/${id}.json`, { credentials });
+        if (response.ok) return await response.json();
+        last = `HTTP ${response.status} (${credentials})`;
+      } catch (error) {
+        // A cross origin fetch with credentials throws outright when the server
+        // does not allow them, which is a failure of this mode, not of the id.
+        last = `${error.message} (${credentials})`;
+      }
+    }
+    throw new Error(last);
+  }
+
   /** Fetches the recipes, a few at a time, and downloads one JSON file. */
   async function rescue({ concurrency = 5 } = {}) {
     const state = load();
@@ -189,9 +212,7 @@
         if (index >= ids.length) return;
         const id = ids[index];
         try {
-          const response = await fetch(`${CDN}/${id}.json`, { credentials: 'omit' });
-          if (!response.ok) throw new Error(`HTTP ${response.status}`);
-          recipes[id] = await response.json();
+          recipes[id] = await fetchRecipe(id);
         } catch (error) {
           failed.push({ id, error: String(error.message ?? error) });
         }
@@ -225,15 +246,58 @@
       `%cRescued ${dump.counts.fetched} recipes, ${failed.length} failed. Downloaded mealime-rescue.json`,
       'color: green; font-weight: bold'
     );
-    if (failed.length) console.log('Failures:', failed);
+    if (failed.length) {
+      console.log('Failures:', failed.slice(0, 20));
+      const allForbidden = failed.every((f) => /403/.test(f.error));
+      if (allForbidden && Object.keys(recipes).length === 0) {
+        console.warn(
+          'Everything came back 403 and nothing succeeded. That points at the collected ids ' +
+            'not being recipe ids, rather than a permissions problem. Run __mise.probe() to check ' +
+            'against a recipe you know exists.'
+        );
+      }
+    }
     // Many ids on a page are not recipes, so some failures are normal and mean
     // the id pointed at something else.
     return dump;
   }
 
+  /**
+   * Checks one id that is known to work against every credential mode, and says
+   * whether it is in the collected set. This is the fastest way to tell a
+   * permissions problem from a wrong ids problem.
+   */
+  async function probe(knownId) {
+    if (!knownId) {
+      console.warn('Pass a recipe uuid you have seen the app fetch, for example __mise.probe("d30ce24f-...")');
+      return null;
+    }
+    const results = {};
+    for (const credentials of CREDENTIAL_MODES) {
+      try {
+        const response = await fetch(`${CDN}/${knownId}.json`, { credentials });
+        results[credentials] = response.status;
+      } catch (error) {
+        results[credentials] = `threw: ${error.message}`;
+      }
+    }
+    const collected = Object.keys(load().ids);
+    const known = collected.includes(knownId.toLowerCase());
+    console.log('Status by credential mode:', results);
+    console.log(`That id ${known ? 'IS' : 'is NOT'} among the ${collected.length} ids collected.`);
+    if (!known) {
+      console.log(
+        'So the scan is picking up ids that are not recipes. The recipe uuids live somewhere ' +
+          'the scan is not looking yet. Send this output in.'
+      );
+    }
+    return { results, knownIdWasCollected: known, collectedCount: collected.length };
+  }
+
   window.__mise = {
     scan,
     crawl,
+    probe,
     rescue,
     status: () => {
       const state = load();

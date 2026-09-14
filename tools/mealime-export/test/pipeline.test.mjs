@@ -10,7 +10,7 @@ import { mkdtemp, mkdir, readFile, rm, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 
-import { runNormalize } from '../src/normalize.mjs';
+import { favoritesFromIndex, runNormalize } from '../src/normalize.mjs';
 
 // A recipe the user imported themselves: it has a source url and sits in their
 // own list, so its text is theirs and travels in full.
@@ -145,5 +145,49 @@ describe('normalize, end to end', () => {
     assert.equal(full.recipes.length, 2);
     assert.equal(full.withheld.length, 0);
     assert.equal(full.source.includesMealimeContent, true);
+  });
+});
+
+describe('favoritesFromIndex', () => {
+  test('reads favorites off the index, which is all the browser path has', () => {
+    assert.deepEqual(
+      favoritesFromIndex([
+        { id: 'a', roles: ['favorites'] },
+        { id: 'b', roles: ['userRecipes'] },
+        { id: 'c', roles: ['favorites', 'userRecipes'] },
+        { id: 'd' },
+      ]),
+      ['a', 'c']
+    );
+  });
+
+  test('copes with an empty or missing index', () => {
+    assert.deepEqual(favoritesFromIndex(), []);
+    assert.deepEqual(favoritesFromIndex([]), []);
+  });
+});
+
+describe('the browser rescue path', () => {
+  test('produces favorites even with no API collection files', async () => {
+    const dir = await mkdtemp(path.join(tmpdir(), 'browser-'));
+    const raw = path.join(dir, 'raw');
+    await writeJson(path.join(raw, 'recipes', 'fav-id.json'), {
+      uuid: 'fav-id',
+      name: 'A Mealime Recipe',
+      serving_count: 4,
+      line_items: [{ quantity: '1', ingredient_name: 'rice' }],
+      instructions: [{ primary_message: 'Cook it.' }],
+    });
+    await writeJson(path.join(raw, '_recipe_index.json'), [
+      { id: 'fav-id', roles: ['favorites'], summary: {} },
+    ]);
+
+    await runNormalize({ outDir: dir, log: () => {} });
+    const bundle = JSON.parse(await readFile(path.join(dir, 'mealime-export.json'), 'utf8'));
+
+    assert.equal(bundle.favorites.length, 1, 'the favorite should be listed');
+    assert.equal(bundle.favorites[0].mealime_id, 'fav-id');
+    assert.equal(bundle.withheld.length, 1, 'and its content should still be withheld');
+    await rm(dir, { recursive: true, force: true });
   });
 });

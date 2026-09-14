@@ -85,6 +85,29 @@ more thing to keep in sync for no gain.
 
 If Mise later needs to go private, the tool moves out then.
 
+## The rescue runs in the browser, because there is no API
+
+Section 5.7 says to pull the data from `api.mealime.com/api/v2` with an auth
+token. There is no such API. A capture of the web app's own network traffic on
+2026-09-14 showed three requests in total: one analytics beacon and two fetches
+of `cdn-recipes.mealime.com/<uuid>.json`, sent with no authentication headers.
+`my.mealime.com` is server rendered, so the recipe list is in the page HTML.
+
+So `browser/rescue.js` is the primary path: it harvests recipe ids from the
+pages the user visits, fetches each recipe from the CDN, and downloads one file.
+No token is needed anywhere, which also makes it far easier for a stranger to
+run before the shutdown.
+
+The Node code is unchanged in shape and still does the normalizing. The browser
+produces raw recipe JSON, `browser/convert.mjs` lays it out the way the API path
+would have, and `npm run normalize` runs exactly as before. Splitting rescue
+from normalize is what made this survivable: only the fetching had to be
+rewritten.
+
+The API client is kept rather than deleted. It costs nothing, it is tested, and
+if Mealime does have an internal API on another host it is a small edit to point
+at it.
+
 ## Dependencies
 
 None so far. The export tool is plain Node with the built in test runner, and

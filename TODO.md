@@ -14,12 +14,16 @@ Known gaps, found while building. Section 11 asks for this list to be kept.
 
 ## Mealime export
 
-- [ ] **The guessed routes are wrong.** A first run on 2026-09-14 returned 404
-      for all six identity candidates under all five auth schemes, so neither
-      `api.mealime.com/api/v2` nor those paths are right. `mealime.com` is not
-      reachable from the cloud build environment, so the real routes have to
-      come from a browser: run `browser/capture-api-calls.js` on my.mealime.com
-      and correct `IDENTITY_CANDIDATES` and `COLLECTION_CANDIDATES`.
+- [x] The guessed API routes were wrong because there is no API. The rescue now
+      runs in the browser against the recipe CDN. See DECISIONS.md.
+- [ ] **The rescue has not been run for real yet.** It is tested against stubbed
+      browser globals only. The CDN JSON shape is assumed to match section 1a
+      and has never been seen. Run it, then check `_normalize_report.json` for
+      warnings before the shutdown, while re-running is still possible.
+- [ ] Favorites and manual grocery items are inferred from which page a recipe
+      was seen on, plus captured page text. The page text is saved in the dump
+      but nothing parses it yet, so `manual_items.json` will be empty on the
+      browser path. Parse it once we have a real dump to look at.
 - [ ] Preferences mapping in `normalizePreferences` is written against the
       preference names in section 1a, not against a real response.
 - [x] Recipe images are now downloaded by `npm run images`, so the rescue does

@@ -1,8 +1,42 @@
-# Browser fallback
+# Browser rescue
 
-Two scripts here, for two different problems.
+This is the main path, not a fallback.
 
-## capture-api-calls.js, when discover finds nothing
+Mealime has no REST API. `my.mealime.com` is server rendered, so the recipe list
+lives in the page HTML, and recipe content comes from
+`cdn-recipes.mealime.com/<uuid>.json` with no authentication at all. Every route
+the Node client guessed at returned 404 because there was nothing there to find.
+
+So the rescue runs in the browser, with the session you already have.
+
+## rescue.js, the one to use
+
+1. Sign in at <https://my.mealime.com>.
+2. Open the console (Cmd+Option+J in Chrome) and paste
+   [`rescue.js`](rescue.js).
+3. Run `__mise.scan()`.
+4. Go to your other list pages: meal plan, favorites, Your Recipes, grocery
+   list. Paste the script again on each and run `__mise.scan()`. Collected ids
+   survive navigation in that tab.
+5. Run `__mise.rescue()`. It fetches every recipe and downloads
+   `mealime-rescue.json`.
+6. Back in a terminal:
+
+   ```sh
+   node browser/convert.mjs --in ~/Downloads/mealime-rescue.json
+   npm run normalize
+   npm run images
+   ```
+
+`__mise.status()` shows what has been collected so far. `__mise.reset()` clears
+it and starts over.
+
+Which page a recipe was found on is recorded, so recipes seen on your favorites
+page come through as favorites.
+
+## The other two scripts
+
+### capture-api-calls.js, for inspecting what the site does
 
 If `npm run discover` returns 404 for every route, the paths it tries are wrong.
 They are guesses: Mealime's API is not documented, so the script probes for it.
@@ -25,7 +59,7 @@ in order to authenticate the same way the web app does.
 Send that in, or use it to fix `IDENTITY_CANDIDATES` and `COLLECTION_CANDIDATES`
 in `../src/discover.mjs` yourself.
 
-## collect-localstorage.js, when the API is a dead end
+### collect-localstorage.js, if the CDN path fails
 
 Use this if the API cannot be made to work at all.
 

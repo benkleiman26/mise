@@ -381,8 +381,15 @@ export async function runNormalize({ outDir, includeMealimeContent = false, log 
     }
   }
 
+  // The API path learns favorites from a favorites collection response. The
+  // browser path has no API to ask, so it records which page each recipe was
+  // seen on instead, and the roles in the index carry the same information.
   const favoritePages = collections.filter((c) => c.file.startsWith('favorites.')).map((c) => c.body);
   const favoriteIds = extractFavoriteIds(favoritePages, recipeId);
+  const fromIndex = favoritesFromIndex(index);
+  for (const id of fromIndex) {
+    if (!favoriteIds.includes(id)) favoriteIds.push(id);
+  }
   await writeJson(path.join(outDir, 'favorites.json'), favoriteIds);
 
   const groceryPages = collections.filter((c) => c.file.startsWith('groceryLists.')).map((c) => c.body);
@@ -415,6 +422,11 @@ export async function runNormalize({ outDir, includeMealimeContent = false, log 
   }
   if (withWarnings > 0) log('See _normalize_report.json. Fix and re-run, no re-fetch needed.');
   return { report, bundle };
+}
+
+/** Reads favorite ids out of the recipe index, used by the browser path. */
+export function favoritesFromIndex(index = []) {
+  return index.filter((entry) => (entry.roles ?? []).includes('favorites')).map((entry) => String(entry.id));
 }
 
 async function readJsonIfPresent(file, fallback) {

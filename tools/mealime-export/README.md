@@ -3,8 +3,17 @@
 Export your own Mealime data before it is deleted.
 
 Mealime shuts down on **October 21, 2026**, and all account data goes with it.
-This script copies your recipes, favorites, manual grocery items, and eating
+This copies your recipes, favorites, manual grocery items, and eating
 preferences out of your account and onto your own disk, as JSON.
+
+**Start with the browser rescue.** Mealime has no REST API to call. The web app
+is server rendered, and recipe content is served as plain JSON from
+`cdn-recipes.mealime.com` with no authentication, so the rescue runs in your
+browser using the session you already have. No token, no setup.
+
+See [`browser/rescue.js`](browser/rescue.js), then come back here for step 3
+onward. The rest of this README covers the API path, which is kept for the case
+where Mealime turns one on, and is currently not expected to work.
 
 It is read only. It only ever issues GET requests, only to mealime.com, and it
 cannot change or delete anything in your account. Both guards are enforced in

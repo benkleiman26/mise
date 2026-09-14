@@ -9,9 +9,9 @@
 // How to use:
 //   1. Sign in at https://my.mealime.com.
 //   2. Paste this file into the console (Cmd+Option+J in Chrome).
-//   3. Run __mise.scan() on each page that lists recipes: your meal plan, your
-//      favorites, Your Recipes, and the grocery list. Re-paste after each
-//      navigation, the collected ids survive in sessionStorage.
+//   3. Run __mise.crawl(). The site is server rendered, so it fetches your other
+//      pages itself and reads the ids out of their HTML. No navigating, no
+//      re-pasting. Use __mise.scan() by hand for a page the crawl missed.
 //   4. Run __mise.rescue(). It fetches every recipe and downloads one file.
 //   5. Convert and normalize it:
 //        node browser/convert.mjs --in ~/Downloads/mealime-rescue.json
@@ -82,6 +82,92 @@
     return total;
   }
 
+  // Links that might change something. A crawl only issues GETs, but a GET to
+  // a sign out or delete route still does damage, so never follow these.
+  const UNSAFE_LINK = /(sign[_-]?out|log[_-]?out|delete|destroy|remove|cancel|unsubscribe|reset|clear|checkout|purchase|subscri)/i;
+
+  /** Same origin page links from a document, minus anything risky. */
+  function linksFrom(html, base) {
+    const doc = new DOMParser().parseFromString(html, 'text/html');
+    const out = new Set();
+    for (const anchor of doc.querySelectorAll('a[href]')) {
+      let url;
+      try {
+        url = new URL(anchor.getAttribute('href'), base);
+      } catch {
+        continue;
+      }
+      if (url.origin !== location.origin) continue;
+      if (UNSAFE_LINK.test(url.pathname + url.search)) continue;
+      if (/\.(png|jpe?g|gif|webp|svg|pdf|css|js)$/i.test(url.pathname)) continue;
+      out.add(url.pathname + url.search);
+    }
+    return [...out];
+  }
+
+  /**
+   * Walks the site's own pages and harvests recipe ids from each one.
+   *
+   * my.mealime.com renders its lists into the HTML, so fetching a page with the
+   * session cookie gives the same ids that visiting it would, without making
+   * anyone click through and re-paste this script on every screen.
+   */
+  async function crawl({ maxPages = 60, concurrency = 4 } = {}) {
+    const state = load();
+    const queue = linksFrom(document.documentElement.innerHTML, location.href);
+    const seen = new Set([location.pathname]);
+    let visited = 0;
+
+    const add = (id, source) => {
+      const key = id.toLowerCase();
+      state.ids[key] = state.ids[key] ?? { sources: [] };
+      if (!state.ids[key].sources.includes(source)) state.ids[key].sources.push(source);
+    };
+
+    console.log(`Crawling up to ${maxPages} pages from ${queue.length} links`);
+    while (queue.length > 0 && visited < maxPages) {
+      const batch = [];
+      while (batch.length < concurrency && queue.length > 0 && visited + batch.length < maxPages) {
+        const next = queue.shift();
+        if (seen.has(next)) continue;
+        seen.add(next);
+        batch.push(next);
+      }
+      if (batch.length === 0) break;
+
+      await Promise.all(
+        batch.map(async (pathAndQuery) => {
+          try {
+            const response = await fetch(pathAndQuery, { credentials: 'include' });
+            if (!response.ok) return;
+            const html = await response.text();
+            const before = Object.keys(state.ids).length;
+            for (const match of html.matchAll(UUID)) add(match[0], pathAndQuery);
+            const found = Object.keys(state.ids).length - before;
+            state.pages[pathAndQuery] = { url: pathAndQuery, title: '', text: '', crawled: true };
+            if (found > 0) console.log(`  ${pathAndQuery}: ${found} new`);
+            // Only follow deeper from pages that actually held recipes.
+            if (found > 0) for (const link of linksFrom(html, location.origin + pathAndQuery)) {
+              if (!seen.has(link)) queue.push(link);
+            }
+          } catch (error) {
+            console.warn(`  ${pathAndQuery}: ${error.message}`);
+          }
+        })
+      );
+      visited += batch.length;
+      save(state);
+    }
+
+    const total = Object.keys(state.ids).length;
+    console.log(
+      `%cCrawled ${visited} pages. ${total} recipe ids total.`,
+      'color: green; font-weight: bold'
+    );
+    console.log('Run __mise.rescue() to download them.');
+    return total;
+  }
+
   /** Fetches the recipes, a few at a time, and downloads one JSON file. */
   async function rescue({ concurrency = 5 } = {}) {
     const state = load();
@@ -147,6 +233,7 @@
 
   window.__mise = {
     scan,
+    crawl,
     rescue,
     status: () => {
       const state = load();
@@ -162,7 +249,7 @@
   console.log(
     '%cMise rescue loaded.',
     'color: green; font-weight: bold',
-    '\nRun __mise.scan() here, visit your other recipe list pages and scan each one,',
-    '\nthen run __mise.rescue() to download everything.'
+    '\nRun __mise.crawl() to walk your pages automatically, then __mise.rescue() to download.',
+    '\nIf you navigate, this script is gone and you paste it again. Collected ids survive.'
   );
 })();

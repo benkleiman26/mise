@@ -20,6 +20,9 @@ Known gaps, found while building. Section 11 asks for this list to be kept.
       browser globals only. The CDN JSON shape is assumed to match section 1a
       and has never been seen. Run it, then check `_normalize_report.json` for
       warnings before the shutdown, while re-running is still possible.
+- [ ] The crawl follows one level deeper only from pages that held recipe ids.
+      If a list page is paginated behind a link that holds none itself, that
+      branch is missed. Check the page count it reports against the site.
 - [ ] Favorites and manual grocery items are inferred from which page a recipe
       was seen on, plus captured page text. The page text is saved in the dump
       but nothing parses it yet, so `manual_items.json` will be empty on the

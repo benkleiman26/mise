@@ -14,13 +14,12 @@ So the rescue runs in the browser, with the session you already have.
 1. Sign in at <https://my.mealime.com>.
 2. Open the console (Cmd+Option+J in Chrome) and paste
    [`rescue.js`](rescue.js).
-3. Run `__mise.scan()`.
-4. Go to your other list pages: meal plan, favorites, Your Recipes, grocery
-   list. Paste the script again on each and run `__mise.scan()`. Collected ids
-   survive navigation in that tab.
-5. Run `__mise.rescue()`. It fetches every recipe and downloads
+3. Run `__mise.crawl()`. The site renders its lists into the page HTML, so the
+   script fetches your other pages itself and reads the ids out of them. No
+   navigating and no re-pasting.
+4. Run `__mise.rescue()`. It fetches every recipe and downloads
    `mealime-rescue.json`.
-6. Back in a terminal:
+5. Back in a terminal:
 
    ```sh
    node browser/convert.mjs --in ~/Downloads/mealime-rescue.json
@@ -30,6 +29,16 @@ So the rescue runs in the browser, with the session you already have.
 
 `__mise.status()` shows what has been collected so far. `__mise.reset()` clears
 it and starts over.
+
+Navigating away unloads the script, and `__mise` goes with it. Paste it again to
+get the commands back: the collected ids live in sessionStorage and survive.
+
+`__mise.scan()` reads only the page in front of you, for anything the crawl
+missed. Scroll to the bottom first so lazily loaded content is in the DOM.
+
+The crawl issues GETs only, stays on my.mealime.com, and skips any link that
+looks like it changes something (sign out, delete, cancel, and similar), since a
+GET to one of those still does damage.
 
 Which page a recipe was found on is recorded, so recipes seen on your favorites
 page come through as favorites.

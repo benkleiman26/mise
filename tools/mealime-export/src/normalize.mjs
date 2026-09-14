@@ -41,7 +41,7 @@ export function collectImages(raw) {
       for (const nested of Object.values(value)) push(nested);
     }
   };
-  for (const key of ['image_url', 'image', 'images', 'photo_url', 'photos', 'hero_image', 'image_urls']) {
+  for (const key of ['image_url', 'image', 'images', 'photo_url', 'photos', 'hero_image', 'image_urls', 'presentation_image_url', 'thumbnail_image_url']) {
     push(raw?.[key]);
   }
   return out;
@@ -152,6 +152,7 @@ export function extractManualItems(groceryListPages) {
       node.is_manual === true ||
       node.custom === true ||
       node.user_added === true ||
+      node.is_user_created === true ||
       node.recipe_id === null ||
       (Array.isArray(node.recipe_ids) && node.recipe_ids.length === 0);
     const name = pick(node, ['name', 'display_name', 'ingredient_name', 'title', 'item_name']);
@@ -170,6 +171,89 @@ export function extractManualItems(groceryListPages) {
   };
   visit(groceryListPages);
   return [...seen.values()].sort((a, b) => a.name.localeCompare(b.name));
+}
+
+/**
+ * Maps one of the user's own recipes (the "Your Recipes" list) onto the same
+ * shape. These arrive from the account object with a prose body instead of
+ * steps and ingredient lines as plain strings. The body is split on blank
+ * lines into steps, which is how the source sites wrote them; single newlines
+ * inside a paragraph are kept.
+ */
+export function splitBodyIntoSteps(body) {
+  if (typeof body !== 'string') return [];
+  return body
+    .split(/\n\s*\n/)
+    .map((p) => p.trim())
+    .filter(Boolean)
+    .map((text, index) => ({ position: index + 1, primary_message: text, secondary_message: '' }));
+}
+
+export function normalizeUserRecipe(raw, { id } = {}) {
+  const warnings = [];
+  const recipe = {
+    mealime_id: id ?? raw?.uid ?? null,
+    name: pick(raw, ['name', 'title'], ''),
+    serving_count: toInt(pick(raw, ['base_servings', 'serving_count', 'servings'])),
+    cooking_minutes: toInt(pick(raw, ['cooking_minutes', 'total_minutes'])),
+    units: 'us',
+    images: collectImages(raw),
+    cookwares: [],
+    line_items: normalizeLineItems({ ingredients: Array.isArray(raw?.ingredients) ? raw.ingredients : [] }),
+    instructions: splitBodyIntoSteps(raw?.body),
+    nutrition: null,
+    source_url: pick(raw, ['import_url', 'source_url', 'url'], null),
+    is_deleted: raw?.is_deleted === true,
+    user_recipe: true,
+  };
+  if (!recipe.name) warnings.push('missing name');
+  if (recipe.line_items.length === 0) warnings.push('no ingredients');
+  if (recipe.instructions.length === 0) warnings.push('no instructions');
+  if (recipe.is_deleted) warnings.push('deleted in Mealime, kept for the owner to decide');
+  return { recipe, warnings };
+}
+
+/**
+ * The user's own collections ("Noodles", "Soups") reference user recipes by
+ * uid. They become Mise collections one for one.
+ */
+export function normalizeCollections(account) {
+  return (account?.collections ?? [])
+    .filter((c) => c && !c.is_deleted)
+    .map((c) => ({
+      name: c.name,
+      created_at: c.created_at ?? null,
+      recipe_ids: (c.members ?? []).map((m) => m.user_recipe_uid ?? m.published_recipe_uuid ?? null).filter(Boolean),
+    }));
+}
+
+/**
+ * Cook history from every past meal plan. Published recipes are keyed by
+ * variant id here (the account object does not carry their uuid), so the
+ * favorites list, which has both, is used to translate where it can.
+ */
+export function normalizeHistory(account) {
+  const variantToUuid = new Map(
+    (account?.favourites ?? []).map((f) => [f.recipe_variant_id, f.published_recipe_uuid])
+  );
+  const counts = new Map();
+  const bump = (key, meal, planCreatedAt) => {
+    const entry = counts.get(key) ?? { recipe_id: key, planned: 0, cooked: 0, last_planned_at: null };
+    entry.planned += 1;
+    if (meal.is_cooked) entry.cooked += 1;
+    if (planCreatedAt && (!entry.last_planned_at || planCreatedAt > entry.last_planned_at)) entry.last_planned_at = planCreatedAt;
+    counts.set(key, entry);
+  };
+  for (const plan of account?.history ?? []) {
+    for (const meal of plan.meals ?? []) {
+      const key = variantToUuid.get(meal.variant_id) ?? `variant:${meal.variant_id}`;
+      bump(key, meal, plan.created_at ?? null);
+    }
+    for (const meal of plan.user_meals ?? []) {
+      if (meal.user_recipe_uid) bump(meal.user_recipe_uid, meal, plan.created_at ?? null);
+    }
+  }
+  return [...counts.values()].sort((a, b) => b.planned - a.planned);
 }
 
 /** Reads the recipe ids that the favorites collection referred to. */
@@ -282,6 +366,10 @@ export function buildBundle({
   favoriteIds = [],
   manualItems = [],
   preferences = null,
+  collections = [],
+  cookHistory = [],
+  recipeNotes = {},
+  recipeRatings = {},
   includeMealimeContent = false,
   method = 'api',
   toolVersion = '1.0.0',
@@ -321,7 +409,7 @@ export function buildBundle({
 
   return {
     format: 'mealime-export',
-    version: 1,
+    version: 2,
     exportedAt: now(),
     source: { tool: 'mealime-export', toolVersion, method, includesMealimeContent: includeMealimeContent },
     counts: {
@@ -329,12 +417,18 @@ export function buildBundle({
       withheldReferences: references.length,
       favorites: favorites.length,
       manualItems: manualItems.length,
+      collections: collections.length,
+      cookHistory: cookHistory.length,
     },
     preferences,
     favorites,
     recipes: out,
     withheld: references,
     manualItems,
+    collections,
+    cookHistory,
+    recipeNotes,
+    recipeRatings,
   };
 }
 
@@ -363,7 +457,13 @@ export async function runNormalize({ outDir, includeMealimeContent = false, log 
   const collections = await readJsonFiles(path.join(rawDir, 'collections'));
   const index = await readJsonIfPresent(path.join(rawDir, '_recipe_index.json'), []);
   const rawPreferences = await readJsonIfPresent(path.join(rawDir, 'preferences.json'), null);
-  const method = existsSync(path.join(rawDir, 'localstorage-dump.json')) ? 'localstorage' : 'api';
+  const rawUserRecipes = await readJsonFiles(path.join(rawDir, 'user_recipes'));
+  const account = await readJsonIfPresent(path.join(rawDir, 'account.json'), null);
+  const method = existsSync(path.join(rawDir, 'localstorage-dump.json'))
+    ? 'localstorage'
+    : existsSync(path.join(rawDir, 'mealime-rescue.json'))
+      ? 'browser-rescue'
+      : 'api';
 
   const report = { normalizedAt: new Date().toISOString(), recipes: [], warningsByRecipe: {} };
   const normalized = [];
@@ -372,6 +472,18 @@ export async function runNormalize({ outDir, includeMealimeContent = false, log 
     // Detail responses are sometimes wrapped in an envelope.
     const source = body?.recipe ?? body?.data ?? body;
     const { recipe, warnings } = normalizeRecipe(source, { id });
+    await writeJson(path.join(outDir, 'recipes', file), recipe);
+    normalized.push(recipe);
+    report.recipes.push({ id, name: recipe.name, warnings });
+    if (warnings.length) {
+      report.warningsByRecipe[id] = warnings;
+      log(`  ${id}: ${warnings.join(', ')}`);
+    }
+  }
+
+  for (const { file, body } of rawUserRecipes) {
+    const id = decodeURIComponent(file.replace(/\.json$/, ''));
+    const { recipe, warnings } = normalizeUserRecipe(body, { id });
     await writeJson(path.join(outDir, 'recipes', file), recipe);
     normalized.push(recipe);
     report.recipes.push({ id, name: recipe.name, warnings });
@@ -397,12 +509,18 @@ export async function runNormalize({ outDir, includeMealimeContent = false, log 
   await writeJson(path.join(outDir, 'manual_items.json'), manualItems);
 
   const preferences = normalizePreferences(rawPreferences);
+  const userCollections = normalizeCollections(account);
+  const cookHistory = normalizeHistory(account);
   const bundle = buildBundle({
     recipes: normalized,
     index,
     favoriteIds,
     manualItems,
     preferences,
+    collections: userCollections,
+    cookHistory,
+    recipeNotes: account?.recipe_notes ?? {},
+    recipeRatings: account?.recipe_ratings ?? {},
     includeMealimeContent,
     method,
   });
@@ -412,7 +530,7 @@ export async function runNormalize({ outDir, includeMealimeContent = false, log 
   const withWarnings = report.recipes.filter((r) => r.warnings.length).length;
   log('');
   log(`Normalized ${report.recipes.length} recipes, ${withWarnings} with warnings.`);
-  log(`Favorites: ${favoriteIds.length}. Manual grocery items: ${manualItems.length}.`);
+  log(`Favorites: ${favoriteIds.length}. Manual grocery items: ${manualItems.length}. Collections: ${userCollections.length}. History entries: ${cookHistory.length}.`);
   log(`Wrote mealime-export.json with ${bundle.counts.recipes} recipes in full.`);
   if (bundle.counts.withheldReferences > 0) {
     log(

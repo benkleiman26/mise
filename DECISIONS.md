@@ -112,3 +112,41 @@ at it.
 
 None so far. The export tool is plain Node with the built in test runner, and
 Node 20 is the only requirement.
+
+## The rescue reads the web app's state instead of scraping pages
+
+The earlier browser rescue scraped every uuid out of page HTML and got 295 of
+them, then hit 403 on all of them. The uuids were not recipes. S3 answers 403,
+not 404, for keys it will not list, so the wall looked like an auth problem
+and was really a wrong-id problem.
+
+The web app is a React app that loads the entire account with one call
+(`api/v2/get_user`, so there is an API, just not one worth probing) and keeps
+the result in component state. `browser/rescue-state.js` walks the React tree,
+takes that object, strips the secrets, and fetches the 54 favourites from
+`cdn-recipes.mealime.com` by their `published_recipe_uuid`, all of which
+answered 200 with no credentials. The user's own 159 recipes are inline in
+the account object, so they need no fetch at all.
+
+This is fragile in the way any dependence on React internals is, and Mealime
+will not change its bundle again before it shuts down, so that is acceptable.
+
+## Images are rescued through the browser, as a zip
+
+`cdn-uploads.mealime.com` refuses everything that is not the owner's browser
+(403 from the cloud, connection refused from the laptop VM) and sends no CORS
+headers, so pages on my.mealime.com cannot fetch it either. A tab opened on
+that origin can fetch same-origin, so `browser/rescue-images.js` runs there,
+packs the files into a stored zip written by hand (no third party script
+loaded into the page), and `images --from-zip` feeds that zip to the same
+download code through its `fetchImpl` hook. Chrome only honors a download
+from a non-HTML document on a real click, which is why the script draws a
+button instead of clicking for you.
+
+## Preferences are decoded from observed ids
+
+The account's profile stores `recipe_type_id: 4` and `dislike_ids: [10]`; the
+lookup tables live only in the app bundle. The settings page for this account
+showed Pescetarian, olives, 4 servings, US units on 2026-09-14, so
+`convert.mjs` carries exactly those id to name pairs and leaves any other id
+labeled as an id rather than guessing.

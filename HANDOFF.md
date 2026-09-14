@@ -1,3 +1,38 @@
+# Handoff: the Mealime rescue is done
+
+Completed 2026-09-14. Kept for the record; the brief below is what the work
+started from and is out of date in the places noted here.
+
+## What the 403 actually was
+
+Hypothesis 2. The 295 uuids scraped from page HTML were mostly not recipes, and
+S3 answers 403 rather than 404 for keys it will not list. Real recipe uuids
+fetch fine with no credentials.
+
+The web app keeps the whole account in React state, loaded by a single
+`api/v2/get_user` call. Reading that object gave the 54 favourites (with their
+`published_recipe_uuid`), the 159 recipes the owner imported (inline, full
+text), collections, manual grocery items, preferences, notes, ratings, and 300
+plans of history. See `browser/rescue-state.js` and DECISIONS.md.
+
+## What changed
+
+- `browser/rescue-state.js`: the rescue that works.
+- `browser/rescue-images.js` and `src/zipfetch.mjs`: photos come out through a
+  tab on the image host as one zip, then `images --from-zip`.
+- `browser/convert.mjs` and `src/normalize.mjs`: handle the version 2 dump,
+  own recipes, collections, history, preferences.
+- 83 tests pass.
+
+## Final counts
+
+213 recipes in `data/mealime/mealime-export.json` (54 favourites, 159 own, 13 of
+those flagged deleted), 54 favourites, 14 manual items, 8 collections, 259
+history entries, 424 images in `data/mealime/images/`. Three own recipes have no
+instructions because they had none in Mealime.
+
+---
+
 # Handoff: finish the Mealime rescue
 
 ## How to start

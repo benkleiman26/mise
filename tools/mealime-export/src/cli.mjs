@@ -14,7 +14,8 @@ import path from 'node:path';
 import { ReadOnlyClient } from './http.mjs';
 import { DEFAULT_BASE, probeCollections, resolveAuthScheme } from './discover.mjs';
 import { runExport } from './export.mjs';
-import { runImages } from './images.mjs';
+import { imageTargets, runImages } from './images.mjs';
+import { fetchFromZip } from './zipfetch.mjs';
 import { runNormalize } from './normalize.mjs';
 
 const USAGE = `
@@ -29,6 +30,8 @@ Commands:
   normalize   Reshape <out>/raw into the format the app importer reads. Offline.
   images      Download the recipe images referenced by the export. Do this
               before the shutdown: the image URLs die with the service.
+  image-paths Print the image paths as JSON for browser/rescue-images.js,
+              since the image host only answers the owner's browser.
 
 Options:
   --out <dir>      Output directory. Default ../../data/mealime
@@ -37,6 +40,9 @@ Options:
   --limit <n>      Stop after n recipe detail fetches. Use for a smoke test.
   --concurrency <n>  Parallel image downloads. Default 4.
   --force          Re-fetch recipes already saved. Default is to resume.
+  --from-zip <file>  For images: read them from a zip the browser built
+                   (see browser/README.md) instead of the network, which
+                   refuses anything that is not the owner's browser.
   --include-mealime-content
                    Keep the full text of Mealime's own recipes in
                    mealime-export.json. Only for your own private copy. The
@@ -85,6 +91,7 @@ async function main() {
       concurrency: { type: 'string' },
       force: { type: 'boolean', default: false },
       'include-mealime-content': { type: 'boolean', default: false },
+      'from-zip': { type: 'string' },
       help: { type: 'boolean', default: false },
     },
   });
@@ -125,11 +132,21 @@ async function main() {
     }
     case 'images': {
       console.log(`Reading ${outDir}\n`);
+      const fetchImpl = values['from-zip'] ? await fetchFromZip(values['from-zip']) : fetch;
+      if (values['from-zip']) console.log(`Reading images from ${values['from-zip']} instead of the network\n`);
       await runImages({
         outDir,
         concurrency: values.concurrency ? Number(values.concurrency) : 4,
         force: values.force,
+        fetchImpl,
       });
+      break;
+    }
+    case 'image-paths': {
+      const { readFile } = await import('node:fs/promises');
+      const bundle = JSON.parse(await readFile(path.join(outDir, 'mealime-export.json'), 'utf8'));
+      const paths = [...new Set(imageTargets([...bundle.recipes, ...bundle.withheld]).map((t) => new URL(t.url).pathname.replace(/^\/uploads\//, '')))];
+      console.log(JSON.stringify(paths));
       break;
     }
     case 'normalize': {

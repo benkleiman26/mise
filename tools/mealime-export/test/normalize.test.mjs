@@ -2,6 +2,10 @@ import { strict as assert } from 'node:assert';
 import { test, describe } from 'node:test';
 
 import {
+  normalizeUserRecipe,
+  splitBodyIntoSteps,
+  normalizeCollections,
+  normalizeHistory,
   collectImages,
   extractFavoriteIds,
   extractManualItems,
@@ -216,7 +220,9 @@ describe('buildBundle', () => {
   test('declares a stable format and version', () => {
     const bundle = buildBundle({});
     assert.equal(bundle.format, 'mealime-export');
-    assert.equal(bundle.version, 1);
+    assert.equal(bundle.version, 2);
+    assert.deepEqual(bundle.collections, []);
+    assert.deepEqual(bundle.cookHistory, []);
   });
 });
 
@@ -248,5 +254,89 @@ describe('normalizePreferences', () => {
 
   test('returns null when there are no preferences to map', () => {
     assert.equal(normalizePreferences(null), null);
+  });
+});
+
+describe('user recipes from the account object', () => {
+  const raw = {
+    uid: 'u-1',
+    name: 'Spicy Rice Noodles',
+    body: 'Heat the oven.\n\nCut the tofu into cubes\nand toss.\n\nBake.',
+    ingredients: ['12 ounces firm tofu', '2 teaspoons sesame oil'],
+    is_deleted: false,
+    import_url: 'https://cooking.nytimes.com/recipes/1019461-spicy',
+    thumbnail_image_url: 'https://cdn-uploads.mealime.com/t.jpg',
+    presentation_image_url: 'https://cdn-uploads.mealime.com/p.jpg',
+    base_servings: 4,
+  };
+
+  test('splits the prose body on blank lines and keeps single newlines', () => {
+    const steps = splitBodyIntoSteps(raw.body);
+    assert.equal(steps.length, 3);
+    assert.equal(steps[1].primary_message, 'Cut the tofu into cubes\nand toss.');
+    assert.equal(steps[2].position, 3);
+  });
+
+  test('maps onto the shared recipe shape with the import url as source', () => {
+    const { recipe, warnings } = normalizeUserRecipe(raw, { id: 'u-1' });
+    assert.equal(recipe.mealime_id, 'u-1');
+    assert.equal(recipe.source_url, raw.import_url);
+    assert.equal(recipe.serving_count, 4);
+    assert.equal(recipe.line_items.length, 2);
+    assert.equal(recipe.line_items[0].raw, '12 ounces firm tofu');
+    assert.deepEqual(recipe.images, [raw.presentation_image_url, raw.thumbnail_image_url]);
+    assert.equal(recipe.user_recipe, true);
+    assert.deepEqual(warnings, []);
+  });
+
+  test('flags deleted recipes instead of dropping them', () => {
+    const { recipe, warnings } = normalizeUserRecipe({ ...raw, is_deleted: true });
+    assert.equal(recipe.is_deleted, true);
+    assert.ok(warnings.some((w) => /deleted/.test(w)));
+  });
+
+  test('user recipes classify as the user\'s own content', () => {
+    const { recipe } = normalizeUserRecipe(raw, { id: 'u-1' });
+    const { provenance, confidence } = classifyProvenance({ roles: ['userRecipes'], recipe });
+    assert.equal(provenance, 'userImported');
+    assert.equal(confidence, 'high');
+  });
+});
+
+describe('collections and history from the account object', () => {
+  const account = {
+    favourites: [{ id: 1, recipe_variant_id: 4307, published_recipe_uuid: 'pub-1' }],
+    collections: [
+      { id: 1, name: 'Noodles', is_deleted: false, created_at: 5, members: [{ type: 'user_recipe', user_recipe_uid: 'u-1' }] },
+      { id: 2, name: 'Old', is_deleted: true, members: [] },
+    ],
+    history: [
+      { id: 10, created_at: 100, meals: [{ id: 1, is_cooked: true, variant_id: 4307 }], user_meals: [{ id: 2, is_cooked: false, user_recipe_uid: 'u-1' }] },
+      { id: 11, created_at: 200, meals: [{ id: 3, is_cooked: false, variant_id: 4307 }, { id: 4, is_cooked: true, variant_id: 99 }], user_meals: [] },
+    ],
+  };
+
+  test('keeps live collections with their member ids', () => {
+    assert.deepEqual(normalizeCollections(account), [{ name: 'Noodles', created_at: 5, recipe_ids: ['u-1'] }]);
+  });
+
+  test('counts plans and cooks per recipe, translating variant ids through favorites', () => {
+    const history = normalizeHistory(account);
+    const pub = history.find((h) => h.recipe_id === 'pub-1');
+    assert.deepEqual(pub, { recipe_id: 'pub-1', planned: 2, cooked: 1, last_planned_at: 200 });
+    assert.ok(history.find((h) => h.recipe_id === 'variant:99'));
+    assert.ok(history.find((h) => h.recipe_id === 'u-1'));
+  });
+});
+
+describe('manual grocery items from the web app', () => {
+  test('recognizes is_user_created rows and keeps the section name as the aisle', () => {
+    const items = extractManualItems({
+      items: [
+        { ingredient_name: 'coke zero', quantity: '', is_user_created: true, section: 'Other', ingredient_id: null },
+        { ingredient_name: 'quinoa', quantity: '1 cup', is_user_created: false, section: 'Rice, Grains & Beans', ingredient_id: 5 },
+      ],
+    });
+    assert.deepEqual(items, [{ name: 'coke zero', quantity: '', aisle: 'Other' }]);
   });
 });

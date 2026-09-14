@@ -4,9 +4,8 @@ Known gaps, found while building. Section 11 asks for this list to be kept.
 
 ## Blocked on the owner
 
-- [ ] **Mealime auth token** so the export can actually run. Section 12, Phase
-      0a. This has a hard deadline of 2026-10-21. See
-      `tools/mealime-export/README.md` for how to copy it.
+- [x] Mealime rescue ran on 2026-09-14 from the owner's signed-in Chrome. No
+      token was needed. See DECISIONS.md.
 - [ ] **Chrome bookmarks export** (`bookmarks.html`) of the open recipe tabs, to
       keep in `data/`. Section 12, Phase 0a.
 - [ ] Bundle identifier and Apple Developer team ID. Section 12, Phase 0b.
@@ -16,19 +15,26 @@ Known gaps, found while building. Section 11 asks for this list to be kept.
 
 - [x] The guessed API routes were wrong because there is no API. The rescue now
       runs in the browser against the recipe CDN. See DECISIONS.md.
-- [ ] **The rescue has not been run for real yet.** It is tested against stubbed
-      browser globals only. The CDN JSON shape is assumed to match section 1a
-      and has never been seen. Run it, then check `_normalize_report.json` for
-      warnings before the shutdown, while re-running is still possible.
+- [x] The rescue ran for real: 54 favourites from the CDN, 159 own recipes from
+      the account object, 424 images. The CDN JSON shape matches section 1a.
+      `_normalize_report.json` has 15 warnings, 13 of them recipes the owner
+      had deleted in Mealime (kept, flagged `is_deleted`) and 3 own recipes
+      with no instructions (Pinto bean patties, Crunchy Roll Bowls, Cucumber
+      Sushi), which had none in Mealime either.
+- [ ] Two own recipes have a Google ad click URL as `source_url` instead of the
+      recipe page (Crisp Gnocchi With Brussels Sprouts and Brown Butter is
+      one). Nothing to recover; the app importer should treat a
+      googleadservices host as "no source".
+- [ ] Cook history for published recipes that were never favourited is keyed
+      `variant:<id>` because the account object does not carry their uuid.
+      Their content was not rescued and cannot be now; the counts are kept.
+- [ ] `rescue.js` and `collect-localstorage.js` are superseded by
+      `rescue-state.js` and could be removed once nobody else needs them.
 - [ ] The crawl follows one level deeper only from pages that held recipe ids.
       If a list page is paginated behind a link that holds none itself, that
       branch is missed. Check the page count it reports against the site.
-- [ ] Favorites and manual grocery items are inferred from which page a recipe
-      was seen on, plus captured page text. The page text is saved in the dump
-      but nothing parses it yet, so `manual_items.json` will be empty on the
-      browser path. Parse it once we have a real dump to look at.
-- [ ] Preferences mapping in `normalizePreferences` is written against the
-      preference names in section 1a, not against a real response.
+- [x] Favorites, manual grocery items (14), collections (8), notes, ratings, and
+      preferences all come straight from the account object now.
 - [x] Recipe images are now downloaded by `npm run images`, so the rescue does
       not depend on Mealime's CDN outliving the service.
 - [x] The `mise` repository is public, so the export tool is already runnable by

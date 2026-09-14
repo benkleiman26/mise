@@ -1,49 +1,52 @@
 # Browser rescue
 
-This is the main path, not a fallback.
+This is the main path, not a fallback. It ran for real on 2026-09-14.
 
-Mealime has no REST API. `my.mealime.com` is server rendered, so the recipe list
-lives in the page HTML, and recipe content comes from
-`cdn-recipes.mealime.com/<uuid>.json` with no authentication at all. Every route
-the Node client guessed at returned 404 because there was nothing there to find.
+## rescue-state.js, the one to use
 
-So the rescue runs in the browser, with the session you already have.
-
-## rescue.js, the one to use
+The web app loads your whole account into React state. This script reads it
+from there, strips the auth token, fetches your favourites from the recipe CDN,
+and downloads one file.
 
 1. Sign in at <https://my.mealime.com>.
 2. Open the console (Cmd+Option+J in Chrome) and paste
-   [`rescue.js`](rescue.js).
-3. Run `__mise.crawl()`. The site renders its lists into the page HTML, so the
-   script fetches your other pages itself and reads the ids out of them. No
-   navigating and no re-pasting.
-4. Run `__mise.rescue()`. It fetches every recipe and downloads
-   `mealime-rescue.json`.
-5. Back in a terminal:
+   [`rescue-state.js`](rescue-state.js).
+3. Run `__miseState.rescue()`. It downloads `mealime-rescue.json`.
+4. Back in a terminal:
 
    ```sh
    node browser/convert.mjs --in ~/Downloads/mealime-rescue.json
-   npm run normalize
-   npm run images
+   node src/cli.mjs normalize --include-mealime-content
    ```
 
-`__mise.status()` shows what has been collected so far. `__mise.reset()` clears
-it and starts over.
+That gets you every favourite (full Mealime recipe JSON), every recipe you
+imported yourself (full text, ingredients, source link), your collections,
+manual grocery items, preferences, notes, ratings, and cook history from every
+past plan.
 
-Navigating away unloads the script, and `__mise` goes with it. Paste it again to
-get the commands back: the collected ids live in sessionStorage and survive.
+## rescue-images.js, for the photos
 
-`__mise.scan()` reads only the page in front of you, for anything the crawl
-missed. Scroll to the bottom first so lazily loaded content is in the DOM.
+The photo host only answers your browser, so the photos come out through a tab
+on that host:
 
-The crawl issues GETs only, stays on my.mealime.com, and skips any link that
-looks like it changes something (sign out, delete, cancel, and similar), since a
-GET to one of those still does damage.
+1. `node src/cli.mjs image-paths > paths.json`
+2. Open any photo from the export in a tab, for example
+   <https://cdn-uploads.mealime.com/uploads/recipe/thumbnail/534/thumbnail_f57e494e-7e4c-435c-a3a4-a653dfdcd7a1.jpg>
+3. Paste [`rescue-images.js`](rescue-images.js) into the console, then
+   `__miseImages.rescue(<contents of paths.json>)`.
+4. Click the green button. It saves `mealime-images.zip`.
+5. `node src/cli.mjs images --from-zip ~/Downloads/mealime-images.zip`
 
-Which page a recipe was found on is recorded, so recipes seen on your favorites
-page come through as favorites.
+## The older scripts
 
-## The other two scripts
+`rescue.js` scraped uuids from page HTML. Most of what it found were not
+recipes, which is why the CDN answered 403 for all of them. It is kept for
+reference only. `collect-localstorage.js` still works as a slow fallback: the
+web app caches each recipe you open under `localStorage["mealime/recipes/<uuid>"]`.
+`capture-api-calls.js` records what the web app requests, which is how the
+`get_user` call was found.
+
+## Reference for the older scripts
 
 ### capture-api-calls.js, for inspecting what the site does
 

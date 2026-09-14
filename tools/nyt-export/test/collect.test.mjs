@@ -174,3 +174,25 @@ describe('rescue', () => {
     assert.deepEqual(dump.recipes[0].folders, ['Easy Kid-Friendly Recipes']);
   });
 });
+
+describe('Recently Viewed is never collected', () => {
+  test('scan refuses on a recently viewed page unless forced', async () => {
+    globalThis.__nyt.reset();
+    const saved = globalThis.location;
+    globalThis.location = {
+      origin: 'https://cooking.nytimes.com',
+      href: 'https://cooking.nytimes.com/recipe-box/recently-viewed',
+      pathname: '/recipe-box/recently-viewed',
+    };
+    globalThis.document = stubDom({ html: '<a href="/recipes/999-viewed-not-saved">x</a>' });
+
+    const afterRefusal = await globalThis.__nyt.scan({ scroll: false });
+    assert.equal(afterRefusal, 0, 'a page of merely viewed recipes must not be collected');
+
+    const afterForce = await globalThis.__nyt.scan({ scroll: false, force: true });
+    assert.equal(afterForce, 1, 'force should still allow it');
+
+    globalThis.location = saved;
+    globalThis.__nyt.reset();
+  });
+});

@@ -24,6 +24,7 @@ Full requirements live in the build spec, linked from `SPEC.md`. Decisions made 
 | `tools/mealime-export` | One time, read only export of the owner's Mealime data. |
 | `tools/nyt-export` | One time, read only export of the owner's NYT Cooking Recipe Box. |
 | `tools/bulk-import` | Bookmarks parsing and inventory, ahead of the in-app bulk URL import. |
+| `tools/resource-lint` | Validates the JSON in `Mise/Resources`, which nothing else checks without Xcode. |
 | `data/` | Rescued personal data. Git ignored, never committed. |
 
 ## Status
@@ -34,7 +35,12 @@ Phase 0a is done for Mealime: the rescue ran on 2026-09-14 and the data is in
 `tools/nyt-export` and `tools/bulk-import` are written and tested but have not
 been run against the real NYT Cooking site or a real bookmarks file yet.
 
-Phase 0b has not started. See `TODO.md`.
+Phase 0b has not started in Xcode. Everything in it that does not need a
+compiler is done: `Mise/Resources/canonical_items.json` (297 items, 71 staples)
+and `seed_recipes.json` (12 recipes), both validated by `tools/resource-lint`.
+`PHASE-0B.md` is the handoff for a Mac session.
+
+See `TODO.md`.
 
 ## Getting started
 

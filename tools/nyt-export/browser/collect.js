@@ -164,6 +164,11 @@
 
   const isCookedPage = (folder, url) => /cooked/i.test(`${folder} ${url}`);
 
+  // Recently Viewed lists recipes the user merely opened. Importing those would
+  // quietly fill the library with things they never chose to save, so it is
+  // excluded everywhere, both from the crawl and from a manual scan.
+  const NOT_SAVED = /recently[-_]?viewed|\/viewed\b/i;
+
   /** Scrolls to the bottom until the page stops growing, for lazy loaded lists. */
   async function autoScroll({ maxRounds = 40, pauseMs = 700 } = {}) {
     let previous = -1;
@@ -204,11 +209,21 @@
     if (report.counts.fromNextData + report.counts.fromDom + report.counts.fromHtml === 0) {
       console.warn('No recipes found on this page. Are you on your Recipe Box, and signed in?');
     }
+    if (NOT_SAVED.test(location.pathname)) {
+      console.warn('This page lists recipes you viewed rather than saved. It is excluded from collection.');
+    }
     return report;
   }
 
   /** Harvests the page you are on. */
-  async function scan({ scroll = true, folder = null, cooked = null } = {}) {
+  async function scan({ scroll = true, folder = null, cooked = null, force = false } = {}) {
+    if (!force && NOT_SAVED.test(location.pathname)) {
+      console.warn(
+        'This is Recently Viewed, which lists recipes you opened rather than saved. Skipping it. ' +
+          'Run __nyt.scan({ force: true }) if you really want them.'
+      );
+      return Object.keys(load().recipes).length;
+    }
     if (scroll) {
       console.log('Scrolling to load everything, this takes a moment');
       await autoScroll();
@@ -239,30 +254,41 @@
   }
 
   /** Follows the Recipe Box folder links and scans each one. */
-  async function crawl({ maxPages = 40 } = {}) {
+  async function crawl({ maxPages = 60 } = {}) {
     const state = load();
     const candidates = new Set();
-    for (const anchor of document.querySelectorAll('a[href]')) {
+    // Folder urls are numeric ids, so the only place the folder's real name
+    // appears is the text of the link pointing at it.
+    const folderNames = state.folderNames ?? {};
+
+    const consider = (anchor, base) => {
       const href = anchor.getAttribute('href');
-      if (!href) continue;
+      if (!href) return;
       let url;
       try {
-        url = new URL(href, location.href);
+        url = new URL(href, base);
       } catch {
-        continue;
+        return;
       }
-      if (url.origin !== ORIGIN) continue;
-      if (!/folder|recipe-box|collection|cooked/i.test(url.pathname + url.search)) continue;
+      if (url.origin !== ORIGIN) return;
+      if (!/folder|recipe-box|collection|cooked/i.test(url.pathname + url.search)) return;
+      if (NOT_SAVED.test(url.pathname + url.search)) return;
       // A GET should be safe here, but never follow anything that reads like a
       // change. Losing a folder is worse than missing one page.
-      if (/(sign[_-]?out|log[_-]?out|delete|remove|unsave|edit|new|create)/i.test(url.pathname + url.search)) continue;
+      if (/(sign[_-]?out|log[_-]?out|delete|remove|unsave|edit|new|create)/i.test(url.pathname + url.search)) return;
+      const label = (anchor.textContent ?? '').trim();
+      if (label && label.length < 80 && !folderNames[url.pathname]) folderNames[url.pathname] = label;
       candidates.add(url.toString());
-    }
+    };
+
+    for (const anchor of document.querySelectorAll('a[href]')) consider(anchor, location.href);
 
     console.log(`Found ${candidates.size} folder pages to fetch`);
     let visited = 0;
+    // candidates grows while we walk it, which a Set iterator handles.
     for (const pageUrl of candidates) {
       if (visited >= maxPages) break;
+      if (state.pages[pageUrl]?.fetched) continue;
       visited += 1;
       try {
         const response = await fetch(pageUrl, { credentials: 'include' });
@@ -273,16 +299,35 @@
         const html = await response.text();
         const doc = new DOMParser().parseFromString(html, 'text/html');
         const next = nextDataOf(doc);
-        const folder = folderOfPage(doc, pageUrl);
+        const pathOnly = new URL(pageUrl).pathname;
+        // A named link beats the url, which is often just a folder id.
+        const folder = folderNames[pathOnly] ?? folderOfPage(doc, pageUrl);
         const found = new Map([...fromHtml(html), ...(next ? fromJson(next) : new Map()), ...fromDom(doc)]);
         const added = absorb(state, found, { folder, pageUrl, cooked: isCookedPage(folder, pageUrl) });
         state.pages[pageUrl] = { folder, found: found.size, at: new Date().toISOString(), fetched: true };
         console.log(`  ${folder}: ${found.size} found, ${added} new`);
+
+        // The Recipe Box paginates with ?page=N, and later pages are only
+        // linked from earlier ones, so keep following them.
+        for (const anchor of doc.querySelectorAll('a[href]')) {
+          const href = anchor.getAttribute('href') ?? '';
+          if (!/[?&]page=\d+/.test(href)) continue;
+          try {
+            const next2 = new URL(href, pageUrl);
+            if (next2.origin === ORIGIN && !NOT_SAVED.test(next2.pathname + next2.search)) {
+              if (!folderNames[next2.pathname]) folderNames[next2.pathname] = folder;
+              candidates.add(next2.toString());
+            }
+          } catch {
+            // Skip a href we cannot parse.
+          }
+        }
       } catch (error) {
         console.warn(`  ${pageUrl}: ${error.message}`);
       }
       await sleep(400);
     }
+    state.folderNames = folderNames;
     save(state);
     const total = Object.keys(state.recipes).length;
     console.log(`%cCrawled ${visited} pages. ${total} recipes total.`, 'color: green; font-weight: bold');

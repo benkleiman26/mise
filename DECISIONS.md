@@ -191,3 +191,38 @@ the same fixture rather than starting from the spec.
 The inventory also answers a planning question that cannot wait for Phase 4: how
 many of the bookmarks sit on hosts without JSON-LD, which is what sizes the AI
 extraction work in Phase 4b.
+
+## Resource JSON is validated in Node, because nothing else can check it
+
+`Mise/Resources/canonical_items.json` and `seed_recipes.json` decide where every
+grocery item lands, and they fail quietly: a duplicate alias files an ingredient
+under the wrong aisle, an unknown unit stops a merge, and neither is a crash.
+
+There is no Swift toolchain in the cloud environment, so `tools/resource-lint`
+is the only check these files get before they reach a phone. It also encodes
+rules the app cannot easily assert, such as section 11's ban on em dashes and
+section 5.1's requirement that every seed ingredient links to a canonical item.
+
+That is a fourth tool directory, against section 8's two. The alternative was
+leaving the files unchecked until someone opened Xcode.
+
+## Canonical item names are lowercase and singular, and aliases are a shared namespace
+
+Names and aliases are validated as one namespace: no alias may repeat, and none
+may equal another item's name. Section 5.3 matches an ingredient by exact name,
+then alias, then fuzzy, so a string claimed by two items is ambiguous at exactly
+the step every merge depends on.
+
+The table has 297 items and 71 staples. Staples default to a pantry status of
+`have`, which is what keeps salt, olive oil and black pepper off every list, the
+first of Mealime's shortcomings listed in section 1a.
+
+## The seed library ships 12 recipes, not 40 to 60
+
+Section 5.1 asks for 40 to 60 and Phase 0b only asks for a loader that imports
+the file. Twelve is enough to exercise the loader, the scaling, and the list
+generator against real data, and the rest is Phase 1 content work.
+
+It matters less than it looks for the owner: his 213 rescued Mealime recipes are
+his library. The seed set is what a stranger sees on first launch, which is a
+section 0 concern and belongs with the rest of the public release work.

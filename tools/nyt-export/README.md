@@ -26,11 +26,20 @@ Box is added to, removed, or marked.
    __nyt.rescue()   // downloads nyt-recipe-box-raw.json
    ```
 
-Start with `probe()`. NYT's markup has not been observed directly by whoever
-wrote this script, so it tries three strategies (the Next.js hydration payload,
-the rendered DOM, and raw link matching) and `probe()` reports which ones find
-anything. **If all three return zero, do not guess: send the `probe()` output to
-whoever is building this.**
+Start with `probe()`. It reports which of three strategies found anything: the
+Next.js hydration payload, the rendered DOM, and raw link matching. As observed
+on 2026-09-14 the DOM and raw matching each found all 48 recipes on a page while
+the hydration payload found none, so the DOM is what actually carries the list.
+**If all three return zero, do not guess: send the `probe()` output to whoever is
+building this.**
+
+The Recipe Box paginates with `?page=2` and onward rather than scrolling
+forever, and folder urls are numeric ids such as `/recipe-box/38271228`, so the
+folder's real name is taken from the text of the link pointing at it.
+
+**Recently Viewed is never collected.** It lists recipes you opened rather than
+saved, and importing it would fill the library with things you never chose.
+`__nyt.scan({ force: true })` overrides that if you ever want them.
 
 `scan()` scrolls to the bottom and clicks any "load more" control until the page
 stops growing, which matters because the Recipe Box loads lazily. `crawl()`

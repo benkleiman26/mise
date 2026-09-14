@@ -162,3 +162,14 @@ describe('runConvert', () => {
     await rm(dir, { recursive: true, force: true });
   });
 });
+
+describe('folder names that are really ids or statuses', () => {
+  test('a numeric folder id never becomes a tag', () => {
+    assert.equal(folderToTag('38271228'), null);
+  });
+
+  test('recently viewed never becomes a tag', () => {
+    assert.equal(folderToTag('Recently Viewed'), null);
+    assert.equal(folderToTag('All'), null);
+  });
+});

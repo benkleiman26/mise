@@ -12,7 +12,18 @@ import path from 'node:path';
 export const RECIPE_URL = /^https:\/\/cooking\.nytimes\.com\/recipes?\/(\d+)(?:-([a-z0-9-]+))?/i;
 
 /** Folders that describe a status rather than a topic, so never become tags. */
-export const STATUS_FOLDERS = [/^cooked/i, /^recipe box$/i, /^my recipes?$/i, /^saved/i, /^all\b/i];
+export const STATUS_FOLDERS = [
+  /^cooked/i,
+  /^recipe box$/i,
+  /^my recipes?$/i,
+  /^saved/i,
+  /^all\b/i,
+  /^recently/i,
+  // A folder url is a numeric id, so a name that is only digits means the
+  // folder's real name was never captured. Better no tag than a tag called
+  // "38271228".
+  /^\d+$/,
+];
 
 /**
  * Turns a folder name into a tag. Spec section 5.1 wants tags flat and

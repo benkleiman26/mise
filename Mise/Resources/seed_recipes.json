@@ -1,0 +1,311 @@
+{
+  "format": "seed-recipes",
+  "version": 1,
+  "note": "Original starter recipes shipped with the app. Section 5.1 asks for 40 to 60; this is the first batch and the rest land in Phase 1. Every ingredient links to a canonical item so the grocery list works on first launch. Written for Mise, not copied from anywhere.",
+  "recipes": [
+    {
+      "id": "seed-sheet-pan-salmon",
+      "title": "Sheet Pan Salmon and Green Beans",
+      "summary": "Salmon and green beans roast together on one pan while the oven does the work.",
+      "sourceType": "builtIn",
+      "prepMinutes": 8, "cookMinutes": 16, "totalMinutes": 24, "baseServings": 4,
+      "tags": ["seafood", "sheet pan", "under 30", "kid friendly", "pescetarian"],
+      "cookware": ["sheet pan"],
+      "ingredients": [
+        { "name": "salmon fillet", "canonicalItem": "salmon", "quantity": 1.5, "unit": "lb" },
+        { "name": "green beans, trimmed", "canonicalItem": "green beans", "quantity": 1, "unit": "lb" },
+        { "name": "olive oil", "canonicalItem": "olive oil", "quantity": 3, "unit": "tbsp" },
+        { "name": "lemon", "canonicalItem": "lemon", "quantity": 1, "unit": "count" },
+        { "name": "garlic, minced", "canonicalItem": "garlic", "quantity": 2, "unit": "clove" },
+        { "name": "kosher salt", "canonicalItem": "kosher salt", "quantity": 1, "unit": "tsp" },
+        { "name": "black pepper", "canonicalItem": "black pepper", "quantity": 0.5, "unit": "tsp" }
+      ],
+      "steps": [
+        { "text": "Heat the oven to 425F and put a sheet pan inside while it heats.", "ingredientRefs": [] },
+        { "text": "Toss the green beans with half the oil, the garlic, and a big pinch of salt.", "ingredientRefs": ["green beans", "olive oil", "garlic", "kosher salt"] },
+        { "text": "Pat the salmon dry, rub it with the rest of the oil, and season it well.", "ingredientRefs": ["salmon", "olive oil", "kosher salt", "black pepper"] },
+        { "text": "Spread the beans on the hot pan, set the salmon on top, and roast until the fish flakes, about 12 to 14 minutes.", "ingredientRefs": ["salmon", "green beans"], "timerSeconds": 780 },
+        { "text": "Squeeze the lemon over everything before serving.", "ingredientRefs": ["lemon"] }
+      ]
+    },
+    {
+      "id": "seed-shrimp-tacos",
+      "title": "Fast Shrimp Tacos",
+      "summary": "Shrimp cook in four minutes, so dinner lands about as fast as the tortillas warm.",
+      "sourceType": "builtIn",
+      "prepMinutes": 12, "cookMinutes": 8, "totalMinutes": 20, "baseServings": 4,
+      "tags": ["seafood", "under 30", "kid friendly", "pescetarian", "mexican"],
+      "cookware": ["skillet"],
+      "ingredients": [
+        { "name": "shrimp, peeled", "canonicalItem": "shrimp", "quantity": 1, "unit": "lb" },
+        { "name": "corn tortillas", "canonicalItem": "corn tortillas", "quantity": 8, "unit": "count" },
+        { "name": "green cabbage, shredded", "canonicalItem": "cabbage", "quantity": 0.5, "unit": "count" },
+        { "name": "lime", "canonicalItem": "lime", "quantity": 2, "unit": "count" },
+        { "name": "mayonnaise", "canonicalItem": "mayonnaise", "quantity": 0.25, "unit": "cup" },
+        { "name": "sriracha", "canonicalItem": "sriracha", "quantity": 1, "unit": "tbsp" },
+        { "name": "cilantro", "canonicalItem": "cilantro", "quantity": 0.5, "unit": "bunch" },
+        { "name": "chili powder", "canonicalItem": "chili powder", "quantity": 1, "unit": "tsp" },
+        { "name": "olive oil", "canonicalItem": "olive oil", "quantity": 1, "unit": "tbsp" }
+      ],
+      "steps": [
+        { "text": "Stir the mayonnaise, sriracha, and the juice of one lime together. Thin it with a little water if it is stiff.", "ingredientRefs": ["mayonnaise", "sriracha", "lime"] },
+        { "text": "Toss the cabbage with the juice of the other lime and a pinch of salt. Let it sit while you cook.", "ingredientRefs": ["cabbage", "lime"] },
+        { "text": "Toss the shrimp with the oil and chili powder, then cook in a hot skillet until pink, about 2 minutes a side.", "ingredientRefs": ["shrimp", "olive oil", "chili powder"], "timerSeconds": 240 },
+        { "text": "Warm the tortillas, then build with shrimp, slaw, sauce, and plenty of cilantro.", "ingredientRefs": ["corn tortillas", "cilantro"] }
+      ]
+    },
+    {
+      "id": "seed-lemon-garlic-pasta",
+      "title": "Lemon Garlic Butter Pasta",
+      "summary": "Five pantry things and one pot. The pasta water does the saucing.",
+      "sourceType": "builtIn",
+      "prepMinutes": 5, "cookMinutes": 15, "totalMinutes": 20, "baseServings": 4,
+      "tags": ["pasta", "one pot", "under 30", "vegetarian", "kid friendly"],
+      "cookware": ["large pot", "colander"],
+      "ingredients": [
+        { "name": "spaghetti", "canonicalItem": "spaghetti", "quantity": 1, "unit": "lb" },
+        { "name": "butter", "canonicalItem": "butter", "quantity": 4, "unit": "tbsp" },
+        { "name": "garlic, thinly sliced", "canonicalItem": "garlic", "quantity": 4, "unit": "clove" },
+        { "name": "lemon", "canonicalItem": "lemon", "quantity": 1, "unit": "count" },
+        { "name": "parmesan, grated", "canonicalItem": "parmesan", "quantity": 2, "unit": "oz" },
+        { "name": "parsley, chopped", "canonicalItem": "parsley", "quantity": 0.25, "unit": "bunch" },
+        { "name": "red pepper flakes", "canonicalItem": "red pepper flakes", "quantity": 0.25, "unit": "tsp" }
+      ],
+      "steps": [
+        { "text": "Boil the pasta in well salted water. Save a mug of the water before you drain it.", "ingredientRefs": ["spaghetti"], "timerSeconds": 540 },
+        { "text": "Melt the butter with the garlic and pepper flakes over low heat until the garlic smells sweet, about 2 minutes. Do not let it brown.", "ingredientRefs": ["butter", "garlic", "red pepper flakes"], "timerSeconds": 120 },
+        { "text": "Add the drained pasta and a splash of the saved water, then toss hard until it turns glossy.", "ingredientRefs": ["spaghetti"] },
+        { "text": "Off the heat, add the parmesan, the zest and juice of the lemon, and the parsley.", "ingredientRefs": ["parmesan", "lemon", "parsley"] }
+      ]
+    },
+    {
+      "id": "seed-crispy-chickpea-bowls",
+      "title": "Crispy Chickpea Bowls",
+      "summary": "Chickpeas crisp in a skillet, then land on rice with a lemon yogurt sauce.",
+      "sourceType": "builtIn",
+      "prepMinutes": 10, "cookMinutes": 20, "totalMinutes": 30, "baseServings": 4,
+      "tags": ["vegetarian", "under 30", "pantry", "one pan"],
+      "cookware": ["skillet", "saucepan"],
+      "ingredients": [
+        { "name": "canned chickpeas, drained", "canonicalItem": "canned chickpeas", "quantity": 2, "unit": "can" },
+        { "name": "white rice", "canonicalItem": "white rice", "quantity": 1.5, "unit": "cup" },
+        { "name": "olive oil", "canonicalItem": "olive oil", "quantity": 3, "unit": "tbsp" },
+        { "name": "cumin", "canonicalItem": "cumin", "quantity": 1, "unit": "tsp" },
+        { "name": "smoked paprika", "canonicalItem": "smoked paprika", "quantity": 1, "unit": "tsp" },
+        { "name": "greek yogurt", "canonicalItem": "greek yogurt", "quantity": 1, "unit": "cup" },
+        { "name": "lemon", "canonicalItem": "lemon", "quantity": 1, "unit": "count" },
+        { "name": "cucumber, diced", "canonicalItem": "cucumber", "quantity": 1, "unit": "count" },
+        { "name": "kosher salt", "canonicalItem": "kosher salt", "quantity": 1, "unit": "tsp" }
+      ],
+      "steps": [
+        { "text": "Cook the rice.", "ingredientRefs": ["white rice"] },
+        { "text": "Dry the chickpeas well, then fry them in the oil over medium high heat until they crackle and brown, about 10 minutes.", "ingredientRefs": ["canned chickpeas", "olive oil"], "timerSeconds": 600 },
+        { "text": "Add the cumin and paprika to the pan and toss for 30 seconds.", "ingredientRefs": ["cumin", "smoked paprika"], "timerSeconds": 30 },
+        { "text": "Stir the yogurt with the lemon juice and a pinch of salt.", "ingredientRefs": ["greek yogurt", "lemon", "kosher salt"] },
+        { "text": "Build bowls with rice, chickpeas, cucumber, and the sauce spooned over.", "ingredientRefs": ["white rice", "canned chickpeas", "cucumber"] }
+      ]
+    },
+    {
+      "id": "seed-miso-butter-cod",
+      "title": "Miso Butter Cod",
+      "summary": "A miso butter melts over cod under the broiler. Four ingredients, eight minutes.",
+      "sourceType": "builtIn",
+      "prepMinutes": 5, "cookMinutes": 10, "totalMinutes": 15, "baseServings": 4,
+      "tags": ["seafood", "under 20", "pescetarian", "japanese"],
+      "cookware": ["sheet pan"],
+      "ingredients": [
+        { "name": "cod fillets", "canonicalItem": "cod", "quantity": 1.5, "unit": "lb" },
+        { "name": "miso paste", "canonicalItem": "miso paste", "quantity": 2, "unit": "tbsp" },
+        { "name": "butter, softened", "canonicalItem": "butter", "quantity": 3, "unit": "tbsp" },
+        { "name": "scallions, sliced", "canonicalItem": "scallions", "quantity": 3, "unit": "count" },
+        { "name": "jasmine rice", "canonicalItem": "jasmine rice", "quantity": 1.5, "unit": "cup" }
+      ],
+      "steps": [
+        { "text": "Start the rice and heat the broiler.", "ingredientRefs": ["jasmine rice"] },
+        { "text": "Mash the miso into the butter until smooth.", "ingredientRefs": ["miso paste", "butter"] },
+        { "text": "Set the cod on a lined pan, spread the miso butter over the top, and broil until it browns and flakes, 7 to 9 minutes.", "ingredientRefs": ["cod", "miso paste", "butter"], "timerSeconds": 480 },
+        { "text": "Scatter the scallions over and serve on the rice.", "ingredientRefs": ["scallions", "jasmine rice"] }
+      ]
+    },
+    {
+      "id": "seed-black-bean-quesadillas",
+      "title": "Black Bean Quesadillas",
+      "summary": "The one everyone eats. Crisp outside, molten inside, ready in fifteen.",
+      "sourceType": "builtIn",
+      "prepMinutes": 5, "cookMinutes": 10, "totalMinutes": 15, "baseServings": 4,
+      "tags": ["vegetarian", "under 20", "kid friendly", "pantry", "mexican"],
+      "cookware": ["skillet"],
+      "ingredients": [
+        { "name": "flour tortillas", "canonicalItem": "flour tortillas", "quantity": 8, "unit": "count" },
+        { "name": "canned black beans, drained", "canonicalItem": "canned black beans", "quantity": 2, "unit": "can" },
+        { "name": "shredded cheddar", "canonicalItem": "cheddar", "quantity": 8, "unit": "oz" },
+        { "name": "cumin", "canonicalItem": "cumin", "quantity": 1, "unit": "tsp" },
+        { "name": "salsa", "canonicalItem": "salsa", "quantity": 1, "unit": "cup" },
+        { "name": "olive oil", "canonicalItem": "olive oil", "quantity": 1, "unit": "tbsp" }
+      ],
+      "steps": [
+        { "text": "Mash half the beans with the cumin and a splash of water so they hold together.", "ingredientRefs": ["canned black beans", "cumin"] },
+        { "text": "Spread the mash on four tortillas, add the whole beans and the cheese, and top with the rest.", "ingredientRefs": ["flour tortillas", "canned black beans", "cheddar"] },
+        { "text": "Cook in a lightly oiled skillet over medium heat until golden and melted, about 3 minutes a side.", "ingredientRefs": ["olive oil"], "timerSeconds": 360 },
+        { "text": "Cut into wedges and serve with the salsa.", "ingredientRefs": ["salsa"] }
+      ]
+    },
+    {
+      "id": "seed-coconut-curry-lentils",
+      "title": "Coconut Curry Lentils",
+      "summary": "Red lentils collapse into a curry in twenty minutes with no soaking.",
+      "sourceType": "builtIn",
+      "prepMinutes": 8, "cookMinutes": 22, "totalMinutes": 30, "baseServings": 4,
+      "tags": ["vegetarian", "vegan", "one pot", "pantry", "indian"],
+      "cookware": ["large pot"],
+      "ingredients": [
+        { "name": "red lentils", "canonicalItem": "dried lentils", "quantity": 1.5, "unit": "cup" },
+        { "name": "coconut milk", "canonicalItem": "coconut milk", "quantity": 1, "unit": "can" },
+        { "name": "yellow onion, diced", "canonicalItem": "yellow onion", "quantity": 1, "unit": "count" },
+        { "name": "garlic, minced", "canonicalItem": "garlic", "quantity": 3, "unit": "clove" },
+        { "name": "ginger, grated", "canonicalItem": "ginger", "quantity": 1, "unit": "tbsp" },
+        { "name": "curry powder", "canonicalItem": "curry powder", "quantity": 2, "unit": "tsp" },
+        { "name": "canned diced tomatoes", "canonicalItem": "canned diced tomatoes", "quantity": 1, "unit": "can" },
+        { "name": "vegetable broth", "canonicalItem": "vegetable broth", "quantity": 2, "unit": "cup" },
+        { "name": "spinach", "canonicalItem": "spinach", "quantity": 4, "unit": "oz" },
+        { "name": "olive oil", "canonicalItem": "olive oil", "quantity": 2, "unit": "tbsp" }
+      ],
+      "steps": [
+        { "text": "Soften the onion in the oil over medium heat, about 5 minutes.", "ingredientRefs": ["yellow onion", "olive oil"], "timerSeconds": 300 },
+        { "text": "Add the garlic, ginger, and curry powder and stir for a minute until fragrant.", "ingredientRefs": ["garlic", "ginger", "curry powder"], "timerSeconds": 60 },
+        { "text": "Add the lentils, tomatoes, coconut milk, and broth. Simmer until the lentils fall apart, about 18 minutes.", "ingredientRefs": ["dried lentils", "canned diced tomatoes", "coconut milk", "vegetable broth"], "timerSeconds": 1080 },
+        { "text": "Stir in the spinach until it wilts, then season to taste.", "ingredientRefs": ["spinach"] }
+      ]
+    },
+    {
+      "id": "seed-sesame-soba",
+      "title": "Sesame Soba Noodles",
+      "summary": "Cold noodles in a sesame dressing. Good hot, better the next day from the fridge.",
+      "sourceType": "builtIn",
+      "prepMinutes": 10, "cookMinutes": 8, "totalMinutes": 18, "baseServings": 4,
+      "tags": ["vegetarian", "under 20", "no cook sauce", "japanese"],
+      "cookware": ["large pot", "colander"],
+      "ingredients": [
+        { "name": "soba noodles", "canonicalItem": "soba noodles", "quantity": 12, "unit": "oz" },
+        { "name": "sesame oil", "canonicalItem": "sesame oil", "quantity": 2, "unit": "tbsp" },
+        { "name": "soy sauce", "canonicalItem": "soy sauce", "quantity": 3, "unit": "tbsp" },
+        { "name": "rice vinegar", "canonicalItem": "rice vinegar", "quantity": 2, "unit": "tbsp" },
+        { "name": "honey", "canonicalItem": "honey", "quantity": 1, "unit": "tbsp" },
+        { "name": "cucumber, cut into matchsticks", "canonicalItem": "cucumber", "quantity": 1, "unit": "count" },
+        { "name": "scallions, sliced", "canonicalItem": "scallions", "quantity": 4, "unit": "count" },
+        { "name": "sesame seeds", "canonicalItem": "sesame seeds", "quantity": 2, "unit": "tbsp" }
+      ],
+      "steps": [
+        { "text": "Boil the soba, then rinse under cold water so it stops sticking.", "ingredientRefs": ["soba noodles"], "timerSeconds": 300 },
+        { "text": "Whisk the sesame oil, soy sauce, vinegar, and honey together.", "ingredientRefs": ["sesame oil", "soy sauce", "rice vinegar", "honey"] },
+        { "text": "Toss the noodles with the dressing, cucumber, and most of the scallions.", "ingredientRefs": ["soba noodles", "cucumber", "scallions"] },
+        { "text": "Finish with the sesame seeds and the rest of the scallions.", "ingredientRefs": ["sesame seeds", "scallions"] }
+      ]
+    },
+    {
+      "id": "seed-tomato-white-bean-soup",
+      "title": "Tomato and White Bean Soup",
+      "summary": "A pantry soup that tastes slow cooked after twenty five minutes.",
+      "sourceType": "builtIn",
+      "prepMinutes": 8, "cookMinutes": 22, "totalMinutes": 30, "baseServings": 4,
+      "tags": ["vegetarian", "one pot", "pantry", "soup"],
+      "cookware": ["large pot"],
+      "ingredients": [
+        { "name": "canned cannellini beans", "canonicalItem": "canned cannellini beans", "quantity": 2, "unit": "can" },
+        { "name": "canned crushed tomatoes", "canonicalItem": "canned crushed tomatoes", "quantity": 1, "unit": "can" },
+        { "name": "vegetable broth", "canonicalItem": "vegetable broth", "quantity": 3, "unit": "cup" },
+        { "name": "yellow onion, diced", "canonicalItem": "yellow onion", "quantity": 1, "unit": "count" },
+        { "name": "garlic, sliced", "canonicalItem": "garlic", "quantity": 4, "unit": "clove" },
+        { "name": "olive oil", "canonicalItem": "olive oil", "quantity": 3, "unit": "tbsp" },
+        { "name": "dried oregano", "canonicalItem": "dried oregano", "quantity": 1, "unit": "tsp" },
+        { "name": "parmesan, grated", "canonicalItem": "parmesan", "quantity": 2, "unit": "oz" },
+        { "name": "sourdough loaf", "canonicalItem": "sourdough loaf", "quantity": 0.5, "unit": "count" }
+      ],
+      "steps": [
+        { "text": "Cook the onion and garlic in the oil until soft and sweet, about 8 minutes.", "ingredientRefs": ["yellow onion", "garlic", "olive oil"], "timerSeconds": 480 },
+        { "text": "Add the oregano, tomatoes, beans, and broth. Simmer 15 minutes.", "ingredientRefs": ["dried oregano", "canned crushed tomatoes", "canned cannellini beans", "vegetable broth"], "timerSeconds": 900 },
+        { "text": "Mash some of the beans against the side of the pot to thicken it.", "ingredientRefs": ["canned cannellini beans"] },
+        { "text": "Serve with parmesan on top and toasted bread alongside.", "ingredientRefs": ["parmesan", "sourdough loaf"] }
+      ]
+    },
+    {
+      "id": "seed-greek-pita-plates",
+      "title": "Greek Salad Pita Plates",
+      "summary": "No cooking at all. Chop, stir, warm the pita, done.",
+      "sourceType": "builtIn",
+      "prepMinutes": 15, "cookMinutes": 3, "totalMinutes": 18, "baseServings": 4,
+      "tags": ["vegetarian", "no cook", "under 20", "greek"],
+      "cookware": [],
+      "ingredients": [
+        { "name": "pita bread", "canonicalItem": "pita bread", "quantity": 4, "unit": "count" },
+        { "name": "feta", "canonicalItem": "feta", "quantity": 6, "unit": "oz" },
+        { "name": "cucumber, chopped", "canonicalItem": "cucumber", "quantity": 1, "unit": "count" },
+        { "name": "tomato, chopped", "canonicalItem": "tomato", "quantity": 3, "unit": "count" },
+        { "name": "red onion, thinly sliced", "canonicalItem": "red onion", "quantity": 0.5, "unit": "count" },
+        { "name": "olive oil", "canonicalItem": "olive oil", "quantity": 3, "unit": "tbsp" },
+        { "name": "red wine vinegar", "canonicalItem": "red wine vinegar", "quantity": 2, "unit": "tbsp" },
+        { "name": "dried oregano", "canonicalItem": "dried oregano", "quantity": 1, "unit": "tsp" },
+        { "name": "greek yogurt", "canonicalItem": "greek yogurt", "quantity": 0.75, "unit": "cup" }
+      ],
+      "steps": [
+        { "text": "Soak the red onion in cold water for 5 minutes so it loses its bite, then drain.", "ingredientRefs": ["red onion"], "timerSeconds": 300 },
+        { "text": "Toss the cucumber, tomato, and onion with the oil, vinegar, and oregano.", "ingredientRefs": ["cucumber", "tomato", "red onion", "olive oil", "red wine vinegar", "dried oregano"] },
+        { "text": "Crumble the feta over the top and let it sit while you warm the pita.", "ingredientRefs": ["feta", "pita bread"] },
+        { "text": "Serve with the yogurt for dipping and the warm pita for scooping.", "ingredientRefs": ["greek yogurt", "pita bread"] }
+      ]
+    },
+    {
+      "id": "seed-broccoli-rice-bowls",
+      "title": "Charred Broccoli Rice Bowls",
+      "summary": "Broccoli roasted hard until the edges go dark, on rice with a soy honey glaze.",
+      "sourceType": "builtIn",
+      "prepMinutes": 8, "cookMinutes": 22, "totalMinutes": 30, "baseServings": 4,
+      "tags": ["vegetarian", "vegan", "sheet pan", "under 30"],
+      "cookware": ["sheet pan", "saucepan"],
+      "ingredients": [
+        { "name": "broccoli, cut into florets", "canonicalItem": "broccoli", "quantity": 2, "unit": "bunch" },
+        { "name": "jasmine rice", "canonicalItem": "jasmine rice", "quantity": 1.5, "unit": "cup" },
+        { "name": "soy sauce", "canonicalItem": "soy sauce", "quantity": 3, "unit": "tbsp" },
+        { "name": "honey", "canonicalItem": "honey", "quantity": 2, "unit": "tbsp" },
+        { "name": "garlic, grated", "canonicalItem": "garlic", "quantity": 2, "unit": "clove" },
+        { "name": "sesame oil", "canonicalItem": "sesame oil", "quantity": 1, "unit": "tbsp" },
+        { "name": "vegetable oil", "canonicalItem": "vegetable oil", "quantity": 2, "unit": "tbsp" },
+        { "name": "sesame seeds", "canonicalItem": "sesame seeds", "quantity": 1, "unit": "tbsp" }
+      ],
+      "steps": [
+        { "text": "Heat the oven to 450F and start the rice.", "ingredientRefs": ["jasmine rice"] },
+        { "text": "Toss the broccoli with the vegetable oil and roast until the edges char, about 20 minutes.", "ingredientRefs": ["broccoli", "vegetable oil"], "timerSeconds": 1200 },
+        { "text": "Warm the soy sauce, honey, garlic, and sesame oil in a small pan until it thickens slightly.", "ingredientRefs": ["soy sauce", "honey", "garlic", "sesame oil"], "timerSeconds": 180 },
+        { "text": "Toss the hot broccoli in the glaze, pile it on the rice, and finish with sesame seeds.", "ingredientRefs": ["broccoli", "jasmine rice", "sesame seeds"] }
+      ]
+    },
+    {
+      "id": "seed-chicken-stir-fry",
+      "title": "Weeknight Chicken Stir Fry",
+      "summary": "Everything chopped before the pan gets hot, then five minutes of cooking.",
+      "sourceType": "builtIn",
+      "prepMinutes": 15, "cookMinutes": 10, "totalMinutes": 25, "baseServings": 4,
+      "tags": ["chicken", "under 30", "one pan", "kid friendly", "chinese"],
+      "cookware": ["skillet", "saucepan"],
+      "ingredients": [
+        { "name": "chicken thighs, cut into strips", "canonicalItem": "chicken thighs", "quantity": 1.5, "unit": "lb" },
+        { "name": "bell pepper, sliced", "canonicalItem": "bell pepper", "quantity": 2, "unit": "count" },
+        { "name": "snap peas", "canonicalItem": "snap peas", "quantity": 8, "unit": "oz" },
+        { "name": "jasmine rice", "canonicalItem": "jasmine rice", "quantity": 1.5, "unit": "cup" },
+        { "name": "soy sauce", "canonicalItem": "soy sauce", "quantity": 0.25, "unit": "cup" },
+        { "name": "cornstarch", "canonicalItem": "cornstarch", "quantity": 1, "unit": "tbsp" },
+        { "name": "ginger, grated", "canonicalItem": "ginger", "quantity": 1, "unit": "tbsp" },
+        { "name": "garlic, minced", "canonicalItem": "garlic", "quantity": 3, "unit": "clove" },
+        { "name": "vegetable oil", "canonicalItem": "vegetable oil", "quantity": 2, "unit": "tbsp" },
+        { "name": "scallions, sliced", "canonicalItem": "scallions", "quantity": 3, "unit": "count" }
+      ],
+      "steps": [
+        { "text": "Start the rice. Chop everything before you turn on the skillet, because there is no time once it is hot.", "ingredientRefs": ["jasmine rice"] },
+        { "text": "Stir the soy sauce, cornstarch, and a splash of water together and set it by the stove.", "ingredientRefs": ["soy sauce", "cornstarch"] },
+        { "text": "Sear the chicken in the oil over high heat until browned, about 5 minutes, then move it to a plate.", "ingredientRefs": ["chicken thighs", "vegetable oil"], "timerSeconds": 300 },
+        { "text": "Cook the pepper and snap peas for 2 minutes, then add the garlic and ginger for 30 seconds.", "ingredientRefs": ["bell pepper", "snap peas", "garlic", "ginger"], "timerSeconds": 150 },
+        { "text": "Return the chicken, pour in the sauce, and toss until it coats everything. Finish with scallions over the rice.", "ingredientRefs": ["chicken thighs", "scallions", "jasmine rice"] }
+      ]
+    }
+  ]
+}

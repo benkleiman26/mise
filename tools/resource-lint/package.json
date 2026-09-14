@@ -1,0 +1,9 @@
+{
+  "name": "resource-lint",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Validates Mise/Resources JSON, which nothing else can check without Xcode.",
+  "engines": { "node": ">=20" },
+  "scripts": { "lint": "node src/cli.mjs", "test": "node --test" }
+}

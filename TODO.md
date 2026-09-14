@@ -50,8 +50,15 @@ Known gaps, found while building. Section 11 asks for this list to be kept.
 
 ## NYT export
 
-- [ ] The Recipe Box page structure is assumed, not observed. The three
-      extraction strategies are tested against stubbed markup only.
+- [x] Page structure confirmed on 2026-09-14: the DOM and raw link matching each
+      found all 48 recipes on a page, the hydration payload found none. It
+      paginates with `?page=N`, folders are numeric ids, and Recently Viewed is
+      now excluded.
+- [ ] The hydration strategy finds nothing on the Recipe Box. Harmless, since
+      the DOM carries the list, but it means one of the three fallbacks is dead
+      weight there. Leave it for recipe pages, which may hydrate differently.
+- [ ] Still not run end to end. The counts to expect are roughly 163 recipes
+      across about 4 pages plus two folders and the Cooked list.
 - [ ] `crawl()` fetches folder pages directly, which is faster than visiting
       them but can miss lazily loaded rows. Any folder whose count looks short
       needs `scan()` run on it in the browser instead.
@@ -74,6 +81,20 @@ Known gaps, found while building. Section 11 asks for this list to be kept.
       A session start hook that installs the Swift Linux toolchain would let the
       platform independent domain services be tested in the cloud.
 
-## Not started
+## Resources
 
-Everything from Phase 0b onward. See section 9 of the spec.
+- [x] `canonical_items.json`: 297 items across the 18 aisles, 71 staples,
+      validated by `tools/resource-lint`.
+- [ ] `seed_recipes.json` has 12 recipes. Section 5.1 asks for 40 to 60, so 28
+      to 48 more in Phase 1. The owner's 213 rescued recipes cover his own
+      library, so this set matters for strangers rather than for him.
+- [ ] No recipe images for the seed set. The app needs a sensible placeholder,
+      or the recipe cards look broken on first launch.
+- [ ] Aisle order in `canonical_items.json` is the spec's default, not the
+      owner's store. Section 12 asks him for his usual store's order in Phase 2.
+
+## Phase 0b
+
+Not started. `PHASE-0B.md` is the handoff for a Mac session, since the cloud
+environment cannot compile Swift. Everything in that phase that does not need a
+compiler is done: both resource files and their validator.

@@ -191,8 +191,16 @@
     throw new Error(last);
   }
 
-  /** Fetches the recipes, a few at a time, and downloads one JSON file. */
-  async function rescue({ concurrency = 5 } = {}) {
+  const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
+  /**
+   * Fetches the recipes and downloads one JSON file.
+   *
+   * Paced on purpose. A few hundred requests arriving at once looks like abuse
+   * to a CDN, and the usual response is a blanket 403 that is indistinguishable
+   * from a missing file. Slower and complete beats fast and blocked.
+   */
+  async function rescue({ concurrency = 3, delayMs = 150 } = {}) {
     const state = load();
     const ids = Object.keys(state.ids);
     if (ids.length === 0) {
@@ -200,7 +208,8 @@
       return null;
     }
 
-    console.log(`Fetching ${ids.length} recipes from ${CDN}`);
+    const estimate = Math.ceil((ids.length * delayMs) / concurrency / 1000);
+    console.log(`Fetching ${ids.length} recipes from ${CDN}, roughly ${estimate}s at this pace`);
     const recipes = {};
     const failed = [];
     let done = 0;
@@ -211,6 +220,7 @@
         const index = cursor++;
         if (index >= ids.length) return;
         const id = ids[index];
+        if (delayMs > 0) await sleep(delayMs);
         try {
           recipes[id] = await fetchRecipe(id);
         } catch (error) {

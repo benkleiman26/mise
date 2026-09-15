@@ -67,26 +67,31 @@ Known gaps, found while building. Section 11 asks for this list to be kept.
 - [x] Fetching page HTML finds nothing: the Recipe Box is rendered client side.
       `collect()` now renders each page in a hidden same origin frame.
 - [x] collect() ran and found 163, matching the expected count.
-- [ ] **Parked at 96 of 163.** `data/nyt/nyt_recipe_box.json` holds 96 real
-      recipes, all filed under one generic list with none marked cooked, so the
-      folders and the Cooked list are missing. Four attempts to produce a
-      complete dump did not, most likely because an older copy of the collector
-      was pasted each time; the collector is now version stamped and convert
-      warns when a dump is stale, which should settle it next time.
+- [x] **Done, 2026-09-15.** `data/nyt/nyt_recipe_box.json` holds 169 recipes,
+      folders "Easy Kid-Friendly Recipes" (70, tag "kid friendly") and "Recipes"
+      (44, no tag, too generic), and 2 marked cooked (Ben has only ever marked
+      two recipes cooked in NYT, confirmed on the Cooked Recipes page). The raw
+      dump is kept at `data/nyt/raw-nyt-recipe-box-2026-09-15.json`.
 
-      Parked deliberately rather than abandoned: NYT is not shutting down, the
-      recipes are safe in the Recipe Box, and this file is not consumed until
-      Phase 4. Finishing it later costs nothing, because the app dedupes on the
-      NYT numeric id per section 5.6a, so a later complete import adds the
-      missing recipes without duplicating the 96 already there.
-
-      To resume: paste `browser/collect.js`, confirm the banner shows the
-      current version, then `__nyt.reset()`, `await __nyt.collect()`,
-      `__nyt.status()`, `__nyt.rescue()`. Expect 163, folders Easy
-      Kid-Friendly Recipes (70) and Recipes (44), and a cooked count above zero.
-- [ ] If hidden frames turn out to be blocked, the next thing to try is the
-      JSON endpoint the page itself calls to build the list. Capture it with
-      `browser/capture-api-calls.js` from the mealime-export tool.
+      Collected by driving the real tab through each list from the cloud session
+      rather than the in-page hidden frames, which froze the renderer. The key
+      fix was scoping the harvest to `[class*="cardGrid"]`: a folder page also
+      renders a `carousel_cardList` of recommendations, and the old unscoped
+      selector tagged those ~26 extra recipes as belonging to the folder. With
+      grid scoping the folders came out at exactly 70 and 44. 169 is a touch
+      over the 163 expected on 2026-09-14; the box grew, and the app dedupes on
+      the NYT id anyway.
+- [ ] Only 48 of 169 recipes carry a title in the dump, since later pages were
+      swept for ids only. Harmless: the app refetches each URL and gets the
+      title from JSON-LD. Re-run with titles if a nicer offline list is wanted.
+- [x] `collect.js` now scopes its harvest to `[class*="cardGrid"]`, so a folder
+      page's recommendation carousel no longer leaks into folder tags. Collector
+      version 2026-09-15.3.
+- [ ] The in-page hidden-frame walk in `collect.js` froze the renderer when run
+      over CDP from a cloud session (many heavy iframes at once). The reliable
+      path was navigating the real tab per list. If `collect.js` is ever run by
+      hand it may still be fine, but a rewrite that navigates rather than frames
+      would be sturdier.
 - [ ] `crawl()` fetches folder pages directly, which is faster than visiting
       them but can miss lazily loaded rows. Any folder whose count looks short
       needs `scan()` run on it in the browser instead.
@@ -96,9 +101,21 @@ Known gaps, found while building. Section 11 asks for this list to be kept.
 
 ## Bulk import
 
-- [ ] The `looksLikeRecipe` heuristic is deliberately generous and has only been
-      run against the test fixture. Check its calls against the real bookmarks
-      file before trusting the "not recipes" count.
+- [ ] Run against Ben's real bookmarks export on 2026-09-15: 49 bookmarks in
+      folders Finance, Riprova, Wellness, and zero actual recipes. It was his
+      bookmarks bar, not the folder of open recipe tabs the import is meant for,
+      so there was nothing to import. The recipe tabs were never bookmarked.
+- [x] Fixed the `looksLikeRecipe` false positives. It now returns a tier
+      (`recipeSignal`): nyt, foodHost, recipePath, recipeTitle, maybe, or no.
+      Account-shaped paths (login, banking, credit-cards, billing and the rest)
+      are ruled out outright unless the host is a known food site, and the
+      inventory reports confident and maybe counts separately rather than one
+      number that treats a bank login like a recipe. The eight account URL
+      shapes from the real export are in the tests.
+- [ ] **The bookmarks input was the wrong folder.** The export was the bookmarks
+      bar, not a folder of the open recipe tabs. If those tabs are still open,
+      bookmark them into one folder, export again, and run the inventory with
+      `--folder`. If they are gone, so is that batch; nothing else depends on it.
 - [ ] `src/bookmarks.mjs` is the reference implementation for Phase 4's Swift
       port. Keep the fixture in step with whatever the app ends up handling.
 

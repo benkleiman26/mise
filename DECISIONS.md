@@ -286,3 +286,109 @@ stored at all.
 
 The general lesson, and it cost two rounds: a count shown to the user has to be
 read from the same place the deliverable is written from, or it is not a check.
+
+## The Xcode project sits at the repository root, with tests beside it
+
+`Mise.xcodeproj` is at the root and the app sources are in `Mise/`, which is what
+section 8 draws. Test files cannot live inside `Mise/` because that folder is a
+synchronized group belonging to the app target, so everything in it compiles into
+the app. `Mise/Tests/` in section 8 would put XCTest code in the shipped binary.
+They live in `MiseTests/` instead, which is the only part of section 8's tree
+that moved.
+
+## The project uses Xcode's synchronized file groups
+
+Xcode 16 and later can point a target at a folder and take whatever is in it,
+rather than listing every file with its own identifier. The project file then
+barely changes, which matters here for two reasons: adding a Swift file in a
+cloud session does not require editing a format that cannot be checked without
+Xcode, and two sessions working on the same project stop colliding in the one
+file they both have to touch.
+
+The cost is that build phase membership is inferred from file type. If
+`canonical_items.json` ever fails to reach the bundle, that inference is the
+first place to look.
+
+## Phase 0b was written without a compiler, and the project file was checked by parsing it
+
+The cloud session has no Swift toolchain and `download.swift.org` is blocked by
+the network policy, so nothing here has been compiled. That was the owner's call
+rather than the plan in `PHASE-0B.md`, which was written for a Mac session.
+
+What could be checked was checked. `project.pbxproj` is generated from a
+description rather than typed, and then parsed with a NeXTSTEP plist reader that
+resolves every object reference, looks for orphans, and asserts the bundle
+identifier and deployment target. Both scripts are kept in
+`tools/xcodeproj-lint/`, for the same reason `tools/resource-lint` exists: a
+cloud session that edits that file has nothing else to check it with. Once Xcode
+has written to the project, the generator stops being safe to run and the
+validator is the only half still useful. The resource files still go through
+`tools/resource-lint`. Everything else waits for Xcode.
+
+## Seeded records get deterministic identifiers rather than random ones
+
+Every record the app ships with derives its id from a stable key: an RFC 4122
+version 5 UUID over a fixed namespace and a string such as
+`canonicalItem:kosher salt`. `StableID` does this, and its test checks the
+implementation against the published RFC vector rather than only against itself.
+
+This is what makes the seed loader idempotent without a "have I seeded" flag,
+which is the kind of thing that gets out of step with the store it describes.
+"Is this already here" becomes a set membership test on ids that were computed
+the same way last launch.
+
+It pays off again in Phase 5. Two devices in one household that both seed before
+they ever sync produce identical rows rather than 297 duplicates to reconcile.
+
+## Ordered relationships carry an explicit position
+
+SwiftData does not promise an order for a to-many relationship. Ingredients,
+steps, planned meals and grocery items all have one that matters, so each
+carries a `position` and is read back through an `ordered...` accessor. Cook
+mode showing step 4 before step 2 is the failure this avoids, and it is the kind
+that appears only after a store reload.
+
+## Tags are strings on the recipe, not their own entity
+
+Section 4 writes `tags: [Tag]` and section 5.1 says tags are flat, lowercase and
+mostly automatic. A join table buys nothing while that is true, and it costs a
+fetch on every recipe row in a library section 5.1 expects to hold a thousand
+items. If renaming a tag everywhere ever becomes a feature, that is when the
+entity earns its place.
+
+## The seed installer lives in App, not in Domain/Services
+
+`PHASE-0B.md` asks for `Domain/Services` to stay free of SwiftUI and SwiftData so
+the grocery list math can move into a package later without untangling anything.
+Seeding is split along that line: `SeedCatalog` decodes and cross checks the two
+JSON files and imports only Foundation, and `SeedInstaller` writes models and
+lives in `App/Seeding`.
+
+Everything that can be got wrong about the seed, an unknown aisle, an ingredient
+that resolves to nothing, a step pointing at an ingredient the recipe does not
+list, is decided in the half that needs no store and no screen to test.
+
+## The skeleton builds in Swift 5 language mode
+
+`SWIFT_VERSION` is 5.0 and `SWIFT_STRICT_CONCURRENCY` is minimal. Swift 6 mode
+against an Xcode 27 SDK would turn a skeleton with no concurrency in it into an
+argument about actor isolation, and the code that will actually do concurrent
+work, the importer, the AI proxy client and the sync engine, is not written yet.
+Worth revisiting when it is.
+
+## The Recipes and Pantry tabs show what was seeded rather than an empty state
+
+Phase 0b asks for an empty state on every tab, and each tab has one. Two of them
+are not reachable on a fresh install, because seeding puts 12 recipes and 71
+pantry staples in the store before the user sees anything, and a screen reading
+"No recipes yet" under twelve recipes would be a lie.
+
+So those two tabs show a plain read only list when there is something in it: no
+search, no filters, no detail screen, no editing. That is also the only way to
+see from inside the app that the seed worked.
+
+## The recipe step model is called RecipeStep
+
+Section 4 names it `Step`. That is a common enough word to collide with
+something in SwiftUI or Foundation later, and renaming a `@Model` class after it
+has a store behind it is a migration. Done now, when it is free.

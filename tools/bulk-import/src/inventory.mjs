@@ -10,7 +10,7 @@ import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import { existsSync } from 'node:fs';
 import path from 'node:path';
 
-import { canonicalUrl, looksLikeRecipe, nytRecipeId, parseBookmarks } from './bookmarks.mjs';
+import { canonicalUrl, looksLikeRecipe, nytRecipeId, parseBookmarks, recipeSignal } from './bookmarks.mjs';
 
 /** Builds the inventory. `knownNytIds` comes from nyt_recipe_box.json. */
 export function buildInventory({ html, knownNytIds = new Set(), folderFilter = null, now = () => new Date().toISOString() }) {
@@ -37,6 +37,7 @@ export function buildInventory({ html, knownNytIds = new Set(), folderFilter = n
       addedAt: bookmark.addedAt,
       host: hostOf(key),
       nytRecipeId: nytRecipeId(bookmark.url),
+      signal: recipeSignal(bookmark),
       likelyRecipe: looksLikeRecipe(bookmark),
     });
   }
@@ -47,7 +48,11 @@ export function buildInventory({ html, knownNytIds = new Set(), folderFilter = n
   }
 
   const byHost = {};
-  for (const entry of entries) byHost[entry.host] = (byHost[entry.host] ?? 0) + 1;
+  const bySignal = {};
+  for (const entry of entries) {
+    byHost[entry.host] = (byHost[entry.host] ?? 0) + 1;
+    bySignal[entry.signal] = (bySignal[entry.signal] ?? 0) + 1;
+  }
 
   const toImport = entries.filter((e) => e.likelyRecipe && !e.alreadyInRecipeBox);
 
@@ -63,9 +68,12 @@ export function buildInventory({ html, knownNytIds = new Set(), folderFilter = n
       nytRecipes: entries.filter((e) => e.nytRecipeId).length,
       alreadyInRecipeBox: entries.filter((e) => e.alreadyInRecipeBox).length,
       likelyRecipes: entries.filter((e) => e.likelyRecipe).length,
+      confidentRecipes: entries.filter((e) => ['nyt', 'foodHost', 'recipePath'].includes(e.signal)).length,
+      maybeRecipes: entries.filter((e) => e.signal === 'maybe').length,
       notRecipes: entries.filter((e) => !e.likelyRecipe).length,
       toImport: toImport.length,
     },
+    bySignal,
     folders,
     hosts: Object.entries(byHost)
       .map(([host, count]) => ({ host, count }))
@@ -105,10 +113,16 @@ export async function runInventory({ inFile, outFile, nytFile = null, folder = n
   log(`  bookmarks in file: ${counts.bookmarksInFile}`);
   if (folder) log(`  in folders matching "${folder}": ${counts.selected}`);
   log(`  unique urls: ${counts.unique} (${counts.duplicates} duplicates collapsed)`);
-  log(`  look like recipes: ${counts.likelyRecipes}`);
+  log(`  look like recipes: ${counts.likelyRecipes} (${counts.confidentRecipes} confident, ${counts.maybeRecipes} maybe)`);
   log(`  not recipes: ${counts.notRecipes}`);
   log(`  NYT recipes: ${counts.nytRecipes}, of which ${counts.alreadyInRecipeBox} are already in the Recipe Box export`);
   log(`  to import: ${counts.toImport}`);
+  log('');
+  if (counts.confidentRecipes === 0 && counts.unique > 0) {
+    log('');
+    log('Nothing here is confidently a recipe. If you meant to export a folder of recipe tabs,');
+    log('check that you exported the right folder, and use --folder to narrow it.');
+  }
   log('');
   log('Top hosts:');
   for (const { host, count } of inventory.hosts.slice(0, 12)) log(`  ${String(count).padStart(4)}  ${host}`);

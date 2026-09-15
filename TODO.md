@@ -67,11 +67,23 @@ Known gaps, found while building. Section 11 asks for this list to be kept.
 - [x] Fetching page HTML finds nothing: the Recipe Box is rendered client side.
       `collect()` now renders each page in a hidden same origin frame.
 - [x] collect() ran and found 163, matching the expected count.
-- [ ] The first rescue downloaded only 96 because sessionStorage filled and
-      rescue() read from there rather than from memory. Fixed; the run needs
-      repeating to produce a complete dump.
-- [ ] Verify the result: expect roughly 163, folders Easy Kid-Friendly Recipes
-      (70) and Recipes (44), and a non-zero cooked count.
+- [ ] **Parked at 96 of 163.** `data/nyt/nyt_recipe_box.json` holds 96 real
+      recipes, all filed under one generic list with none marked cooked, so the
+      folders and the Cooked list are missing. Four attempts to produce a
+      complete dump did not, most likely because an older copy of the collector
+      was pasted each time; the collector is now version stamped and convert
+      warns when a dump is stale, which should settle it next time.
+
+      Parked deliberately rather than abandoned: NYT is not shutting down, the
+      recipes are safe in the Recipe Box, and this file is not consumed until
+      Phase 4. Finishing it later costs nothing, because the app dedupes on the
+      NYT numeric id per section 5.6a, so a later complete import adds the
+      missing recipes without duplicating the 96 already there.
+
+      To resume: paste `browser/collect.js`, confirm the banner shows the
+      current version, then `__nyt.reset()`, `await __nyt.collect()`,
+      `__nyt.status()`, `__nyt.rescue()`. Expect 163, folders Easy
+      Kid-Friendly Recipes (70) and Recipes (44), and a cooked count above zero.
 - [ ] If hidden frames turn out to be blocked, the next thing to try is the
       JSON endpoint the page itself calls to build the list. Capture it with
       `browser/capture-api-calls.js` from the mealime-export tool.

@@ -32,8 +32,9 @@ Full requirements live in the build spec, linked from `SPEC.md`. Decisions made 
 Phase 0a is done for Mealime: the rescue ran on 2026-09-14 and the data is in
 `data/mealime/`, which is git ignored.
 
-`tools/nyt-export` and `tools/bulk-import` are written and tested but have not
-been run against the real NYT Cooking site or a real bookmarks file yet.
+`tools/nyt-export` has run: 96 of about 163 recipes are in `data/nyt/`, parked
+short of complete on purpose, see `TODO.md`. `tools/bulk-import` is written and
+tested but has not been run against a real bookmarks file.
 
 Phase 0b has not started in Xcode. Everything in it that does not need a
 compiler is done: `Mise/Resources/canonical_items.json` (297 items, 71 staples)

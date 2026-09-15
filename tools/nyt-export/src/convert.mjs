@@ -138,9 +138,30 @@ export function buildRecipeBox(dump, { now = () => new Date().toISOString() } = 
 }
 
 /** Warnings worth showing before the owner walks away thinking it is done. */
-export function reviewWarnings(box, { expected = 163 } = {}) {
+export function reviewWarnings(box, { expected = 163, dump = null } = {}) {
   const warnings = [];
   const { recipes, cooked, withTitle } = box.counts;
+
+  // A stale download is the likeliest cause of a short result, and it looks
+  // exactly like a collection failure unless you check.
+  const claimed = dump?.counts?.recipes;
+  if (Number.isInteger(claimed) && claimed > recipes) {
+    warnings.push(
+      `The dump says it holds ${claimed} recipes but only ${recipes} came through. If you downloaded more than once, ` +
+        'your browser saved the newer one with a "(1)" suffix and this read the older file. Convert the newest: ' +
+        'node src/cli.mjs convert --in "$(ls -t ~/Downloads/nyt-recipe-box-raw*.json | head -1)"'
+    );
+  }
+
+  // Everything under one generic list, and nothing cooked, means only the main
+  // page was harvested rather than the folders.
+  const onlyGenericFolder = box.folders.length === 1 && /recipe box|^all$/i.test(box.folders[0]?.name ?? '');
+  if (onlyGenericFolder && cooked === 0) {
+    warnings.push(
+      'Every recipe is filed under one generic list and none is marked cooked, so the folders and the Cooked ' +
+        'Recipes list were never harvested. Run __nyt.collect() rather than __nyt.scan(), then rescue again.'
+    );
+  }
   if (recipes < expected * 0.9) {
     warnings.push(
       `Only ${recipes} recipes, and about ${expected} were expected. Open each folder in the browser and run __nyt.scan() there, since a fetched page can miss lazily loaded rows.`
@@ -165,6 +186,14 @@ export async function runConvert({ inFile, outFile, log = console.log }) {
   if (dump?.format && dump.format !== 'nyt-recipe-box-raw') {
     log(`Warning: expected a nyt-recipe-box-raw dump, got "${dump.format}". Continuing anyway.`);
   }
+
+  // Say which file this actually is. Browsers do not overwrite a download, they
+  // add "(1)" to the new one, so it is easy to convert a stale dump and read
+  // its low counts as a collection problem.
+  log(`Reading ${inFile}`);
+  if (dump?.collectedAt) log(`  collected at ${dump.collectedAt}`);
+  if (dump?.counts) log(`  the dump reports ${dump.counts.recipes} recipes across ${dump.counts.pages ?? '?'} pages`);
+
   const box = buildRecipeBox(dump);
 
   await mkdir(path.dirname(outFile), { recursive: true });
@@ -178,7 +207,7 @@ export async function runConvert({ inFile, outFile, log = console.log }) {
   for (const folder of box.folders) {
     log(`    ${folder.name}: ${folder.count}${folder.tag ? ` -> tag "${folder.tag}"` : ''}`);
   }
-  const warnings = reviewWarnings(box);
+  const warnings = reviewWarnings(box, { dump });
   if (warnings.length) {
     log('');
     for (const warning of warnings) log(`Warning: ${warning}`);

@@ -173,3 +173,26 @@ describe('folder names that are really ids or statuses', () => {
     assert.equal(folderToTag('All'), null);
   });
 });
+
+describe('catching a stale or partial dump', () => {
+  test('notices when the dump claims more recipes than came through', () => {
+    const dump = { counts: { recipes: 163 }, recipes: [{ id: '1', title: 'x', folders: ['A'] }] };
+    const warnings = reviewWarnings(buildRecipeBox(dump), { dump });
+    assert.match(warnings.join(' '), /says it holds 163 recipes but only 1 came through/);
+    assert.match(warnings.join(' '), /ls -t/);
+  });
+
+  test('notices when only the main list was harvested', () => {
+    const recipes = Array.from({ length: 96 }, (_, i) => ({ id: String(i + 1), title: 't', folders: ['recipe box'] }));
+    const warnings = reviewWarnings(buildRecipeBox({ recipes }));
+    assert.match(warnings.join(' '), /folders and the Cooked Recipes list were never harvested/);
+  });
+
+  test('stays quiet when the counts agree', () => {
+    const recipes = Array.from({ length: 163 }, (_, i) => ({
+      id: String(i + 1), title: 't', cooked: i < 20, folders: ['Easy Kid-Friendly Recipes', 'Recipes'],
+    }));
+    const dump = { counts: { recipes: 163 }, recipes };
+    assert.deepEqual(reviewWarnings(buildRecipeBox(dump), { dump }), []);
+  });
+});

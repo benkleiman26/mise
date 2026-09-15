@@ -268,3 +268,21 @@ An Apple Developer team id is deliberately not being collected. It is needed for
 signing on a real device and for TestFlight, which is Phase 5. Everything up to
 then runs in the simulator. Asking the owner to buy a developer membership now
 would spend money months before it is used.
+
+## The browser collectors hold state in memory, with sessionStorage as a backup
+
+A NYT run reported 163 recipes and downloaded 96. The two numbers came from
+different places: collect() counted its in-memory state while rescue() re-read
+sessionStorage, so a write that failed part way through produced an honest
+looking count and a short file. Nothing warned loudly enough to notice.
+
+Memory is now the source of truth and sessionStorage is only a backup, so the
+run finishes intact even when storage fills. status() compares the two and says
+when they disagree, and the dump records that storage failed.
+
+The proximate cause was scan() storing each page's Next.js hydration payload,
+capped at 2MB apiece, which nothing downstream ever read. That is no longer
+stored at all.
+
+The general lesson, and it cost two rounds: a count shown to the user has to be
+read from the same place the deliverable is written from, or it is not a check.

@@ -215,3 +215,29 @@ describe('cleanFolderLabel', () => {
     assert.equal(internals.cleanFolderLabel('Weeknight Wins1 recipe'), 'Weeknight Wins');
   });
 });
+
+describe('collected recipes survive a sessionStorage failure', () => {
+  test('rescue downloads everything even when saving throws', async () => {
+    globalThis.__nyt.reset();
+    const realSet = globalThis.sessionStorage.setItem;
+    globalThis.document = stubDom({ html: '<a href="/recipes/1111-one">a</a><a href="/recipes/2222-two">b</a>' });
+    await globalThis.__nyt.scan({ scroll: false });
+
+    // Storage fills up part way through, which is what lost recipes before.
+    globalThis.sessionStorage.setItem = () => { throw new Error('QuotaExceededError'); };
+    globalThis.document = stubDom({ html: '<a href="/recipes/3333-three">c</a>' });
+    const quiet = console.warn;
+    console.warn = () => {};
+    await globalThis.__nyt.scan({ scroll: false });
+    console.warn = quiet;
+
+    const counts = globalThis.__nyt.rescue();
+    assert.equal(counts.recipes, 3, 'the recipe collected after the failure must still be downloaded');
+    const dump = JSON.parse(globalThis.__blob);
+    assert.deepEqual(dump.recipes.map((r) => r.id).sort(), ['1111', '2222', '3333']);
+    assert.equal(dump.storageFailed, true, 'the dump should record that storage failed');
+
+    globalThis.sessionStorage.setItem = realSet;
+    globalThis.__nyt.reset();
+  });
+});

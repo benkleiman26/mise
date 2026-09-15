@@ -24,22 +24,50 @@
   // and is what the app dedupes on, per spec section 5.6a.
   const RECIPE_HREF = /\/recipes?\/(\d+)[-/]([a-z0-9-]*)/i;
   const RECIPE_ANYWHERE = /\/recipes?\/(\d+)-([a-z0-9-]+)/gi;
-  const MAX_NEXT_DATA = 2_000_000;
 
   const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
+  // Memory is the source of truth, not sessionStorage.
+  //
+  // These were the other way round, and it lost data: collect() reported its
+  // in-memory total while rescue() re-read sessionStorage, so a write that
+  // failed part way through gave an honest looking count and a short download.
+  // sessionStorage is now only a backup, so collected recipes survive
+  // navigation. If it fails, the run still finishes with everything intact.
+  let memory = null;
+  let storageFailed = false;
+
+  const blank = () => ({ recipes: {}, pages: {}, folderNames: {} });
+
   const load = () => {
+    if (memory) return memory;
     try {
-      return JSON.parse(sessionStorage.getItem(KEY)) ?? { recipes: {}, pages: {}, nextData: {} };
+      memory = JSON.parse(sessionStorage.getItem(KEY)) ?? blank();
     } catch {
-      return { recipes: {}, pages: {}, nextData: {} };
+      memory = blank();
     }
+    // Older runs stored the hydration payload, which is large and unused.
+    delete memory.nextData;
+    return memory;
   };
+
   const save = (state) => {
+    memory = state;
     try {
       sessionStorage.setItem(KEY, JSON.stringify(state));
+      storageFailed = false;
     } catch (error) {
-      console.warn('sessionStorage is full or blocked, collected data will not survive navigation.', error);
+      if (!storageFailed) {
+        console.warn(
+          '%cCould not save to sessionStorage: ' + (error?.message ?? error),
+          'color: orange; font-weight: bold'
+        );
+        console.warn(
+          'Everything collected is still held in memory and rescue() will include it. Just do not ' +
+            'navigate away or reload this tab before running __nyt.rescue().'
+        );
+      }
+      storageFailed = true;
     }
   };
 
@@ -254,12 +282,15 @@
       pageUrl: location.href,
       cooked: cooked ?? isCookedPage(name, location.href),
     });
-    state.pages[location.href] = { folder: name, found: found.size, at: new Date().toISOString() };
-    if (next) {
-      const text = JSON.stringify(next);
-      if (text.length <= MAX_NEXT_DATA) state.nextData[location.href] = next;
-      else state.pages[location.href].nextDataTooLarge = text.length;
-    }
+    // The hydration payload is not stored. It runs to megabytes, nothing
+    // downstream reads it, and filling sessionStorage with it is what made an
+    // earlier run lose recipes.
+    state.pages[location.href] = {
+      folder: name,
+      found: found.size,
+      at: new Date().toISOString(),
+      hadNextData: Boolean(next),
+    };
     save(state);
     const total = Object.keys(state.recipes).length;
     console.log(`%cScanned "${name}": ${found.size} on the page, ${added} new, ${total} total.`, 'color: green; font-weight: bold');
@@ -482,7 +513,21 @@
     console.log(`${recipes.length} recipes, ${recipes.filter((r) => r.cooked).length} marked cooked`);
     console.log('By folder:', byFolder);
     console.log('Pages scanned:', Object.keys(state.pages).length);
-    return { total: recipes.length, byFolder };
+
+    // If these disagree, a reload would lose the difference, so say so.
+    let persisted = 0;
+    try {
+      persisted = Object.keys(JSON.parse(sessionStorage.getItem(KEY))?.recipes ?? {}).length;
+    } catch {
+      persisted = 0;
+    }
+    if (persisted !== recipes.length) {
+      console.warn(
+        `Only ${persisted} of ${recipes.length} are saved to this tab's storage. The rest live in memory ` +
+          'only, so run __nyt.rescue() before navigating or reloading.'
+      );
+    }
+    return { total: recipes.length, persisted, byFolder };
   }
 
   function rescue() {
@@ -505,7 +550,7 @@
       },
       recipes,
       pages: state.pages,
-      nextData: state.nextData,
+      storageFailed,
     };
     const blob = new Blob([JSON.stringify(dump, null, 2)], { type: 'application/json' });
     const a = document.createElement('a');
@@ -515,6 +560,9 @@
     a.click();
     a.remove();
     console.log(`%cDownloaded nyt-recipe-box-raw.json with ${recipes.length} recipes.`, 'color: green; font-weight: bold');
+    if (storageFailed) {
+      console.warn('sessionStorage failed during this run, so the download is the only copy. Convert it before closing the tab.');
+    }
     console.log('Next: node src/cli.mjs convert --in ~/Downloads/nyt-recipe-box-raw.json');
     return dump.counts;
   }
@@ -526,7 +574,11 @@
     crawl,
     status,
     rescue,
-    reset: () => sessionStorage.removeItem(KEY),
+    reset: () => {
+      memory = null;
+      storageFailed = false;
+      sessionStorage.removeItem(KEY);
+    },
     // Exposed so the extraction logic can be tested without a browser. The
     // page structure here has never been seen by whoever wrote this, so these
     // are the parts most likely to be wrong and most worth covering.

@@ -66,9 +66,12 @@ Known gaps, found while building. Section 11 asks for this list to be kept.
       weight there. Leave it for recipe pages, which may hydrate differently.
 - [x] Fetching page HTML finds nothing: the Recipe Box is rendered client side.
       `collect()` now renders each page in a hidden same origin frame.
-- [ ] Still not run end to end. Expect roughly 163 across about 4 pages, plus
-      folders Easy Kid-Friendly Recipes (70) and Recipes (44), and the Cooked
-      list.
+- [x] collect() ran and found 163, matching the expected count.
+- [ ] The first rescue downloaded only 96 because sessionStorage filled and
+      rescue() read from there rather than from memory. Fixed; the run needs
+      repeating to produce a complete dump.
+- [ ] Verify the result: expect roughly 163, folders Easy Kid-Friendly Recipes
+      (70) and Recipes (44), and a non-zero cooked count.
 - [ ] If hidden frames turn out to be blocked, the next thing to try is the
       JSON endpoint the page itself calls to build the list. Capture it with
       `browser/capture-api-calls.js` from the mealime-export tool.

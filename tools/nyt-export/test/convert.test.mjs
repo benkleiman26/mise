@@ -192,7 +192,7 @@ describe('catching a stale or partial dump', () => {
     const recipes = Array.from({ length: 163 }, (_, i) => ({
       id: String(i + 1), title: 't', cooked: i < 20, folders: ['Easy Kid-Friendly Recipes', 'Recipes'],
     }));
-    const dump = { counts: { recipes: 163 }, recipes };
+    const dump = { scriptVersion: '2026-09-15.2', counts: { recipes: 163 }, recipes };
     assert.deepEqual(reviewWarnings(buildRecipeBox(dump), { dump }), []);
   });
 });

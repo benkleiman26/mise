@@ -19,12 +19,13 @@ Box is added to, removed, or marked.
 3. Run the steps it prints:
 
    ```js
-   __nyt.probe()    // what does this page look like? run this first
-   __nyt.scan()     // harvest this page, scrolling to load everything
-   __nyt.crawl()    // find your folders and walk them
+   __nyt.collect()  // walks every list, page by page. this is the one to use
    __nyt.status()   // counts, by folder
    __nyt.rescue()   // downloads nyt-recipe-box-raw.json
    ```
+
+   `__nyt.probe()` inspects the page you are on, and `__nyt.scan()` harvests
+   just that page, for anything `collect()` misses.
 
 Start with `probe()`. It reports which of three strategies found anything: the
 Next.js hydration payload, the rendered DOM, and raw link matching. As observed
@@ -33,9 +34,20 @@ the hydration payload found none, so the DOM is what actually carries the list.
 **If all three return zero, do not guess: send the `probe()` output to whoever is
 building this.**
 
-The Recipe Box paginates with `?page=2` and onward rather than scrolling
-forever, and folder urls are numeric ids such as `/recipe-box/38271228`, so the
-folder's real name is taken from the text of the link pointing at it.
+**The Recipe Box is rendered client side.** Fetching a page returns an empty
+shell with no recipes in it, so `collect()` loads each page in a hidden
+same-origin frame and lets the page's own JavaScript build the list, the same
+way opening it yourself would. `crawl()`, which fetches HTML directly, is kept
+only because it may suit a differently built page; on the Recipe Box it finds
+nothing and says so.
+
+It paginates with `?page=2` and onward rather than scrolling forever, and folder
+urls are numeric ids such as `/recipe-box/38271228`, so the folder's real name
+comes from the text of the link pointing at it, with the item count stripped off
+the end.
+
+If framing is blocked, fall back to doing it by hand: open each list, paste the
+script again, and run `__nyt.scan()`.
 
 **Recently Viewed is never collected.** It lists recipes you opened rather than
 saved, and importing it would fill the library with things you never chose.

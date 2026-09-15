@@ -226,3 +226,19 @@ generator against real data, and the rest is Phase 1 content work.
 It matters less than it looks for the owner: his 213 rescued Mealime recipes are
 his library. The seed set is what a stranger sees on first launch, which is a
 section 0 concern and belongs with the rest of the public release work.
+
+## The NYT Recipe Box is collected through hidden frames, not by fetching HTML
+
+Fetching `/recipe-box` and its folder pages returns an empty shell: on
+2026-09-15 a crawl fetched 8 pages successfully and found zero recipes in every
+one, while the same page open in a tab showed 48. The list is built client side.
+`hasNextData: true` with zero recipes in the payload said the same thing.
+
+So `collect()` loads each page in a hidden same origin iframe and lets the
+page's own JavaScript render the list, then reads the frame's DOM. That keeps
+the whole run to a single paste, rather than making the owner open eight lists
+and re-paste the script on each.
+
+`crawl()` is kept rather than deleted. It costs nothing, it is the right shape
+for a server rendered site, and it now reports the client rendering diagnosis
+instead of a silent zero.

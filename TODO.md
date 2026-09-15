@@ -57,8 +57,14 @@ Known gaps, found while building. Section 11 asks for this list to be kept.
 - [ ] The hydration strategy finds nothing on the Recipe Box. Harmless, since
       the DOM carries the list, but it means one of the three fallbacks is dead
       weight there. Leave it for recipe pages, which may hydrate differently.
-- [ ] Still not run end to end. The counts to expect are roughly 163 recipes
-      across about 4 pages plus two folders and the Cooked list.
+- [x] Fetching page HTML finds nothing: the Recipe Box is rendered client side.
+      `collect()` now renders each page in a hidden same origin frame.
+- [ ] Still not run end to end. Expect roughly 163 across about 4 pages, plus
+      folders Easy Kid-Friendly Recipes (70) and Recipes (44), and the Cooked
+      list.
+- [ ] If hidden frames turn out to be blocked, the next thing to try is the
+      JSON endpoint the page itself calls to build the list. Capture it with
+      `browser/capture-api-calls.js` from the mealime-export tool.
 - [ ] `crawl()` fetches folder pages directly, which is faster than visiting
       them but can miss lazily loaded rows. Any folder whose count looks short
       needs `scan()` run on it in the browser instead.

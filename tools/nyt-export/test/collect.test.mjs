@@ -196,3 +196,22 @@ describe('Recently Viewed is never collected', () => {
     globalThis.__nyt.reset();
   });
 });
+
+describe('cleanFolderLabel', () => {
+  test('strips the count welded onto the folder name', () => {
+    assert.equal(internals.cleanFolderLabel('Easy Kid-Friendly Recipes70 recipes'), 'Easy Kid-Friendly Recipes');
+    assert.equal(internals.cleanFolderLabel('Recipes44 recipes'), 'Recipes');
+    assert.equal(internals.cleanFolderLabel('Cooked Recipes'), 'Cooked Recipes');
+  });
+
+  test('collapses whitespace and rejects junk', () => {
+    assert.equal(internals.cleanFolderLabel('  Your   Recipe Box \n'), 'Your Recipe Box');
+    assert.equal(internals.cleanFolderLabel(''), null);
+    assert.equal(internals.cleanFolderLabel(null), null);
+    assert.equal(internals.cleanFolderLabel('x'.repeat(200)), null);
+  });
+
+  test('handles a singular count', () => {
+    assert.equal(internals.cleanFolderLabel('Weeknight Wins1 recipe'), 'Weeknight Wins');
+  });
+});

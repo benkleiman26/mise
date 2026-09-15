@@ -164,6 +164,19 @@
 
   const isCookedPage = (folder, url) => /cooked/i.test(`${folder} ${url}`);
 
+  /**
+   * Folder links read like "Easy Kid-Friendly Recipes70 recipes", with the
+   * count run straight onto the name. Strip it, or every folder ends up with a
+   * number welded to its tag.
+   */
+  function cleanFolderLabel(text) {
+    const label = String(text ?? '')
+      .replace(/\s+/g, ' ')
+      .replace(/\s*\d+\s*recipes?\s*$/i, '')
+      .trim();
+    return label && label.length < 80 ? label : null;
+  }
+
   // Recently Viewed lists recipes the user merely opened. Importing those would
   // quietly fill the library with things they never chose to save, so it is
   // excluded everywhere, both from the crawl and from a manual scan.
@@ -276,8 +289,8 @@
       // A GET should be safe here, but never follow anything that reads like a
       // change. Losing a folder is worse than missing one page.
       if (/(sign[_-]?out|log[_-]?out|delete|remove|unsave|edit|new|create)/i.test(url.pathname + url.search)) return;
-      const label = (anchor.textContent ?? '').trim();
-      if (label && label.length < 80 && !folderNames[url.pathname]) folderNames[url.pathname] = label;
+      const label = cleanFolderLabel(anchor.textContent);
+      if (label && !folderNames[url.pathname]) folderNames[url.pathname] = label;
       candidates.add(url.toString());
     };
 
@@ -331,8 +344,132 @@
     save(state);
     const total = Object.keys(state.recipes).length;
     console.log(`%cCrawled ${visited} pages. ${total} recipes total.`, 'color: green; font-weight: bold');
-    console.log('A fetched folder page may not include lazily loaded rows. Open any folder that looks short and run __nyt.scan().');
+    if (visited > 0 && found_nothing(state, candidates)) {
+      console.warn(
+        'Every fetched page held zero recipes, which means the Recipe Box is rendered client side: ' +
+          'the HTML that arrives over the wire is an empty shell. Use __nyt.collect() instead, which ' +
+          'renders each page in a hidden frame.'
+      );
+    }
     return total;
+  }
+
+  /**
+   * Waits for a frame to finish rendering its recipe list.
+   *
+   * The Recipe Box is rendered client side, so the HTML that arrives over the
+   * wire holds no recipes at all. Fetching it returns an empty shell, which is
+   * exactly what crawl() found. A frame runs the page's JavaScript, so the list
+   * appears the same way it does when you open the page yourself.
+   */
+  function waitForRecipes(frame, timeoutMs) {
+    return new Promise((resolve) => {
+      const startedAt = Date.now();
+      const tick = () => {
+        let doc = null;
+        try {
+          doc = frame.contentDocument;
+        } catch {
+          // Cross origin, which should not happen on our own origin.
+          return resolve({ doc: null, reason: 'blocked' });
+        }
+        const links = doc?.querySelectorAll?.('a[href*="/recipes/"]')?.length ?? 0;
+        if (links > 0) return resolve({ doc, reason: 'ready', links });
+        if (Date.now() - startedAt > timeoutMs) {
+          return resolve({ doc, reason: doc ? 'empty' : 'blocked' });
+        }
+        setTimeout(tick, 300);
+      };
+      tick();
+    });
+  }
+
+  /** Loads one page in a hidden frame and harvests it. */
+  async function harvestInFrame(pageUrl, { timeoutMs = 20000 } = {}) {
+    const frame = document.createElement('iframe');
+    frame.setAttribute('aria-hidden', 'true');
+    frame.style.cssText = 'position:fixed;left:-10000px;top:0;width:1280px;height:2400px;border:0;';
+    frame.src = pageUrl;
+    document.body.appendChild(frame);
+    try {
+      const { doc, reason, links } = await waitForRecipes(frame, timeoutMs);
+      if (!doc || reason !== 'ready') return { found: new Map(), reason };
+      // Give lazily rendered rows a moment after the first link appears.
+      await sleep(600);
+      const found = new Map([...fromHtml(doc.documentElement.innerHTML), ...fromDom(doc)]);
+      return { found, reason, links };
+    } finally {
+      frame.remove();
+    }
+  }
+
+  /**
+   * The one to run. Walks every list in the Recipe Box, page by page, rendering
+   * each in a hidden frame, and stops a list when a page turns up nothing new.
+   */
+  async function collect({ maxPagesPerList = 12, timeoutMs = 20000 } = {}) {
+    const state = load();
+    const lists = new Map();
+
+    for (const anchor of document.querySelectorAll('a[href]')) {
+      const href = anchor.getAttribute('href');
+      if (!href) continue;
+      let url;
+      try {
+        url = new URL(href, location.href);
+      } catch {
+        continue;
+      }
+      if (url.origin !== ORIGIN) continue;
+      if (!/\/recipe-box/i.test(url.pathname)) continue;
+      if (NOT_SAVED.test(url.pathname + url.search)) continue;
+      if (/(sign[_-]?out|log[_-]?out|delete|remove|unsave|edit|new|create)/i.test(url.pathname + url.search)) continue;
+      if (!lists.has(url.pathname)) lists.set(url.pathname, cleanFolderLabel(anchor.textContent) ?? folderOfPage(document, url.href));
+    }
+    if (lists.size === 0) lists.set('/recipe-box', 'Recipe Box');
+
+    console.log(`Walking ${lists.size} lists: ${[...lists.values()].join(', ')}`);
+    let blocked = 0;
+
+    for (const [listPath, folder] of lists) {
+      const cooked = isCookedPage(folder, listPath);
+      for (let page = 1; page <= maxPagesPerList; page += 1) {
+        const pageUrl = page === 1 ? `${ORIGIN}${listPath}` : `${ORIGIN}${listPath}?page=${page}`;
+        const { found, reason } = await harvestInFrame(pageUrl, { timeoutMs });
+        if (reason === 'blocked') {
+          blocked += 1;
+          console.warn(`  ${folder} page ${page}: the frame was blocked`);
+          break;
+        }
+        if (found.size === 0) {
+          if (page === 1) console.warn(`  ${folder}: nothing on the first page`);
+          break;
+        }
+        const added = absorb(state, found, { folder, pageUrl, cooked });
+        state.pages[pageUrl] = { folder, found: found.size, at: new Date().toISOString(), viaFrame: true };
+        save(state);
+        console.log(`  ${folder} page ${page}: ${found.size} found, ${added} new`);
+        // A page that adds nothing new means this list is already covered.
+        if (added === 0 && page > 1) break;
+      }
+    }
+
+    const total = Object.keys(state.recipes).length;
+    console.log(`%c${total} recipes collected.`, 'color: green; font-weight: bold');
+    if (blocked > 0) {
+      console.warn(
+        'Some pages could not be framed. Fall back to doing it by hand: open each list, paste this ' +
+          'script again, and run __nyt.scan().'
+      );
+    }
+    console.log('Run __nyt.status() to check the counts, then __nyt.rescue().');
+    return total;
+  }
+
+  /** True when the crawl fetched pages but none of them held a recipe. */
+  function found_nothing(state, candidates) {
+    const fetched = [...candidates].filter((url) => state.pages[url]?.fetched);
+    return fetched.length > 0 && fetched.every((url) => state.pages[url].found === 0);
   }
 
   function status() {
@@ -385,6 +522,7 @@
   window.__nyt = {
     probe,
     scan,
+    collect,
     crawl,
     status,
     rescue,
@@ -392,11 +530,12 @@
     // Exposed so the extraction logic can be tested without a browser. The
     // page structure here has never been seen by whoever wrote this, so these
     // are the parts most likely to be wrong and most worth covering.
-    __internals: { fromJson, fromHtml, fromDom, absorb, folderOfPage, isCookedPage, nextDataOf, clean },
+    __internals: { fromJson, fromHtml, fromDom, absorb, folderOfPage, isCookedPage, nextDataOf, clean, cleanFolderLabel },
   };
   console.log(
     '%cNYT Recipe Box export loaded.',
     'color: green; font-weight: bold',
-    '\nStart with __nyt.probe(), then __nyt.scan(), then __nyt.crawl(), then __nyt.rescue().'
+    '\nRun __nyt.collect() to walk every list, then __nyt.status() and __nyt.rescue().',
+    '\n__nyt.probe() inspects the page you are on. __nyt.scan() harvests just this page.'
   );
 })();

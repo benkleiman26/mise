@@ -102,6 +102,49 @@ Known gaps, found while building. Section 11 asks for this list to be kept.
 - [ ] `src/bookmarks.mjs` is the reference implementation for Phase 4's Swift
       port. Keep the fixture in step with whatever the app ends up handling.
 
+## Phase 0b review, from a read rather than a compiler
+
+Reviewed on the branch before any build. None of this is verified; it is a list
+of what to watch for, in the order it is likely to bite.
+
+- [ ] **Likely compile error: ambiguous `id`.** `SwiftDataRepository` is generic
+      over `Entity: PersistentModel, Entity: HouseholdRecord`. Both supply an
+      `id`: `HouseholdRecord` declares `var id: UUID`, and `PersistentModel`
+      inherits `Identifiable`. In the generic body, `$0.id` at line 26 and
+      `map(\.id)` at line 30 may not resolve, giving "ambiguous use of 'id'".
+
+      Concrete classes are probably fine, since their own `id: UUID` satisfies
+      `Identifiable`. It is the generic context that is in doubt.
+
+      Fix in order of preference: add `Entity.ID == UUID` to the `where` clause;
+      or disambiguate at the call site with `($0 as any HouseholdRecord).id`; or
+      rename the protocol requirement to `recordID` and give each model
+      `var recordID: UUID { id }`. Try the constraint first, it is one line.
+
+- [ ] **Confirm the two JSON files are in Copy Bundle Resources.** Synchronized
+      file groups infer membership from file type, which should treat `.json` as
+      a resource, but that is the assumption most likely to be silently wrong.
+      The app reports it in Settings rather than crashing, so check there on
+      first run, not just that it launched.
+
+- [ ] **Run the app twice to prove idempotency for real.** The tests cover it in
+      memory. The claim that matters is on disk: launch, force quit, launch
+      again, and confirm Settings still reports 297 canonical items and 12
+      recipes rather than 594 and 24.
+
+- [ ] `.task { container.seedIfNeeded() }` runs after the first render, so the
+      tabs will show empty states for a frame before filling in. Fine for a
+      skeleton, worth a loading state before anyone sees it.
+
+- [ ] `@Attribute(.unique)` on every model is right for Supabase but is not
+      supported by CloudKit. Nothing plans to use CloudKit, since section 3
+      chose Supabase, but record it so nobody reaches for CloudKit in Phase 5
+      and spends an afternoon on the error.
+
+- [ ] `MiseBundle` resolves resources through `Bundle(for:)` rather than
+      `Bundle.main`, which is the right call for a hosted test target. Confirm
+      it actually finds the files from both the app and the tests.
+
 ## Environment
 
 - [ ] No Swift toolchain or Xcode in the cloud environment, so no Swift code can

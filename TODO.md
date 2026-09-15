@@ -123,6 +123,16 @@ Known gaps, found while building. Section 11 asks for this list to be kept.
 
 ## Phase 0b
 
-Not started. `PHASE-0B.md` is the handoff for a Mac session, since the cloud
-environment cannot compile Swift. Everything in that phase that does not need a
-compiler is done: both resource files and their validator.
+Done and verified on 2026-09-15. It builds in Xcode 27, runs in the iPhone 18
+Pro simulator on iOS 27, and Settings reports 45 recipes, 297 grocery items and
+71 pantry entries. The same three numbers came back on a second launch, so
+seeding is idempotent on disk and not only in the in-memory tests.
+
+- [x] The ambiguous `id` that the pre-build review predicted did not happen.
+      The generic over `PersistentModel` and `HouseholdRecord` compiles.
+- [x] The two JSON resources reached the app bundle, which was the assumption
+      most likely to be silently wrong.
+- [ ] `Cmd + U` was never run, so the 26 unit tests have not been executed on a
+      Mac. The app working is stronger evidence than the tests would be, but
+      run them before Phase 1 builds on top of this.
+- [ ] No app icon, and no loading state while seeding runs after first render.

@@ -242,3 +242,29 @@ and re-paste the script on each.
 `crawl()` is kept rather than deleted. It costs nothing, it is the right shape
 for a server rendered site, and it now reports the client rendering diagnosis
 instead of a silent zero.
+
+## The deployment target is iOS 18, not the iOS 17 in the spec
+
+Section 3 sets a floor of iOS 17, written when that was one version back. The
+owner's Mac runs Xcode 27 against the iOS 27 SDK, so 17 is now several versions
+back, and section 12 asked for the minimum to be confirmed rather than assumed.
+
+iOS 17 is the expensive floor specifically because it is where SwiftData
+shipped, at its roughest, and Mise puts every record in SwiftData from Phase 0b
+onward. iOS 18 avoids that while still reaching phones back to 2018 hardware,
+which keeps section 0's audience of Mealime users largely intact. Raising it
+further would buy little and cut real people off.
+
+Reversible until the models and views are written against it, which is why it
+was settled before Phase 0b rather than during.
+
+## The bundle identifier is com.benkleiman.mise and there is no team id yet
+
+A bundle identifier is only a unique string, and Apple does not verify domain
+ownership, so this needs no purchase or setup and can change until the first App
+Store submission.
+
+An Apple Developer team id is deliberately not being collected. It is needed for
+signing on a real device and for TestFlight, which is Phase 5. Everything up to
+then runs in the simulator. Asking the owner to buy a developer membership now
+would spend money months before it is used.

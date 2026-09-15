@@ -85,23 +85,22 @@ anything. It does mean nothing is ever exercised on the actual floor. If the
 minimum stays at iOS 17, install that runtime before the TestFlight build in
 Phase 5, or the first real device on an old OS is where problems surface.
 
-**The minimum deserves a fresh decision.** Section 3 says iOS 17+, written when
-that was one version back. It is now several. Section 12 asks the owner to
-confirm the minimum is acceptable for his devices, and that question is
-genuinely live rather than a formality:
+The installed SDK is **iOS 27.0**, so that is the ceiling for anything written
+here. The simulator runtimes are iOS 26.5, which is normal: you can run on a
+runtime older than the SDK.
 
-- Staying at iOS 17 means availability checks around anything newer, and
-  SwiftData's earliest release, which was its roughest.
-- Raising the floor removes that friction and simplifies the models written in
-  this phase, at the cost of excluding older phones. Section 0 aims at Mealime's
-  audience, not just the owner, and some of them are on old hardware.
+**The deployment target is iOS 18.0.** Section 3 says iOS 17+, written when that
+was one version back rather than several. The owner asked for the call to be
+made rather than put to him, so it is made, and recorded in `DECISIONS.md` with
+the reasoning. Set `IPHONEOS_DEPLOYMENT_TARGET = 18.0`.
 
-This is cheap to decide now and expensive to revisit once every model and view
-has been written against one answer. **Ask the owner before writing the models.**
-Do not pick a floor unilaterally.
+It is reversible for now and gets expensive once models and views assume it, so
+if you have a concrete reason to move it, raise that before writing them rather
+than after.
 
-Whichever floor is chosen, put it in the spec's section 3 rather than only in
-the Xcode project, and note it in `DECISIONS.md`.
+Note that the SDK being iOS 27 means the compiler will happily accept newer APIs
+only if you guard them. Prefer the iOS 18 baseline and avoid `if #available`
+ladders in this phase; the skeleton has no need of anything recent.
 
 ## Things worth deciding well
 
@@ -165,15 +164,21 @@ From section 11:
 - Section 7: use SwiftUI defaults well, do not build a custom design system.
   Dynamic Type, light and dark mode, SF Symbols.
 
-## Needed from the owner before you finish
+## Nothing is needed from the owner to finish this phase
 
-Both are in section 12 and are already in `TODO.md`:
+Both section 12 items are settled:
 
-- Bundle identifier, suggested `com.<yourdomain>.mise`, and the Apple Developer
-  team ID.
-- Confirmation that iOS 17 is an acceptable minimum for his devices.
+- **Bundle identifier: `com.benkleiman.mise`.** It is only a unique string;
+  Apple does not check that you own the domain. It can be changed freely until
+  the first App Store submission.
+- **Apple Developer team ID: not needed.** Signing only matters for a real
+  device or TestFlight, which is Phase 5. Phase 0b runs in the simulator, where
+  automatic signing with any Apple ID, or none, is fine. Do not ask the owner to
+  buy a developer membership for this phase.
+- **Deployment target: iOS 18.0**, see above.
 
-Neither blocks starting. Use a placeholder bundle id and say so in the summary.
+If Xcode nags about a team, leave signing on automatic and select the personal
+team, or none at all. Do not let it become a blocker.
 
 ## Done means
 

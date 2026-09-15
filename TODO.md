@@ -13,14 +13,15 @@ Known gaps, found while building. Section 11 asks for this list to be kept.
       tested but has never run against the real site. Start with
       `__nyt.probe()`, and if all three extraction strategies return zero, send
       that output back rather than guessing at the markup.
-- [ ] Bundle identifier and Apple Developer team ID. Section 12, Phase 0b.
-- [ ] **Confirm the minimum iOS version.** Section 12, Phase 0b. The Mac runs
-      Xcode 27 with iOS 26.5 simulators, so the spec's iOS 17 floor is now
-      several versions back and is worth re-deciding rather than inheriting.
-      Decide before Phase 0b writes the models. See `PHASE-0B.md`.
-- [ ] No iOS 17 simulator runtime is installed, so nothing is ever exercised on
-      the floor the app claims to support. Install one before the Phase 5
-      TestFlight build if the minimum stays at 17.
+- [x] Bundle identifier settled as `com.benkleiman.mise`. No Apple Developer
+      team id is needed until Phase 5, since everything before that runs in the
+      simulator.
+- [x] Minimum iOS version settled at 18.0, against the iOS 27 SDK. See
+      DECISIONS.md. The spec's section 3 still says 17 and should be updated
+      when the owner next edits it.
+- [ ] No iOS 18 simulator runtime is installed, only 26.5. Building for an 18
+      target and running on 26.5 is fine, but nothing is ever exercised on the
+      floor. Install an iOS 18 runtime before the Phase 5 TestFlight build.
 
 ## Mealime export
 

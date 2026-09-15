@@ -107,7 +107,10 @@ Known gaps, found while building. Section 11 asks for this list to be kept.
 - [ ] No Swift toolchain or Xcode in the cloud environment, so no Swift code can
       be compiled or tested there. The app target has to be built on the Mac.
       A session start hook that installs the Swift Linux toolchain would let the
-      platform independent domain services be tested in the cloud.
+      platform independent domain services be tested in the cloud, but
+      `download.swift.org` is blocked by the network policy, so the hook would
+      need that opened first. Even then SwiftUI and SwiftData do not exist on
+      Linux, so only `Domain/Services` would ever compile there.
 
 ## Resources
 
@@ -123,6 +126,44 @@ Known gaps, found while building. Section 11 asks for this list to be kept.
 
 ## Phase 0b
 
-Not started. `PHASE-0B.md` is the handoff for a Mac session, since the cloud
-environment cannot compile Swift. Everything in that phase that does not need a
-compiler is done: both resource files and their validator.
+Written in a cloud session with no Swift toolchain, so none of it has been
+compiled. In order:
+
+- [ ] **Open `Mise.xcodeproj` in Xcode and build.** The project file was
+      generated and then checked by parsing it, which proves every reference
+      resolves and nothing is orphaned. It does not prove Xcode likes it. If it
+      refuses to open, `tools/xcodeproj-lint/` holds the generator and the
+      validator, and the file is small enough to recreate from the target list
+      by hand.
+- [ ] **Check that the two JSON files reach the app bundle.** Synchronized file
+      groups infer build phase membership from file type. If they do not land in
+      Resources, the app opens with a message in Settings saying the starter
+      recipes could not be loaded, and `SeedCatalogTests` fails. The fix is one
+      drag in the Build Phases tab.
+- [ ] **Run the tests** with Command U, or
+      `xcodebuild test -scheme Mise -destination 'platform=iOS Simulator,name=iPhone 17'`.
+      Expect 297 canonical items, 12 recipes, 71 pantry staples, and a second
+      seed run that inserts nothing.
+- [ ] Expect compiler complaints. The likely spots, in rough order: the
+      `@Model` classes declaring their own `id: UUID`, `Codable` enums and
+      dictionaries as SwiftData attributes, and `@MainActor` protocols being
+      satisfied by an inherited generic base class.
+- [ ] No recipe images for the seed set, so the Recipes tab is text only. A
+      placeholder is needed before the cards in Phase 1 look finished.
+- [ ] `SwiftDataRepository.find(id:)` and `existingIDs()` fetch everything and
+      filter in Swift. Fine for 297 rows, not fine for the thousand recipe
+      library section 5.1 expects. Move to a `#Predicate` on each concrete
+      repository when the library grows.
+- [ ] Seeding never removes anything. A canonical item deleted by hand comes
+      back on the next launch, since the id is derived rather than remembered.
+      Nothing in v1 deletes canonical items, so it can wait, but it is the first
+      thing to break if editing the table ever ships.
+- [ ] Settings is read only. Editing preferences, reordering aisles and
+      inviting a household member are section 5.6, and "Import from Mealime" is
+      section 5.7, all Phase 5.
+- [ ] The app icon is an empty slot in the asset catalog. Section 12 asks the
+      owner for a direction in Phase 5.
+- [ ] `Domain/Services` holds only `SeedCatalog`, `StableID` and the bundle
+      accessor so far. Whether `ListGenerator` and friends move to a `MiseCore`
+      package is still a question for the owner, per `PHASE-0B.md`. Nothing here
+      forecloses it.

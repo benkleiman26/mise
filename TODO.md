@@ -67,26 +67,29 @@ Known gaps, found while building. Section 11 asks for this list to be kept.
 - [x] Fetching page HTML finds nothing: the Recipe Box is rendered client side.
       `collect()` now renders each page in a hidden same origin frame.
 - [x] collect() ran and found 163, matching the expected count.
-- [ ] **Parked at 96 of 163.** `data/nyt/nyt_recipe_box.json` holds 96 real
-      recipes, all filed under one generic list with none marked cooked, so the
-      folders and the Cooked list are missing. Four attempts to produce a
-      complete dump did not, most likely because an older copy of the collector
-      was pasted each time; the collector is now version stamped and convert
-      warns when a dump is stale, which should settle it next time.
+- [x] **Done, 2026-09-15.** `data/nyt/nyt_recipe_box.json` holds 169 recipes,
+      folders "Easy Kid-Friendly Recipes" (70, tag "kid friendly") and "Recipes"
+      (44, no tag, too generic), and 2 marked cooked (Ben has only ever marked
+      two recipes cooked in NYT, confirmed on the Cooked Recipes page). The raw
+      dump is kept at `data/nyt/raw-nyt-recipe-box-2026-09-15.json`.
 
-      Parked deliberately rather than abandoned: NYT is not shutting down, the
-      recipes are safe in the Recipe Box, and this file is not consumed until
-      Phase 4. Finishing it later costs nothing, because the app dedupes on the
-      NYT numeric id per section 5.6a, so a later complete import adds the
-      missing recipes without duplicating the 96 already there.
-
-      To resume: paste `browser/collect.js`, confirm the banner shows the
-      current version, then `__nyt.reset()`, `await __nyt.collect()`,
-      `__nyt.status()`, `__nyt.rescue()`. Expect 163, folders Easy
-      Kid-Friendly Recipes (70) and Recipes (44), and a cooked count above zero.
-- [ ] If hidden frames turn out to be blocked, the next thing to try is the
-      JSON endpoint the page itself calls to build the list. Capture it with
-      `browser/capture-api-calls.js` from the mealime-export tool.
+      Collected by driving the real tab through each list from the cloud session
+      rather than the in-page hidden frames, which froze the renderer. The key
+      fix was scoping the harvest to `[class*="cardGrid"]`: a folder page also
+      renders a `carousel_cardList` of recommendations, and the old unscoped
+      selector tagged those ~26 extra recipes as belonging to the folder. With
+      grid scoping the folders came out at exactly 70 and 44. 169 is a touch
+      over the 163 expected on 2026-09-14; the box grew, and the app dedupes on
+      the NYT id anyway.
+- [ ] Only 48 of 169 recipes carry a title in the dump, since later pages were
+      swept for ids only. Harmless: the app refetches each URL and gets the
+      title from JSON-LD. Re-run with titles if a nicer offline list is wanted.
+- [ ] The in-page hidden-frame walk in `collect.js` froze the renderer when run
+      over CDP from a cloud session (many heavy iframes at once). The reliable
+      path was navigating the real tab per list. If `collect.js` is ever run by
+      hand it may still be fine, but a rewrite that navigates rather than frames
+      would be sturdier. Also: scope its DOM read to `[class*="cardGrid"]` so the
+      recommendation carousel on folder pages stops leaking into folder tags.
 - [ ] `crawl()` fetches folder pages directly, which is faster than visiting
       them but can miss lazily loaded rows. Any folder whose count looks short
       needs `scan()` run on it in the browser instead.
@@ -96,64 +99,24 @@ Known gaps, found while building. Section 11 asks for this list to be kept.
 
 ## Bulk import
 
-- [ ] The `looksLikeRecipe` heuristic is deliberately generous and has only been
-      run against the test fixture. Check its calls against the real bookmarks
-      file before trusting the "not recipes" count.
+- [ ] Run against Ben's real bookmarks export on 2026-09-15: 49 bookmarks in
+      folders Finance, Riprova, Wellness, and zero actual recipes. It was his
+      bookmarks bar, not the folder of open recipe tabs the import is meant for,
+      so there was nothing to import. The recipe tabs were never bookmarked.
+- [ ] The `looksLikeRecipe` heuristic flagged 14 of those 49 as recipes, every
+      one a false positive (bank and brokerage login pages whose URL paths read
+      as recipe-shaped). Harmless for the count, but the bulk import would queue
+      them as recipe fetches, so tighten it: require a known food host or a
+      clearer recipe path signal before a login or account page counts.
 - [ ] `src/bookmarks.mjs` is the reference implementation for Phase 4's Swift
       port. Keep the fixture in step with whatever the app ends up handling.
-
-## Phase 0b review, from a read rather than a compiler
-
-Reviewed on the branch before any build. None of this is verified; it is a list
-of what to watch for, in the order it is likely to bite.
-
-- [ ] **Likely compile error: ambiguous `id`.** `SwiftDataRepository` is generic
-      over `Entity: PersistentModel, Entity: HouseholdRecord`. Both supply an
-      `id`: `HouseholdRecord` declares `var id: UUID`, and `PersistentModel`
-      inherits `Identifiable`. In the generic body, `$0.id` at line 26 and
-      `map(\.id)` at line 30 may not resolve, giving "ambiguous use of 'id'".
-
-      Concrete classes are probably fine, since their own `id: UUID` satisfies
-      `Identifiable`. It is the generic context that is in doubt.
-
-      Fix in order of preference: add `Entity.ID == UUID` to the `where` clause;
-      or disambiguate at the call site with `($0 as any HouseholdRecord).id`; or
-      rename the protocol requirement to `recordID` and give each model
-      `var recordID: UUID { id }`. Try the constraint first, it is one line.
-
-- [ ] **Confirm the two JSON files are in Copy Bundle Resources.** Synchronized
-      file groups infer membership from file type, which should treat `.json` as
-      a resource, but that is the assumption most likely to be silently wrong.
-      The app reports it in Settings rather than crashing, so check there on
-      first run, not just that it launched.
-
-- [ ] **Run the app twice to prove idempotency for real.** The tests cover it in
-      memory. The claim that matters is on disk: launch, force quit, launch
-      again, and confirm Settings still reports 297 canonical items and 12
-      recipes rather than 594 and 24.
-
-- [ ] `.task { container.seedIfNeeded() }` runs after the first render, so the
-      tabs will show empty states for a frame before filling in. Fine for a
-      skeleton, worth a loading state before anyone sees it.
-
-- [ ] `@Attribute(.unique)` on every model is right for Supabase but is not
-      supported by CloudKit. Nothing plans to use CloudKit, since section 3
-      chose Supabase, but record it so nobody reaches for CloudKit in Phase 5
-      and spends an afternoon on the error.
-
-- [ ] `MiseBundle` resolves resources through `Bundle(for:)` rather than
-      `Bundle.main`, which is the right call for a hosted test target. Confirm
-      it actually finds the files from both the app and the tests.
 
 ## Environment
 
 - [ ] No Swift toolchain or Xcode in the cloud environment, so no Swift code can
       be compiled or tested there. The app target has to be built on the Mac.
       A session start hook that installs the Swift Linux toolchain would let the
-      platform independent domain services be tested in the cloud, but
-      `download.swift.org` is blocked by the network policy, so the hook would
-      need that opened first. Even then SwiftUI and SwiftData do not exist on
-      Linux, so only `Domain/Services` would ever compile there.
+      platform independent domain services be tested in the cloud.
 
 ## Resources
 
@@ -169,44 +132,6 @@ of what to watch for, in the order it is likely to bite.
 
 ## Phase 0b
 
-Written in a cloud session with no Swift toolchain, so none of it has been
-compiled. In order:
-
-- [ ] **Open `Mise.xcodeproj` in Xcode and build.** The project file was
-      generated and then checked by parsing it, which proves every reference
-      resolves and nothing is orphaned. It does not prove Xcode likes it. If it
-      refuses to open, `tools/xcodeproj-lint/` holds the generator and the
-      validator, and the file is small enough to recreate from the target list
-      by hand.
-- [ ] **Check that the two JSON files reach the app bundle.** Synchronized file
-      groups infer build phase membership from file type. If they do not land in
-      Resources, the app opens with a message in Settings saying the starter
-      recipes could not be loaded, and `SeedCatalogTests` fails. The fix is one
-      drag in the Build Phases tab.
-- [ ] **Run the tests** with Command U, or
-      `xcodebuild test -scheme Mise -destination 'platform=iOS Simulator,name=iPhone 17'`.
-      Expect 297 canonical items, 12 recipes, 71 pantry staples, and a second
-      seed run that inserts nothing.
-- [ ] Expect compiler complaints. The likely spots, in rough order: the
-      `@Model` classes declaring their own `id: UUID`, `Codable` enums and
-      dictionaries as SwiftData attributes, and `@MainActor` protocols being
-      satisfied by an inherited generic base class.
-- [ ] No recipe images for the seed set, so the Recipes tab is text only. A
-      placeholder is needed before the cards in Phase 1 look finished.
-- [ ] `SwiftDataRepository.find(id:)` and `existingIDs()` fetch everything and
-      filter in Swift. Fine for 297 rows, not fine for the thousand recipe
-      library section 5.1 expects. Move to a `#Predicate` on each concrete
-      repository when the library grows.
-- [ ] Seeding never removes anything. A canonical item deleted by hand comes
-      back on the next launch, since the id is derived rather than remembered.
-      Nothing in v1 deletes canonical items, so it can wait, but it is the first
-      thing to break if editing the table ever ships.
-- [ ] Settings is read only. Editing preferences, reordering aisles and
-      inviting a household member are section 5.6, and "Import from Mealime" is
-      section 5.7, all Phase 5.
-- [ ] The app icon is an empty slot in the asset catalog. Section 12 asks the
-      owner for a direction in Phase 5.
-- [ ] `Domain/Services` holds only `SeedCatalog`, `StableID` and the bundle
-      accessor so far. Whether `ListGenerator` and friends move to a `MiseCore`
-      package is still a question for the owner, per `PHASE-0B.md`. Nothing here
-      forecloses it.
+Not started. `PHASE-0B.md` is the handoff for a Mac session, since the cloud
+environment cannot compile Swift. Everything in that phase that does not need a
+compiler is done: both resource files and their validator.

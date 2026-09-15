@@ -72,6 +72,37 @@ mode.
 The owner's rescued Mealime data is in `data/`, which is git ignored. **Do not
 commit anything from `data/`.** The repository is public.
 
+## The toolchain, and a deployment target question
+
+Confirmed on the owner's Mac on 2026-09-15: **Xcode 27.0** (build 27A266a), with
+**iOS 26.5** simulator runtimes installed (iPhone 17 family, iPhone Air, iPad
+Pro M5). That is far ahead of anything this repository assumes, so two things
+follow.
+
+**No iOS 17 runtime is installed.** Building with a deployment target of iOS 17
+and running on an iOS 26.5 simulator is fine and normal, so this does not block
+anything. It does mean nothing is ever exercised on the actual floor. If the
+minimum stays at iOS 17, install that runtime before the TestFlight build in
+Phase 5, or the first real device on an old OS is where problems surface.
+
+**The minimum deserves a fresh decision.** Section 3 says iOS 17+, written when
+that was one version back. It is now several. Section 12 asks the owner to
+confirm the minimum is acceptable for his devices, and that question is
+genuinely live rather than a formality:
+
+- Staying at iOS 17 means availability checks around anything newer, and
+  SwiftData's earliest release, which was its roughest.
+- Raising the floor removes that friction and simplifies the models written in
+  this phase, at the cost of excluding older phones. Section 0 aims at Mealime's
+  audience, not just the owner, and some of them are on old hardware.
+
+This is cheap to decide now and expensive to revisit once every model and view
+has been written against one answer. **Ask the owner before writing the models.**
+Do not pick a floor unilaterally.
+
+Whichever floor is chosen, put it in the spec's section 3 rather than only in
+the Xcode project, and note it in `DECISIONS.md`.
+
 ## Things worth deciding well
 
 **Models.** Section 4 lists them: Recipe, Ingredient, Step, canonical grocery

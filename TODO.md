@@ -14,7 +14,13 @@ Known gaps, found while building. Section 11 asks for this list to be kept.
       `__nyt.probe()`, and if all three extraction strategies return zero, send
       that output back rather than guessing at the markup.
 - [ ] Bundle identifier and Apple Developer team ID. Section 12, Phase 0b.
-- [ ] Confirm iOS 17 as the minimum. Section 12, Phase 0b.
+- [ ] **Confirm the minimum iOS version.** Section 12, Phase 0b. The Mac runs
+      Xcode 27 with iOS 26.5 simulators, so the spec's iOS 17 floor is now
+      several versions back and is worth re-deciding rather than inheriting.
+      Decide before Phase 0b writes the models. See `PHASE-0B.md`.
+- [ ] No iOS 17 simulator runtime is installed, so nothing is ever exercised on
+      the floor the app claims to support. Install one before the Phase 5
+      TestFlight build if the minimum stays at 17.
 
 ## Mealime export
 

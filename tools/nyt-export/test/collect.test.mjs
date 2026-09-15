@@ -241,3 +241,38 @@ describe('collected recipes survive a sessionStorage failure', () => {
     globalThis.__nyt.reset();
   });
 });
+
+describe('a folder page carousel does not leak into the folder', () => {
+  // A folder page renders the folder's own cardGrid plus a carousel of
+  // recommendations. Harvesting both is how a 70 recipe folder came out at 96.
+  function stubWithGrid({ gridHtml, carouselHtml }) {
+    const grid = {
+      innerHTML: gridHtml,
+      querySelectorAll: () => [],
+    };
+    return {
+      title: 'Folder',
+      documentElement: { innerHTML: gridHtml + carouselHtml },
+      body: { innerText: '', appendChild() {} },
+      getElementById: () => null,
+      querySelector: () => null,
+      querySelectorAll: (selector) => (selector.includes('cardGrid') ? [grid] : []),
+      createElement: () => ({ click() {}, remove() {}, set href(v) {}, set download(v) {} }),
+    };
+  }
+
+  test('scopes the harvest to the card grid when there is one', () => {
+    const doc = stubWithGrid({
+      gridHtml: '<a href="/recipes/111-mine">mine</a><a href="/recipes/222-also-mine">also</a>',
+      carouselHtml: '<div class="carousel_cardList"><a href="/recipes/999-recommended">rec</a></div>',
+    });
+    const markup = internals.markupOf(doc);
+    const found = internals.fromHtml(markup);
+    assert.deepEqual([...found.keys()].sort(), ['111', '222'], 'the recommendation must not be collected');
+  });
+
+  test('falls back to the whole document when there is no grid', () => {
+    const doc = stubDom({ html: '<a href="/recipes/333-only">x</a>' });
+    assert.deepEqual([...internals.fromHtml(internals.markupOf(doc)).keys()], ['333']);
+  });
+});

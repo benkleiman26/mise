@@ -87,7 +87,7 @@ export function nytRecipeId(url) {
 }
 
 /** Hosts that are almost certainly not a recipe, so they can be set aside. */
-const NOT_RECIPES = [
+const NOT_RECIPE_HOSTS = [
   /^(www\.)?(google|bing|duckduckgo)\./i,
   /^(www\.)?(youtube|youtu\.be|twitter|x|facebook|instagram|reddit|pinterest)\./i,
   /^(mail|drive|docs|calendar)\.google\./i,
@@ -95,11 +95,33 @@ const NOT_RECIPES = [
 ];
 
 /**
- * A guess at whether a bookmark is a recipe, used only to order the work and
- * to set expectations. The import still tries every URL, because guessing wrong
- * and skipping a real recipe is worse than one wasted fetch.
+ * Paths that mean an account page rather than an article.
+ *
+ * This is the fix for a real miss: run against a real bookmarks bar, the old
+ * heuristic called 14 of 49 bookmarks recipes, every one a bank or brokerage
+ * login whose path happened to read as recipe shaped. The bulk import would
+ * have queued them all as recipe fetches.
  */
-export function looksLikeRecipe({ url, title }) {
+const ACCOUNT_PATH =
+  /\b(log[-_]?in|sign[-_]?in|sign[-_]?on|logon|auth|oauth|sso|account|accounts|banking|secure|portal|dashboard|billing|checkout|cart|invoice|statement|password|profile|settings|admin|support|careers|privacy|terms|customer[-_]?service|client[-_]?home|credit[-_]?cards?|loans?|mortgage|insurance|investing|brokerage|retirement)\b/i;
+
+/** Sites that publish recipes, so a bookmark there is one with high confidence. */
+const FOOD_HOSTS =
+  /(cooking\.nytimes|seriouseats|smittenkitchen|bonappetit|epicurious|food52|allrecipes|foodnetwork|simplyrecipes|budgetbytes|thekitchn|delish|tasteofhome|halfbakedharvest|loveandlemons|minimalistbaker|cookieandkate|pinchofyum|americastestkitchen|kingarthurbaking|bbcgoodfood|jamieoliver|justonecookbook|thewoksoflife|recipetineats|sallysbakingaddiction|thepioneerwoman|eatingwell|myrecipes|yummly|seriouseats|nytimes\.com\/.*\/food)/i;
+
+const RECIPE_PATH = /\b(recipes?|cook(ing)?|kitchen|bak(e|ing)|dinner|dish|meal)\b/i;
+const RECIPE_TITLE = /\b(recipe|salad|soup|chicken|pasta|roast|bake[ds]?|stew|curry|risotto|taco|braise|skillet|sheet[- ]pan)\b/i;
+
+/**
+ * Why a bookmark is, or is not, thought to be a recipe.
+ *
+ * A tier rather than a yes or no, because the two failure modes cost different
+ * amounts. Queueing a bank login as a recipe fetch is noise the user has to
+ * clear; missing a real recipe loses it. So an unknown host with an
+ * article-shaped path stays a `maybe` and still gets imported, while anything
+ * that reads as an account page is ruled out outright.
+ */
+export function recipeSignal({ url, title } = {}) {
   let host;
   let pathname;
   try {
@@ -107,15 +129,29 @@ export function looksLikeRecipe({ url, title }) {
     host = parsed.hostname;
     pathname = parsed.pathname;
   } catch {
-    return false;
+    return 'no';
   }
-  if (NOT_RECIPES.some((pattern) => pattern.test(host))) return false;
-  if (nytRecipeId(url)) return true;
-  if (/recipe|cook|kitchen|food|bake|dinner|eats/i.test(host + pathname)) return true;
-  if (title && /recipe|salad|soup|chicken|pasta|roast|bake/i.test(title)) return true;
-  // A plain article URL on an unknown host may still be a recipe, so this is a
-  // maybe rather than a no.
-  return pathname.split('/').filter(Boolean).length >= 2;
+
+  if (NOT_RECIPE_HOSTS.some((pattern) => pattern.test(host))) return 'no';
+  if (nytRecipeId(url)) return 'nyt';
+  if (FOOD_HOSTS.test(host)) return 'foodHost';
+  // Checked after the food hosts, so a real site's "recipes/login" page is not
+  // thrown away along with a bank's.
+  if (ACCOUNT_PATH.test(pathname)) return 'no';
+  if (RECIPE_PATH.test(host + pathname)) return 'recipePath';
+  if (title && RECIPE_TITLE.test(title)) return 'recipeTitle';
+  // An unknown host with a real article path. Worth a fetch, not worth
+  // counting as a recipe with any confidence.
+  return pathname.split('/').filter(Boolean).length >= 2 ? 'maybe' : 'no';
+}
+
+/**
+ * Whether the bulk import should try this URL at all. The import fetches
+ * everything it is given, so this only rules out what is certainly not a
+ * recipe. Use `recipeSignal` when the confidence matters.
+ */
+export function looksLikeRecipe(bookmark) {
+  return recipeSignal(bookmark) !== 'no';
 }
 
 /** Normalizes a URL for deduplication: no fragment, no tracking parameters. */

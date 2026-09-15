@@ -2,7 +2,7 @@ import { strict as assert } from 'node:assert';
 import { test, describe } from 'node:test';
 import { readFileSync } from 'node:fs';
 
-import { canonicalUrl, decodeEntities, looksLikeRecipe, nytRecipeId, parseBookmarks } from '../src/bookmarks.mjs';
+import { canonicalUrl, decodeEntities, looksLikeRecipe, nytRecipeId, parseBookmarks, recipeSignal } from '../src/bookmarks.mjs';
 import { buildInventory } from '../src/inventory.mjs';
 
 const HTML = readFileSync(new URL('./fixtures/bookmarks.html', import.meta.url), 'utf8');
@@ -126,5 +126,68 @@ describe('buildInventory', () => {
   test('declares a stable format and version', () => {
     assert.equal(inventory.format, 'bookmarks-inventory');
     assert.equal(inventory.version, 1);
+  });
+});
+
+describe('account pages are not recipes', () => {
+  // Run against a real bookmarks bar, the old heuristic called 14 of 49
+  // bookmarks recipes, every one a bank or brokerage page whose path read as
+  // recipe shaped. These are that shape.
+  const accountPages = [
+    'https://www.chase.com/personal/credit-cards',
+    'https://secure.bankofamerica.com/login/sign-in/signOnV2Screen.go',
+    'https://www.fidelity.com/customer-service/overview',
+    'https://www.schwab.com/client-home',
+    'https://www.ally.com/bank/online-savings-account/',
+    'https://login.vanguard.com/account/dashboard',
+    'https://www.statefarm.com/insurance/auto',
+    'https://my.example.com/billing/statement',
+  ];
+
+  for (const url of accountPages) {
+    test(`rules out ${new URL(url).hostname}`, () => {
+      assert.equal(recipeSignal({ url }), 'no');
+      assert.equal(looksLikeRecipe({ url }), false);
+    });
+  }
+});
+
+describe('recipeSignal tiers', () => {
+  test('names why it is confident', () => {
+    assert.equal(recipeSignal({ url: 'https://cooking.nytimes.com/recipes/1-x' }), 'nyt');
+    assert.equal(recipeSignal({ url: 'https://www.seriouseats.com/the-best-chili-recipe' }), 'foodHost');
+    assert.equal(recipeSignal({ url: 'https://someblog.test/recipes/lemon-pasta' }), 'recipePath');
+    assert.equal(recipeSignal({ url: 'https://someblog.test/x', title: 'Roast Chicken' }), 'recipeTitle');
+  });
+
+  test('keeps an unknown article as a maybe rather than dropping it', () => {
+    assert.equal(recipeSignal({ url: 'https://someblog.test/2024/03/thing' }), 'maybe');
+    assert.equal(looksLikeRecipe({ url: 'https://someblog.test/2024/03/thing' }), true);
+  });
+
+  test('a food site login is still ruled out, but the site is not', () => {
+    assert.equal(recipeSignal({ url: 'https://www.seriouseats.com/account/login' }), 'foodHost');
+    assert.equal(recipeSignal({ url: 'https://unknownfood.test/account/login' }), 'no');
+  });
+
+  test('handles junk without throwing', () => {
+    assert.equal(recipeSignal({ url: 'not a url' }), 'no');
+    assert.equal(recipeSignal({}), 'no');
+    assert.equal(recipeSignal(), 'no');
+  });
+});
+
+describe('inventory reports confidence, not just a count', () => {
+  test('separates confident recipes from maybes', () => {
+    const html = `<DL><p>
+      <DT><A HREF="https://cooking.nytimes.com/recipes/1-x">A</A>
+      <DT><A HREF="https://someblog.test/2024/03/thing">B</A>
+      <DT><A HREF="https://www.chase.com/personal/credit-cards">C</A>
+    </DL><p>`;
+    const inv = buildInventory({ html });
+    assert.equal(inv.counts.confidentRecipes, 1);
+    assert.equal(inv.counts.maybeRecipes, 1);
+    assert.equal(inv.counts.notRecipes, 1);
+    assert.deepEqual(inv.bySignal, { nyt: 1, maybe: 1, no: 1 });
   });
 });

@@ -4,7 +4,7 @@ import { mkdtemp, readFile, rm, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 
-import { buildRecipeBox, folderToTag, normalizeRecipe, reviewWarnings, runConvert } from '../src/convert.mjs';
+import { CURRENT_COLLECTOR, buildRecipeBox, folderToTag, normalizeRecipe, reviewWarnings, runConvert } from '../src/convert.mjs';
 
 describe('folderToTag', () => {
   test('turns a folder name into a flat lowercase tag', () => {
@@ -192,7 +192,7 @@ describe('catching a stale or partial dump', () => {
     const recipes = Array.from({ length: 163 }, (_, i) => ({
       id: String(i + 1), title: 't', cooked: i < 20, folders: ['Easy Kid-Friendly Recipes', 'Recipes'],
     }));
-    const dump = { scriptVersion: '2026-09-15.2', counts: { recipes: 163 }, recipes };
+    const dump = { scriptVersion: CURRENT_COLLECTOR, counts: { recipes: 163 }, recipes };
     assert.deepEqual(reviewWarnings(buildRecipeBox(dump), { dump }), []);
   });
 });
@@ -214,7 +214,7 @@ describe('collector version stamping', () => {
     const recipes = Array.from({ length: 163 }, (_, i) => ({
       id: String(i + 1), title: 't', cooked: i < 20, folders: ['Easy Kid-Friendly Recipes', 'Recipes'],
     }));
-    const dump = { scriptVersion: '2026-09-15.2', counts: { recipes: 163 }, recipes };
+    const dump = { scriptVersion: CURRENT_COLLECTOR, counts: { recipes: 163 }, recipes };
     assert.deepEqual(reviewWarnings(buildRecipeBox(dump), { dump }), []);
   });
 });

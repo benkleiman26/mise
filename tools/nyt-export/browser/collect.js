@@ -22,7 +22,7 @@
   // It is stamped into the dump so convert can tell which script produced it,
   // which matters because the script is pasted by hand and an old copy in the
   // clipboard looks exactly like a new one.
-  const SCRIPT_VERSION = '2026-09-15.2';
+  const SCRIPT_VERSION = '2026-09-15.3';
   const KEY = '__nytRecipeBox';
   const ORIGIN = 'https://cooking.nytimes.com';
   // cooking.nytimes.com/recipes/<numeric id>-<slug>. The id is the stable key
@@ -136,10 +136,34 @@
     return out;
   }
 
-  /** Reads recipe links out of the rendered DOM. */
+  /**
+   * Where a page's own recipes live.
+   *
+   * A folder page renders the folder's cardGrid and also a
+   * carousel_cardList of recommendations. Harvesting the whole document
+   * tagged about 26 recommended recipes as belonging to the folder, which is
+   * how "Easy Kid-Friendly Recipes" came out at 96 instead of 70. Scope to the
+   * grid when there is one, and fall back to the document when there is not.
+   */
+  function recipeRoots(doc = document) {
+    const grids = [...(doc.querySelectorAll?.('[class*="cardGrid"]') ?? [])];
+    return grids.length > 0 ? grids : [doc];
+  }
+
+  /** The markup to scan, scoped the same way. */
+  function markupOf(doc = document) {
+    return recipeRoots(doc)
+      .map((root) => root.innerHTML ?? root.documentElement?.innerHTML ?? '')
+      .join('\n');
+  }
+
+  /** Reads recipe links out of the rendered DOM, scoped to the card grid. */
   function fromDom(doc = document) {
     const out = new Map();
-    for (const anchor of doc.querySelectorAll('a[href*="/recipes/"], a[href*="/recipe/"]')) {
+    const anchors = recipeRoots(doc).flatMap((root) => [
+      ...(root.querySelectorAll?.('a[href*="/recipes/"], a[href*="/recipe/"]') ?? []),
+    ]);
+    for (const anchor of anchors) {
       const href = anchor.getAttribute('href') ?? '';
       const match = href.match(RECIPE_HREF);
       if (!match) continue;
@@ -238,7 +262,7 @@
     const next = nextDataOf();
     const dom = fromDom();
     const json = next ? fromJson(next) : new Map();
-    const html = fromHtml(document.documentElement.innerHTML);
+    const html = fromHtml(markupOf());
     const folderLinks = [...document.querySelectorAll('a[href]')]
       .map((a) => a.getAttribute('href'))
       .filter((h) => h && /folder|recipe-box|collection|cooked/i.test(h));
@@ -248,6 +272,7 @@
       folderGuess: folderOfPage(),
       hasNextData: Boolean(next),
       counts: { fromNextData: json.size, fromDom: dom.size, fromHtml: html.size },
+      scopedToCardGrid: recipeRoots().length > 0 && recipeRoots()[0] !== document,
       folderLinks: [...new Set(folderLinks)].slice(0, 40),
       sampleFromDom: [...dom.values()].slice(0, 3),
     };
@@ -278,7 +303,7 @@
     const name = folder ?? folderOfPage();
     const next = nextDataOf();
     const found = new Map([
-      ...fromHtml(document.documentElement.innerHTML),
+      ...fromHtml(markupOf()),
       ...(next ? fromJson(next) : new Map()),
       ...fromDom(),
     ]);
@@ -432,7 +457,7 @@
       if (!doc || reason !== 'ready') return { found: new Map(), reason };
       // Give lazily rendered rows a moment after the first link appears.
       await sleep(600);
-      const found = new Map([...fromHtml(doc.documentElement.innerHTML), ...fromDom(doc)]);
+      const found = new Map([...fromHtml(markupOf(doc)), ...fromDom(doc)]);
       return { found, reason, links };
     } finally {
       frame.remove();
@@ -588,7 +613,7 @@
     // Exposed so the extraction logic can be tested without a browser. The
     // page structure here has never been seen by whoever wrote this, so these
     // are the parts most likely to be wrong and most worth covering.
-    __internals: { fromJson, fromHtml, fromDom, absorb, folderOfPage, isCookedPage, nextDataOf, clean, cleanFolderLabel },
+    __internals: { fromJson, fromHtml, fromDom, absorb, folderOfPage, isCookedPage, nextDataOf, clean, cleanFolderLabel, recipeRoots, markupOf },
   };
   console.log(
     `%cNYT Recipe Box export loaded, version ${SCRIPT_VERSION}.`,

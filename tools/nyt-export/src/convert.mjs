@@ -138,7 +138,7 @@ export function buildRecipeBox(dump, { now = () => new Date().toISOString() } = 
 }
 
 /** Warnings worth showing before the owner walks away thinking it is done. */
-export const CURRENT_COLLECTOR = '2026-09-15.2';
+export const CURRENT_COLLECTOR = '2026-09-15.3';
 
 export function reviewWarnings(box, { expected = 163, dump = null, collector = CURRENT_COLLECTOR } = {}) {
   const warnings = [];

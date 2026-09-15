@@ -84,12 +84,14 @@ Known gaps, found while building. Section 11 asks for this list to be kept.
 - [ ] Only 48 of 169 recipes carry a title in the dump, since later pages were
       swept for ids only. Harmless: the app refetches each URL and gets the
       title from JSON-LD. Re-run with titles if a nicer offline list is wanted.
+- [x] `collect.js` now scopes its harvest to `[class*="cardGrid"]`, so a folder
+      page's recommendation carousel no longer leaks into folder tags. Collector
+      version 2026-09-15.3.
 - [ ] The in-page hidden-frame walk in `collect.js` froze the renderer when run
       over CDP from a cloud session (many heavy iframes at once). The reliable
       path was navigating the real tab per list. If `collect.js` is ever run by
       hand it may still be fine, but a rewrite that navigates rather than frames
-      would be sturdier. Also: scope its DOM read to `[class*="cardGrid"]` so the
-      recommendation carousel on folder pages stops leaking into folder tags.
+      would be sturdier.
 - [ ] `crawl()` fetches folder pages directly, which is faster than visiting
       them but can miss lazily loaded rows. Any folder whose count looks short
       needs `scan()` run on it in the browser instead.
@@ -103,11 +105,17 @@ Known gaps, found while building. Section 11 asks for this list to be kept.
       folders Finance, Riprova, Wellness, and zero actual recipes. It was his
       bookmarks bar, not the folder of open recipe tabs the import is meant for,
       so there was nothing to import. The recipe tabs were never bookmarked.
-- [ ] The `looksLikeRecipe` heuristic flagged 14 of those 49 as recipes, every
-      one a false positive (bank and brokerage login pages whose URL paths read
-      as recipe-shaped). Harmless for the count, but the bulk import would queue
-      them as recipe fetches, so tighten it: require a known food host or a
-      clearer recipe path signal before a login or account page counts.
+- [x] Fixed the `looksLikeRecipe` false positives. It now returns a tier
+      (`recipeSignal`): nyt, foodHost, recipePath, recipeTitle, maybe, or no.
+      Account-shaped paths (login, banking, credit-cards, billing and the rest)
+      are ruled out outright unless the host is a known food site, and the
+      inventory reports confident and maybe counts separately rather than one
+      number that treats a bank login like a recipe. The eight account URL
+      shapes from the real export are in the tests.
+- [ ] **The bookmarks input was the wrong folder.** The export was the bookmarks
+      bar, not a folder of the open recipe tabs. If those tabs are still open,
+      bookmark them into one folder, export again, and run the inventory with
+      `--folder`. If they are gone, so is that batch; nothing else depends on it.
 - [ ] `src/bookmarks.mjs` is the reference implementation for Phase 4's Swift
       port. Keep the fixture in step with whatever the app ends up handling.
 

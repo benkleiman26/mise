@@ -138,9 +138,21 @@ export function buildRecipeBox(dump, { now = () => new Date().toISOString() } = 
 }
 
 /** Warnings worth showing before the owner walks away thinking it is done. */
-export function reviewWarnings(box, { expected = 163, dump = null } = {}) {
+export const CURRENT_COLLECTOR = '2026-09-15.2';
+
+export function reviewWarnings(box, { expected = 163, dump = null, collector = CURRENT_COLLECTOR } = {}) {
   const warnings = [];
   const { recipes, cooked, withTitle } = box.counts;
+
+  // The collector is pasted by hand, so an old copy still sitting in the
+  // clipboard produces a dump that looks current. Say so outright.
+  if (dump && dump.scriptVersion !== collector) {
+    warnings.push(
+      `This dump came from collector ${dump.scriptVersion ?? '(unversioned, so older than 2026-09-15.2)'} but the ` +
+        `current one is ${collector}. Re-copy the script and collect again: ` +
+        'cd ~/mise && git pull && pbcopy < tools/nyt-export/browser/collect.js'
+    );
+  }
 
   // A stale download is the likeliest cause of a short result, and it looks
   // exactly like a collection failure unless you check.
@@ -192,6 +204,7 @@ export async function runConvert({ inFile, outFile, log = console.log }) {
   // its low counts as a collection problem.
   log(`Reading ${inFile}`);
   if (dump?.collectedAt) log(`  collected at ${dump.collectedAt}`);
+  log(`  produced by collector ${dump?.scriptVersion ?? 'an older version, before versions were stamped'}`);
   if (dump?.counts) log(`  the dump reports ${dump.counts.recipes} recipes across ${dump.counts.pages ?? '?'} pages`);
 
   const box = buildRecipeBox(dump);

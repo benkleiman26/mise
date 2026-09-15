@@ -18,6 +18,11 @@
 // the output back rather than guessing.
 
 (() => {
+  // Bumped whenever the collector changes in a way that affects the output.
+  // It is stamped into the dump so convert can tell which script produced it,
+  // which matters because the script is pasted by hand and an old copy in the
+  // clipboard looks exactly like a new one.
+  const SCRIPT_VERSION = '2026-09-15.2';
   const KEY = '__nytRecipeBox';
   const ORIGIN = 'https://cooking.nytimes.com';
   // cooking.nytimes.com/recipes/<numeric id>-<slug>. The id is the stable key
@@ -540,6 +545,7 @@
     const dump = {
       format: 'nyt-recipe-box-raw',
       version: 1,
+      scriptVersion: SCRIPT_VERSION,
       collectedAt: new Date().toISOString(),
       origin: location.origin,
       counts: {
@@ -585,7 +591,7 @@
     __internals: { fromJson, fromHtml, fromDom, absorb, folderOfPage, isCookedPage, nextDataOf, clean, cleanFolderLabel },
   };
   console.log(
-    '%cNYT Recipe Box export loaded.',
+    `%cNYT Recipe Box export loaded, version ${SCRIPT_VERSION}.`,
     'color: green; font-weight: bold',
     '\nRun __nyt.collect() to walk every list, then __nyt.status() and __nyt.rescue().',
     '\n__nyt.probe() inspects the page you are on. __nyt.scan() harvests just this page.'

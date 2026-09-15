@@ -196,3 +196,25 @@ describe('catching a stale or partial dump', () => {
     assert.deepEqual(reviewWarnings(buildRecipeBox(dump), { dump }), []);
   });
 });
+
+describe('collector version stamping', () => {
+  test('says so when the dump came from an older collector', () => {
+    const dump = { scriptVersion: '2026-01-01.1', recipes: [{ id: '1', title: 'x', folders: ['A'] }] };
+    const warnings = reviewWarnings(buildRecipeBox(dump), { dump, collector: '2026-09-15.2' });
+    assert.match(warnings.join(' '), /came from collector 2026-01-01\.1/);
+    assert.match(warnings.join(' '), /git pull/);
+  });
+
+  test('says so when the dump predates version stamping entirely', () => {
+    const dump = { recipes: [{ id: '1', title: 'x', folders: ['A'] }] };
+    assert.match(reviewWarnings(buildRecipeBox(dump), { dump }).join(' '), /unversioned/);
+  });
+
+  test('stays quiet when the versions match', () => {
+    const recipes = Array.from({ length: 163 }, (_, i) => ({
+      id: String(i + 1), title: 't', cooked: i < 20, folders: ['Easy Kid-Friendly Recipes', 'Recipes'],
+    }));
+    const dump = { scriptVersion: '2026-09-15.2', counts: { recipes: 163 }, recipes };
+    assert.deepEqual(reviewWarnings(buildRecipeBox(dump), { dump }), []);
+  });
+});

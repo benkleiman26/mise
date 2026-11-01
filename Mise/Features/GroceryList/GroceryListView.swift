@@ -94,10 +94,12 @@ struct GroceryListView: View {
         }
     }
 
-    /// A tap target, not a `Button`. A button filling the row claims the drag
-    /// before the list sees it, and the list stops scrolling. `contentShape`
-    /// plus `onTapGesture` gives the whole row the tap without the gesture
-    /// fight.
+    /// A tap target, not a `Button`: `contentShape` plus `onTapGesture` gives
+    /// the whole row the tap without a button's press styling, which on a
+    /// checklist row reads as a glitch rather than as feedback.
+    ///
+    /// This was written to fix a scrolling report that turned out to be how
+    /// the simulator was being driven. A `Button` here would have been fine.
     private func row(_ item: GroceryItem, in store: GroceryListStore) -> some View {
         HStack(alignment: .firstTextBaseline, spacing: 12) {
             Image(systemName: item.isChecked ? "checkmark.circle.fill" : "circle")

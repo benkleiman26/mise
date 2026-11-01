@@ -7,10 +7,13 @@ import SwiftUI
 /// tabs: pick recipes, then make the list. "Make the list" lands the user on the
 /// list rather than leaving them to find it.
 ///
-/// Built with the `Tab` values rather than `.tabItem` and `.tag`. The older
-/// spelling still compiles against the iOS 27 SDK and is what the first version
-/// used, and on iOS 26 the content inside it would not scroll. The enum is
-/// called `Screen` because `Tab` is now SwiftUI's own type.
+/// Built with the `Tab` values rather than `.tabItem` and `.tag`, which is the
+/// spelling iOS 18 introduced and the SDK now expects. The enum is called
+/// `Screen` because `Tab` is SwiftUI's own type.
+///
+/// This was first changed while chasing a reported scrolling bug that turned
+/// out not to be a bug at all. It stays because it is the current API, not
+/// because it fixed anything.
 struct RootView: View {
     enum Screen: Hashable {
         case plan, list, recipes, pantry

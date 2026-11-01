@@ -653,3 +653,24 @@ Every word typed now has to appear somewhere in the recipe's title, summary,
 tags or ingredient names, in any order and as a prefix of a longer word. People
 type the words they remember rather than the title, and they stop typing
 halfway through a word.
+
+## The scrolling bug was not a bug
+
+Reported on 2026-11-01: no list in the app would scroll, on any screen. Two
+changes went in chasing it, and both diagnoses were wrong.
+
+The cause was the advice given for driving the simulator: click, hold, then
+drag. Pausing before moving makes iOS read a long press rather than a scroll,
+so the list does not move. Clicking and dragging in one motion, which is what
+the user was already doing on the home screen, works.
+
+Both changes stayed, because each is defensible on its own: `Tab` values are
+the spelling iOS 18 introduced, and a checklist row reads better as a tap
+target than as a button. Neither fixed anything, and the comments in those
+files now say so. A comment that claims to fix a bug that never existed is
+worse than no comment, because the next person preserves the shape for a
+reason that was never true.
+
+The lesson worth keeping is about evidence. Three rounds were spent on code
+before anyone checked whether a system app scrolled, which would have settled
+it in ten seconds. Rule out the harness before rewriting the thing under test.

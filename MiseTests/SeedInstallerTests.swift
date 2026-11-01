@@ -62,10 +62,13 @@ final class SeedInstallerTests: XCTestCase {
         XCTAssertEqual(report.pantryEntriesInserted, catalog.canonicalItems.filter(\.isStaple).count)
         XCTAssertTrue(report.isClean, "Unresolved: \(report.unresolvedIngredients) \(report.unresolvedStepReferences)")
 
+        // Tied to the catalog rather than to today's numbers. The invariant is
+        // that everything in the file reached the store, which stays true when
+        // the library grows; a literal count only says what it was on the day.
         XCTAssertEqual(try households.count(), 1)
-        XCTAssertEqual(try canonicalItems.count(), 297)
-        XCTAssertEqual(try recipes.count(), 12)
-        XCTAssertEqual(try pantry.count(), 71)
+        XCTAssertEqual(try canonicalItems.count(), catalog.canonicalItems.count)
+        XCTAssertEqual(try recipes.count(), catalog.recipes.count)
+        XCTAssertEqual(try pantry.count(), catalog.canonicalItems.filter(\.isStaple).count)
     }
 
     /// The whole point of deriving ids from stable keys.
@@ -99,8 +102,8 @@ final class SeedInstallerTests: XCTestCase {
         try installer.install(catalog)
         let third = try installer.install(catalog)
         XCTAssertFalse(third.insertedAnything)
-        XCTAssertEqual(try recipes.count(), 12)
-        XCTAssertEqual(try canonicalItems.count(), 297)
+        XCTAssertEqual(try recipes.count(), catalog.recipes.count)
+        XCTAssertEqual(try canonicalItems.count(), catalog.canonicalItems.count)
     }
 
     /// Section 5.1 again, this time on what actually reached the store rather
@@ -126,7 +129,8 @@ final class SeedInstallerTests: XCTestCase {
             }
         }
 
-        XCTAssertEqual(checked, 97, "The seed library should have 97 ingredient lines in total")
+        let expected = catalog.recipes.reduce(0) { $0 + $1.ingredients.count }
+        XCTAssertEqual(checked, expected, "every ingredient line in the catalog should have reached the store")
     }
 
     /// Cook mode reads these, so a ref that points at nothing is a blank line on

@@ -29,7 +29,13 @@ final class SeedCatalogTests: XCTestCase {
     }
 
     func testTheSeedLibraryLoads() {
-        XCTAssertEqual(catalog.recipes.count, 12)
+        // Section 5.1 asks for 40 to 60 starter recipes. Asserting the range
+        // rather than today's number means adding a recipe does not fail a test
+        // that was never about the exact count.
+        XCTAssertTrue(
+            (40...60).contains(catalog.recipes.count),
+            "section 5.1 asks for 40 to 60 seed recipes, the library has \(catalog.recipes.count)"
+        )
         XCTAssertTrue(catalog.recipes.allSatisfy { $0.sourceType == .builtIn })
     }
 

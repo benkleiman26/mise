@@ -591,3 +591,29 @@ list screen prefers when it is set. The shopper sees the whole thing.
 
 The model should grow a proper quantity list when something else needs it, and
 TODO.md says so.
+
+## A perishable staple starts at "low", not "have"
+
+The first real list, three dinners on 2026-11-01, came out at ten rows. It was
+correct, and it was missing eggs.
+
+Every one of the 71 staples was seeded into the pantry as `have`, and section 4
+says the generator excludes `have`. That is exactly right for kosher salt,
+olive oil and cumin, which is what the rule was written for. It is wrong for
+eggs, milk, butter, parmesan, frozen peas, garlic, scallions and yellow onion,
+which are staples in the sense that every kitchen has them and also the things a
+household rebuys every week.
+
+The two failures are not symmetrical. An item wrongly on the list costs one tap.
+An item wrongly off it means standing in the kitchen on Wednesday without eggs.
+So the rule now leans the other way for anything perishable: a staple in
+produce, meat, seafood, deli, dairy, bakery or frozen starts at `low`, which
+section 4 includes, and everything else starts at `have`.
+
+Classifying by aisle rather than by a new flag on each item means the table
+cannot drift out of step with the rule, and adding a staple to the table gets
+the right default for free.
+
+This only applies on a first seed. Seeding is idempotent by design, so an
+install that already has 71 `have` entries keeps them. Deleting the app and
+running again is the way to pick the new defaults up.

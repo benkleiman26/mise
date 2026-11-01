@@ -205,8 +205,16 @@ struct SeedInstaller {
 
     // MARK: - Pantry
 
-    /// Staples default to `have`, which is the whole reason salt and olive oil
-    /// stay off the list. Section 1a calls that out as one of Mealime's misses.
+    /// A shelf stable staple defaults to `have`, which is the whole reason salt
+    /// and olive oil stay off the list. Section 1a calls that out as one of
+    /// Mealime's misses.
+    ///
+    /// A perishable staple does not. Eggs, milk, butter, onions and garlic are
+    /// staples in the sense that every kitchen has them, and also the things a
+    /// household runs out of weekly. Starting them at `have` means Mise quietly
+    /// drops them from the list and the shopper comes home without eggs, which
+    /// is a worse failure than one extra row to untick. They start at `low`,
+    /// which section 4 includes on the list.
     private func installStaplePantryEntries(
         _ catalog: SeedCatalog,
         household: Household,
@@ -225,10 +233,20 @@ struct SeedInstaller {
                     id: entryID,
                     householdID: household.id,
                     canonicalItemID: item.id,
-                    status: .have
+                    status: Self.startingStatus(for: item.aisle)
                 )
             )
             report.pantryEntriesInserted += 1
+        }
+    }
+
+    /// Perishable aisles are the ones whose contents have to be rebought.
+    static func startingStatus(for aisle: Aisle) -> PantryStatus {
+        switch aisle {
+        case .produce, .meat, .seafood, .deliAndCheese, .dairyAndEggs, .bakery, .frozen:
+            return .low
+        default:
+            return .have
         }
     }
 }

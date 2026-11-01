@@ -190,6 +190,12 @@ green on the Mac: 70 tests, no failures, up from 61 before `ListGenerator`.
       record. It shows as the empty state, so it is invisible, but it is junk.
 - [ ] Nothing shows which meals an item came from, although
       `sourceRecipeIDs` is stored for it. Section 5.3 asks for that tap.
+- [ ] The pantry seeding rule changed after the first real list. An install
+      from before 2026-11-01 keeps its old all `have` entries, because seeding
+      is idempotent. Delete the app and run again to pick up the new defaults.
+- [ ] Nothing in the app can change a pantry status yet, so a staple seeded as
+      `low` can only be hidden by editing the store. The Pantry tab is read
+      only until section 5.4 lands.
 - [ ] The rest of Phase 1 is untouched: collections, tags, smart lists, facet
       chips, sort orders, manual recipe entry and the paste a link flow.
 

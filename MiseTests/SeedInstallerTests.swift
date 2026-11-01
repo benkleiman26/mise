@@ -162,15 +162,38 @@ final class SeedInstallerTests: XCTestCase {
         XCTAssertEqual(recipe.orderedIngredients.map(\.position), Array(0..<seed.ingredients.count))
     }
 
-    /// Section 1a: this is what keeps salt and olive oil off every list.
-    func testStaplesArePreSeededAsHave() throws {
+    /// Section 1a: this is what keeps salt and olive oil off every list, and
+    /// what keeps eggs on it.
+    func testStaplesArePreSeededByHowPerishableTheyAre() throws {
         try makeInstaller().install(catalog)
 
         let itemsByID = try Dictionary(uniqueKeysWithValues: canonicalItems.all().map { ($0.id, $0) })
         let entries = try pantry.all()
 
         XCTAssertEqual(entries.count, 71)
-        XCTAssertTrue(entries.allSatisfy { $0.status == .have })
+
+        for entry in entries {
+            let item = try XCTUnwrap(itemsByID[entry.canonicalItemID])
+            XCTAssertEqual(
+                entry.status,
+                SeedInstaller.startingStatus(for: item.aisle),
+                "\(item.name) in \(item.aisle.rawValue) started as \(entry.status.rawValue)"
+            )
+        }
+
+        // The point of the rule: a shelf stable staple is hidden and a
+        // perishable one is not.
+        let byName = try Dictionary(uniqueKeysWithValues: canonicalItems.all().map { ($0.name, $0) })
+        let statusByItemID = Dictionary(uniqueKeysWithValues: entries.map { ($0.canonicalItemID, $0.status) })
+
+        for name in ["kosher salt", "olive oil", "soy sauce"] {
+            let item = try XCTUnwrap(byName[name], "\(name) is not in the table")
+            XCTAssertEqual(statusByItemID[item.id], .have, "\(name) should be hidden from the list")
+        }
+        for name in ["eggs", "milk", "butter", "yellow onion", "garlic"] {
+            let item = try XCTUnwrap(byName[name], "\(name) is not in the table")
+            XCTAssertEqual(statusByItemID[item.id], .low, "\(name) should still reach the list")
+        }
 
         for entry in entries {
             let item = try XCTUnwrap(itemsByID[entry.canonicalItemID])

@@ -7,6 +7,7 @@ import { existsSync } from 'node:fs';
 import path from 'node:path';
 
 import { lintCanonicalItems, lintSeedRecipes } from './lint.mjs';
+import { lintUnitFixtures } from './units.mjs';
 
 const root = path.join(import.meta.dirname, '..', '..', '..', 'Mise', 'Resources');
 const canonicalFile = path.join(root, 'canonical_items.json');
@@ -32,6 +33,20 @@ if (existsSync(seedFile)) {
   failures += seedProblems.length;
 } else {
   console.log('seed_recipes.json: not present yet');
+}
+
+const unitFixtures = path.join(import.meta.dirname, '..', '..', '..', 'MiseTests', 'Fixtures', 'unit_conversion.json');
+if (existsSync(unitFixtures)) {
+  const doc = await readJson(unitFixtures);
+  const problems = lintUnitFixtures(doc);
+  console.log(
+    `unit_conversion.json: ${doc.conversions?.length ?? 0} conversions, ` +
+      `${doc.combinations?.length ?? 0} combinations, ${doc.fractions?.length ?? 0} fractions`
+  );
+  for (const problem of problems) console.error(`  ${problem}`);
+  failures += problems.length;
+} else {
+  console.log('unit_conversion.json: not present yet');
 }
 
 if (failures) {

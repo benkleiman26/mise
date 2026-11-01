@@ -392,3 +392,47 @@ see from inside the app that the seed worked.
 Section 4 names it `Step`. That is a common enough word to collide with
 something in SwiftUI or Foundation later, and renaming a `@Model` class after it
 has a store behind it is a migration. Done now, when it is free.
+
+## Expected behaviour for the domain services is written as fixtures, not only as tests
+
+There is no Swift toolchain in the cloud environment and no route to one:
+`download.swift.org` is denied by the network policy, `gh` is scoped to attached
+repositories, and there is no apt package. So Swift written here cannot be
+compiled, let alone tested, before it reaches a Mac.
+
+`MiseTests/Fixtures/unit_conversion.json` is the answer. It states what
+UnitConverter should do as data: the multiplier table, every conversion and its
+result, the combinations and how they render, the fractions. Every expected
+value in it is recomputed from its own multiplier table by
+`tools/resource-lint`, which is plain Node and runs here. So the behaviour is
+verified before any Swift exists, and a failing Swift test means the code
+disagrees with a checked expectation rather than two unverified things
+disagreeing with each other.
+
+The validator mirrors the merge and format rules in about forty lines of
+JavaScript. That is duplication, and it is the one kind worth having: it checks
+the test data rather than the app, and if it ever drifts from the Swift the
+Swift tests fail rather than the fixture quietly being wrong. It is a different
+case from the Mealime exporter, where a second ingredient parser was refused
+because both would have been production code.
+
+## Converting stays inside a family, and a merge never loses quantity
+
+Section 4 allows conversion only within volume or within mass, with cups to
+grams refused unless the canonical item carries a density override. The override
+is not built yet; nothing needs it until Phase 2.
+
+Discrete units go further: a can only ever adds to another can. Two cans and one
+bunch stay two lines, because a can is not some number of bunches and guessing
+is worse than two lines.
+
+A merged quantity is expressed in the largest unit present that still leaves at
+least one of it, so half a pound plus four ounces reads "12 oz" rather than
+"0.75 lb". Quantities are rendered with the fractions a measuring cup actually
+has, and anything that is not one of those is shown as a decimal rather than
+rounded to a fraction that would be a small lie.
+
+Section 4's own example, "1 cup + 2 tbsp", is read as showing the join format
+for two quantities that cannot be added, since those two particular quantities
+are both volume and therefore do add, to 1 1/8 cups. The format is used where
+the rule actually bites: a volume beside a mass, or two different discrete units.

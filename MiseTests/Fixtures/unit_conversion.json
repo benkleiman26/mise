@@ -1,0 +1,99 @@
+{
+  "format": "unit-conversion-fixtures",
+  "version": 1,
+  "note": "The expected behaviour of UnitConverter, as data. Written where it can be validated without a Swift toolchain: tools/resource-lint recomputes every expected value from the multipliers below, so a wrong number here fails before it reaches a test. UnitConverterTests asserts the Swift table matches these multipliers, which keeps the two from drifting.",
+  "baseUnits": { "volume": "ml", "mass": "g" },
+  "families": {
+    "volume": ["tsp", "tbsp", "cup", "floz", "ml", "l"],
+    "mass": ["oz", "lb", "g", "kg"],
+    "discrete": ["count", "pinch", "clove", "can", "bunch", "package"]
+  },
+  "multipliers": {
+    "ml": 1, "l": 1000, "tsp": 4.928922, "tbsp": 14.786765, "floz": 29.573530, "cup": 236.588236,
+    "g": 1, "kg": 1000, "oz": 28.349523, "lb": 453.592370
+  },
+  "conversions": [
+    { "note": "the US volume ladder, which must come out exact", "quantity": 1, "from": "tbsp", "to": "tsp", "expected": 3 },
+    { "quantity": 1, "from": "cup", "to": "tbsp", "expected": 16 },
+    { "quantity": 1, "from": "cup", "to": "floz", "expected": 8 },
+    { "quantity": 0.5, "from": "floz", "to": "tsp", "expected": 3 },
+    { "quantity": 1, "from": "cup", "to": "ml", "expected": 236.5882 },
+    { "quantity": 1, "from": "l", "to": "cup", "expected": 4.2268 },
+    { "note": "and the mass ladder", "quantity": 1, "from": "lb", "to": "oz", "expected": 16 },
+    { "quantity": 8, "from": "oz", "to": "lb", "expected": 0.5 },
+    { "quantity": 1, "from": "kg", "to": "g", "expected": 1000 },
+    { "quantity": 1, "from": "oz", "to": "g", "expected": 28.3495 },
+    { "quantity": 500, "from": "g", "to": "lb", "expected": 1.1023 },
+    { "note": "identity is always allowed, including for discrete units", "quantity": 3, "from": "can", "to": "can", "expected": 3 },
+    { "note": "across families is a guess, so it is refused", "quantity": 1, "from": "cup", "to": "g", "expected": null },
+    { "quantity": 1, "from": "lb", "to": "ml", "expected": null },
+    { "note": "a can is not a number of bunches", "quantity": 2, "from": "can", "to": "bunch", "expected": null },
+    { "quantity": 2, "from": "clove", "to": "tsp", "expected": null }
+  ],
+  "combinations": [
+    {
+      "note": "section 1a: Mealime listed sesame oil twice because it would not add these. We do.",
+      "input": [[3, "tbsp"], [2, "tsp"]],
+      "expected": [[3.6667, "tbsp"]],
+      "formatted": "3 2/3 tbsp"
+    },
+    {
+      "note": "the quantities section 4 uses as its example. Both are volume, so they add.",
+      "input": [[1, "cup"], [2, "tbsp"]],
+      "expected": [[1.125, "cup"]],
+      "formatted": "1 1/8 cups"
+    },
+    {
+      "note": "a sum that falls below one of the larger unit steps down rather than reading 0.75 lb",
+      "input": [[0.5, "lb"], [4, "oz"]],
+      "expected": [[12, "oz"]],
+      "formatted": "12 oz"
+    },
+    {
+      "note": "same unit twice is the common case",
+      "input": [[2, "tsp"], [1, "tsp"]],
+      "expected": [[3, "tsp"]],
+      "formatted": "3 tsp"
+    },
+    { "input": [[0.25, "cup"], [1, "tbsp"]], "expected": [[5, "tbsp"]], "formatted": "5 tbsp" },
+    { "input": [[250, "ml"], [1, "l"]], "expected": [[1.25, "l"]], "formatted": "1 1/4 l" },
+    {
+      "note": "across families, keep both. This is the rule section 4 states.",
+      "input": [[1, "cup"], [100, "g"]],
+      "expected": [[1, "cup"], [100, "g"]],
+      "formatted": "1 cup + 100 g"
+    },
+    {
+      "note": "two different discrete units never merge",
+      "input": [[2, "can"], [1, "bunch"]],
+      "expected": [[2, "can"], [1, "bunch"]],
+      "formatted": "2 cans + 1 bunch"
+    },
+    {
+      "note": "the same discrete unit does",
+      "input": [[2, "can"], [1, "can"]],
+      "expected": [[3, "can"]],
+      "formatted": "3 cans"
+    },
+    {
+      "note": "a bare count, as in 2 eggs plus 1 egg",
+      "input": [[2, null], [1, null]],
+      "expected": [[3, null]],
+      "formatted": "3"
+    },
+    { "note": "one measurement passes through untouched", "input": [[1.5, "lb"]], "expected": [[1.5, "lb"]], "formatted": "1 1/2 lb" },
+    { "note": "nothing in, nothing out", "input": [], "expected": [], "formatted": "" }
+  ],
+  "fractions": [
+    { "value": 2, "expected": "2" },
+    { "value": 1.5, "expected": "1 1/2" },
+    { "value": 0.5, "expected": "1/2" },
+    { "value": 0.25, "expected": "1/4" },
+    { "value": 0.75, "expected": "3/4" },
+    { "value": 0.125, "expected": "1/8" },
+    { "value": 0.3333, "expected": "1/3" },
+    { "value": 1.6667, "expected": "1 2/3" },
+    { "note": "not a fraction any measuring cup has, so show the number", "value": 0.4, "expected": "0.4" },
+    { "value": 0, "expected": "0" }
+  ]
+}

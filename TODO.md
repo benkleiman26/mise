@@ -126,6 +126,23 @@ below about re-running or re-fetching is history rather than a possible action.
 - [ ] `src/bookmarks.mjs` is the reference implementation for Phase 4's Swift
       port. Keep the fixture in step with whatever the app ends up handling.
 
+## Phase 1
+
+- [x] `UnitConverter` written, with `MiseTests/Fixtures/unit_conversion.json`
+      stating its behaviour and `tools/resource-lint` verifying every expected
+      value against the multiplier table.
+- [ ] **The Swift has never been compiled.** No toolchain here. `UnitConverter`
+      and `UnitConverterTests` need a build and a `Cmd + U` on the Mac. The
+      fixtures are checked; the Swift transcription of them is not.
+- [ ] Confirm `MiseTests/Fixtures/*.json` lands in the test target's resources.
+      Same assumption that was worth checking for the app's own JSON, and
+      `UnitConverterTests` fails with a clear message if it did not.
+- [ ] `IngredientParser` not started. It needs the same treatment: a fixture
+      corpus of real ingredient strings with expected parses, verified here,
+      then the Swift against it.
+- [ ] No density override on canonical items yet, so cups to grams is always
+      refused. Section 4 allows the override; nothing needs it before Phase 2.
+
 ## Environment
 
 - [ ] No Swift toolchain or Xcode in the cloud environment, so no Swift code can

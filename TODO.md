@@ -173,13 +173,13 @@ entry, and the week plan. Section 5.1 and 5.2.
 
 ## The first usable loop
 
-Landed on 2026-11-01, never compiled in the cloud. Everything in this section
-needs a Mac run before it can be called done.
+Landed on 2026-11-01. It compiles against the iOS 27 SDK and the suite is
+green on the Mac: 70 tests, no failures, up from 61 before `ListGenerator`.
 
-- [ ] `xcodebuild test` has never seen `PlanStore`, `GroceryListStore`,
-      `RecipeDetailView`, or the rewritten `RecipesView`, `PlanView`,
-      `GroceryListView` and `RootView`. The four domain services underneath
-      them are green; the wiring above them is unverified.
+- [x] `xcodebuild build` and `xcodebuild test` both exit 0 with the new stores
+      and views in the target. First try, no errors.
+- [ ] Compiling is not running. Nobody has used the loop against a real plan
+      yet, so the list has never been read by a person who then went shopping.
 - [ ] No tests cover the two new stores. They need an in-memory container and a
       seeded household, which is what `SeedInstallerTests` already sets up.
 - [ ] `GroceryItem` holds one quantity, and a generated row can carry two. The

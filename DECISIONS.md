@@ -674,3 +674,41 @@ reason that was never true.
 The lesson worth keeping is about evidence. Three rounds were spent on code
 before anyone checked whether a system app scrolled, which would have settled
 it in ten seconds. Rule out the harness before rewriting the thing under test.
+
+## The importer reshapes in Node and parses in Swift
+
+The Mealime library arrives as ingredient lines written the way people write
+them: "2 scallions, trimmed then sliced crosswise 1/4-inch-thick", with the
+quantity field empty because the owner typed most of these in himself.
+
+The obvious place to parse that is the Node converter, where the files are. It
+is the wrong place. `IngredientParser` already does exactly this job in Swift,
+with 52 fixture cases, and `CanonicalMatcher` behind it with 32 more. A second
+parser in JavaScript would be a second set of answers to the same question, and
+the two would disagree within a week, in a way that only shows up as a
+duplicated row on a grocery list months later.
+
+So the split is: Node reshapes Mealime's fields into Mise's import shape and
+keeps every ingredient line exactly as written. Swift parses, matches and
+stores. An imported recipe then behaves on the grocery list identically to a
+built in one, because it went through the same two pieces of code.
+
+The import file is picked with `fileImporter` rather than read from a path
+baked into the app. That is one more tap, and it is the version that works on
+the owner's phone later rather than only in the simulator.
+
+## Imported recipe ids are derived, so importing twice replaces
+
+Keyed on `import:<source>:<external id>`, run through the same v5 UUID scheme
+as the seed. Importing the same file again replaces those recipes rather than
+building a second library, which matters because the first import will not be
+the last: the converter will improve, and the owner should be able to re-run it
+without cleaning up by hand.
+
+The source is part of the key, so a Mealime recipe and an NYT recipe that
+happen to share an id stay separate, and neither can collide with a seed recipe
+even if it names one.
+
+The replace is a delete and an insert, committed in that order. Doing both
+inside one transaction asks a unique constraint to hold two rows with the same
+id at once.

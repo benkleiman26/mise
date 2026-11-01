@@ -1,12 +1,15 @@
 import SwiftUI
+import UniformTypeIdentifiers
 
-/// Behind the gear on Plan, per section 7. Read only for now: this phase is the
-/// skeleton, and preference editing, aisle reordering and "Import from Mealime"
-/// land with sections 5.6 and 5.7.
+/// Behind the gear on Plan, per section 7. Mostly read only still: preference
+/// editing and aisle reordering land with section 5.6. The recipe import from
+/// section 5.7 lives here.
 struct SettingsView: View {
     @Environment(AppContainer.self) private var container
     @Environment(\.dismiss) private var dismiss
     @State private var store: SettingsStore?
+    @State private var importer: ImportStore?
+    @State private var isPickingFile = false
 
     var body: some View {
         NavigationStack {
@@ -49,6 +52,8 @@ struct SettingsView: View {
                     seedFooter
                 }
 
+                importSection
+
                 Section("About") {
                     LabeledContent("Version", value: store?.appVersion ?? "0")
                 }
@@ -70,8 +75,84 @@ struct SettingsView: View {
                     pantry: container.pantry
                 )
             }
+            if importer == nil {
+                importer = ImportStore(
+                    recipes: container.recipes,
+                    canonicalItems: container.canonicalItems,
+                    households: container.households
+                )
+            }
             store?.load()
         }
+        .fileImporter(
+            isPresented: $isPickingFile,
+            allowedContentTypes: [.json],
+            allowsMultipleSelection: false
+        ) { result in
+            switch result {
+            case .success(let urls):
+                guard let url = urls.first else { return }
+                importer?.importRecipes(from: url)
+                store?.load()
+            case .failure(let error):
+                // The picker itself failed, which is not the same as the file
+                // being wrong, so it is worth saying separately.
+                print("The file could not be opened: \(error)")
+            }
+        }
+    }
+
+    /// Section 5.7. The file comes from `tools/mealime-import`, which runs on
+    /// the owner's own machine, because the rescued library is personal and
+    /// this repository is public.
+    @ViewBuilder
+    private var importSection: some View {
+        Section {
+            Button {
+                isPickingFile = true
+            } label: {
+                if importer?.isWorking == true {
+                    Label("Importing", systemImage: "hourglass")
+                } else {
+                    Label("Import recipes from a file", systemImage: "square.and.arrow.down")
+                }
+            }
+            .disabled(importer?.isWorking == true)
+
+            if let report = importer?.report {
+                LabeledContent("Added", value: "\(report.recipesInserted)")
+                LabeledContent("Replaced", value: "\(report.recipesUpdated)")
+                LabeledContent("Ingredient lines", value: "\(report.ingredientsRead)")
+                if report.ingredientsNeedingReview > 0 {
+                    LabeledContent("Lines worth a look", value: "\(report.ingredientsNeedingReview)")
+                }
+                if !report.unmatchedIngredients.isEmpty {
+                    NavigationLink {
+                        unmatchedList(report.unmatchedIngredients)
+                    } label: {
+                        LabeledContent("Not yet categorised", value: "\(report.unmatchedIngredients.count)")
+                    }
+                }
+            }
+
+            if let problem = importer?.problem {
+                Text(problem)
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary)
+            }
+        } header: {
+            Text("Import")
+        } footer: {
+            Text("Pick a Mise recipe import file. Importing the same file again replaces those recipes rather than adding a second copy of them.")
+        }
+    }
+
+    private func unmatchedList(_ names: [String]) -> some View {
+        List(names, id: \.self) { name in
+            Text(name)
+        }
+        .navigationTitle("Not yet categorised")
+        .navigationBarTitleDisplayMode(.inline)
     }
 
     @ViewBuilder

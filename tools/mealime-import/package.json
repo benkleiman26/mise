@@ -1,0 +1,12 @@
+{
+  "name": "mealime-import",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Turn a rescued Mealime library into a file Mise can import.",
+  "scripts": {
+    "test": "node --test",
+    "convert": "node src/cli.mjs"
+  },
+  "engines": { "node": ">=20" }
+}

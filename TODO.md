@@ -185,11 +185,21 @@ green on the Mac: 70 tests, no failures, up from 61 before `ListGenerator`.
 - [x] `GroceryItem` now stores the real quantity list rather than one quantity
       and a `note` holding the written form. The `note` field is free for an
       actual note.
-- [ ] **The owner's own recipes are not in the app.** 213 rescued from Mealime
-      and 169 from NYT Cooking sit in `data/` on the Mac, and the app ships
-      only the 45 seed recipes. Searching for a favourite finds nothing, which
-      is the first thing the owner noticed on 2026-11-01. An importer that
-      reads those two exports is the single largest thing still missing.
+- [x] **Mealime import.** `tools/mealime-import` converts the rescued library,
+      and Settings imports the result. Written 2026-11-01, not yet run against
+      the real 213.
+- [ ] **NYT import.** The NYT export captured urls, folders and cooked flags
+      only, because the Recipe Box renders client side and has no API. Turning
+      169 urls into recipes means fetching each page and reading its JSON-LD,
+      and those pages are paywalled, so it has to run in the owner's signed in
+      browser the way the export did.
+- [ ] Imported recipes have no photos. 424 are in `data/mealime/images/`,
+      named by recipe id, and `Recipe.imageData` is ready for them.
+- [ ] An imported recipe with no cooking time shows "0 min". It should say the
+      time was not recorded.
+- [ ] Nothing in the app lets the user categorise an unmatched ingredient, so
+      the import's "not yet categorised" list is read only. Section 5.3 rule 2
+      wants that tap to teach the alias table.
 - [ ] Tapping a grocery row does not show which meals need it, although
       `sourceRecipeIDs` is on every row. Asked for on 2026-11-01, for later.
 - [ ] Making a list with no meals planned still creates an empty `GroceryList`

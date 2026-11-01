@@ -14,8 +14,8 @@ final class UnitConverterTests: XCTestCase {
         struct Conversion: Decodable {
             let note: String?
             let quantity: Double
-            let from: Unit
-            let to: Unit
+            let from: Mise.Unit
+            let to: Mise.Unit
             let expected: Double?
         }
 
@@ -34,7 +34,7 @@ final class UnitConverterTests: XCTestCase {
         /// A `[quantity, unit]` pair, where the unit may be null.
         enum Part: Decodable {
             case number(Double)
-            case unit(Unit?)
+            case unit(Mise.Unit?)
 
             init(from decoder: Decoder) throws {
                 let container = try decoder.singleValueContainer()
@@ -43,14 +43,14 @@ final class UnitConverterTests: XCTestCase {
                 } else if let value = try? container.decode(Double.self) {
                     self = .number(value)
                 } else {
-                    self = .unit(try container.decode(Unit.self))
+                    self = .unit(try container.decode(Mise.Unit.self))
                 }
             }
         }
 
         let multipliers: [String: Double]
-        let families: [String: [Unit]]
-        let baseUnits: [String: Unit]
+        let families: [String: [Mise.Unit]]
+        let baseUnits: [String: Mise.Unit]
         let conversions: [Conversion]
         let combinations: [Combination]
         let fractions: [Fraction]
@@ -65,17 +65,17 @@ final class UnitConverterTests: XCTestCase {
         return try! JSONDecoder().decode(Fixtures.self, from: Data(contentsOf: url))
     }()
 
-    private func measurements(from parts: [[Fixtures.Part]]) -> [Measurement] {
+    private func measurements(from parts: [[Fixtures.Part]]) -> [Quantity] {
         parts.map { pair in
             var quantity = 0.0
-            var unit: Unit?
+            var unit: Mise.Unit?
             for part in pair {
                 switch part {
                 case .number(let value): quantity = value
                 case .unit(let value): unit = value
                 }
             }
-            return Measurement(quantity, unit)
+            return Quantity(quantity, unit)
         }
     }
 
@@ -85,8 +85,8 @@ final class UnitConverterTests: XCTestCase {
     /// wrong thing, so check it first.
     func testMultipliersMatchTheFixture() {
         for (name, expected) in Self.fixtures.multipliers {
-            guard let unit = Unit(rawValue: name) else {
-                XCTFail("The fixture has a multiplier for \"\(name)\", which is not a Unit")
+            guard let unit = Mise.Unit(rawValue: name) else {
+                XCTFail("The fixture has a multiplier for \"\(name)\", which is not a unit")
                 continue
             }
             XCTAssertEqual(unit.baseMultiplier ?? .nan, expected, accuracy: 1e-6, "multiplier for \(name)")
@@ -106,14 +106,14 @@ final class UnitConverterTests: XCTestCase {
     }
 
     func testDiscreteUnitsHaveNoMultiplier() {
-        for unit in Unit.allCases where unit.family == .discrete {
+        for unit in Mise.Unit.allCases where unit.family == .discrete {
             XCTAssertNil(unit.baseMultiplier, "\(unit.rawValue) is discrete and must not convert")
         }
     }
 
     func testEveryUnitIsCovered() {
         let covered = Set(Self.fixtures.families.values.flatMap { $0 })
-        XCTAssertEqual(covered, Set(Unit.allCases), "the fixture must place every unit in a family")
+        XCTAssertEqual(covered, Set(Mise.Unit.allCases), "the fixture must place every unit in a family")
     }
 
     // MARK: - Conversion
@@ -136,8 +136,8 @@ final class UnitConverterTests: XCTestCase {
     }
 
     func testCanConvertAgreesWithConvert() {
-        for from in Unit.allCases {
-            for to in Unit.allCases {
+        for from in Mise.Unit.allCases {
+            for to in Mise.Unit.allCases {
                 XCTAssertEqual(
                     UnitConverter.canConvert(from: from, to: to),
                     UnitConverter.convert(1, from: from, to: to) != nil,
@@ -151,8 +151,8 @@ final class UnitConverterTests: XCTestCase {
     /// converter claims to handle. This catches a multiplier that is wrong in a
     /// way the fixture's chosen examples happen to miss.
     func testConversionRoundTrips() {
-        for from in Unit.allCases {
-            for to in Unit.allCases where UnitConverter.canConvert(from: from, to: to) {
+        for from in Mise.Unit.allCases {
+            for to in Mise.Unit.allCases where UnitConverter.canConvert(from: from, to: to) {
                 guard let there = UnitConverter.convert(7.5, from: from, to: to),
                       let back = UnitConverter.convert(there, from: to, to: from)
                 else {
@@ -165,8 +165,8 @@ final class UnitConverterTests: XCTestCase {
     }
 
     func testNeverConvertsAcrossFamilies() {
-        for from in Unit.allCases {
-            for to in Unit.allCases where from.family != to.family {
+        for from in Mise.Unit.allCases {
+            for to in Mise.Unit.allCases where from.family != to.family {
                 XCTAssertNil(
                     UnitConverter.convert(1, from: from, to: to),
                     "\(from.rawValue) to \(to.rawValue) crosses families and must be refused"
@@ -202,7 +202,7 @@ final class UnitConverterTests: XCTestCase {
     /// makes it trustworthy: merging may change how a quantity is written, but
     /// never how much of it there is.
     func testCombiningConservesTheTotal() {
-        let input = [Measurement(3, .tbsp), Measurement(2, .tsp), Measurement(0.25, .cup)]
+        let input = [Quantity(3, .tbsp), Quantity(2, .tsp), Quantity(0.25, .cup)]
         let combined = UnitConverter.combine(input)
         XCTAssertEqual(combined.count, 1)
 
@@ -212,7 +212,7 @@ final class UnitConverterTests: XCTestCase {
     }
 
     func testCombiningIsOrderStable() {
-        let combined = UnitConverter.combine([Measurement(100, .g), Measurement(1, .cup)])
+        let combined = UnitConverter.combine([Quantity(100, .g), Quantity(1, .cup)])
         XCTAssertEqual(combined.map(\.unit), [.g, .cup], "the first measurement should still lead")
     }
 
@@ -225,12 +225,12 @@ final class UnitConverterTests: XCTestCase {
     }
 
     func testPluralizesOnlyWhereItReadsWell() {
-        XCTAssertEqual(UnitConverter.format(Measurement(2, .cup)), "2 cups")
-        XCTAssertEqual(UnitConverter.format(Measurement(1, .cup)), "1 cup")
-        XCTAssertEqual(UnitConverter.format(Measurement(2, .tbsp)), "2 tbsp")
-        XCTAssertEqual(UnitConverter.format(Measurement(2, .g)), "2 g")
-        XCTAssertEqual(UnitConverter.format(Measurement(2, .can)), "2 cans")
-        XCTAssertEqual(UnitConverter.format(Measurement(2, .count)), "2")
-        XCTAssertEqual(UnitConverter.format(Measurement(2, nil)), "2")
+        XCTAssertEqual(UnitConverter.format(Quantity(2, .cup)), "2 cups")
+        XCTAssertEqual(UnitConverter.format(Quantity(1, .cup)), "1 cup")
+        XCTAssertEqual(UnitConverter.format(Quantity(2, .tbsp)), "2 tbsp")
+        XCTAssertEqual(UnitConverter.format(Quantity(2, .g)), "2 g")
+        XCTAssertEqual(UnitConverter.format(Quantity(2, .can)), "2 cans")
+        XCTAssertEqual(UnitConverter.format(Quantity(2, .count)), "2")
+        XCTAssertEqual(UnitConverter.format(Quantity(2, nil)), "2")
     }
 }

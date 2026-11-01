@@ -153,8 +153,11 @@ below about re-running or re-fetching is history rather than a possible action.
 - [x] All 379 seed ingredient lines resolve to the item the seed data names,
       and none needs review. Enforced by `tools/resource-lint`, so it cannot
       break without a failure here.
-- [ ] All three services are written and none has been compiled. One Mac
-      session should build and run them together.
+- [ ] All three services are written. The first compile found two Foundation
+      name collisions, now fixed, and nothing has been run yet.
+- [ ] `Unit` shadows `Foundation.Unit`, so test files say `Mise.Unit`. Fine
+      while it is only tests. If the Share Extension needs the same prefix in
+      Phase 4, rename the enum instead of spreading it.
 - [ ] The matcher has no edit distance rung, so a typo like "cilatro" resolves
       to nothing. Section 5.3 only asks for exact, alias and fuzzy, and
       containment covers fuzzy; add edit distance if real imports need it.

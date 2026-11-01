@@ -512,3 +512,20 @@ resolving to the item the seed data names.
 That runs without Xcode, so editing either JSON file cannot quietly break the
 thing section 2 calls the hero feature. All 379 currently resolve, and none of
 them needs review.
+
+## Our measurement type is called Quantity, because Foundation owns Measurement
+
+The first compile of the Phase 1 services failed on two name collisions, both
+with Foundation. `Measurement` is a core Foundation type, and shadowing it made
+every test file that imports XCTest ambiguous. It was renamed to `Quantity`.
+
+That one was straightforwardly a mistake on our side, and cheap to fix because
+the type was a day old.
+
+`Unit` is the other collision, and it stays. Section 4 calls them units, the
+enum has been there since Phase 0b, and inside the module our `Unit` shadows
+Foundation's cleanly. It is only ambiguous across `@testable import`, where both
+are visible, so the three test files say `Mise.Unit`.
+
+If that qualification starts appearing outside tests, for example in the Share
+Extension in Phase 4, rename the enum then rather than spreading the prefix.

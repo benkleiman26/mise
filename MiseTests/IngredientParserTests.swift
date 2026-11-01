@@ -21,7 +21,7 @@ final class IngredientParserTests: XCTestCase {
         struct Case: Decodable {
             let input: String
             let quantity: Double?
-            let unit: Unit?
+            let unit: Mise.Unit?
             let name: String
             let preparation: String?
             let parenthetical: String?
@@ -87,7 +87,7 @@ final class IngredientParserTests: XCTestCase {
         struct Ingredient: Decodable {
             let name: String
             let quantity: Double?
-            let unit: Unit?
+            let unit: Mise.Unit?
         }
         let recipes: [Recipe]
     }
@@ -110,7 +110,7 @@ final class IngredientParserTests: XCTestCase {
 
         for recipe in Self.seed.recipes {
             for ingredient in recipe.ingredients {
-                let amount = UnitConverter.format(Measurement(ingredient.quantity ?? 1, ingredient.unit))
+                let amount = UnitConverter.format(Quantity(ingredient.quantity ?? 1, ingredient.unit))
                 let line = amount.isEmpty ? ingredient.name : "\(amount) \(ingredient.name)"
                 let parsed = IngredientParser.parse(line)
                 let label = "\(recipe.title): \"\(line)\""
@@ -150,7 +150,7 @@ final class IngredientParserTests: XCTestCase {
 
         for recipe in Self.seed.recipes {
             for ingredient in recipe.ingredients {
-                let amount = UnitConverter.format(Measurement(ingredient.quantity ?? 1, ingredient.unit))
+                let amount = UnitConverter.format(Quantity(ingredient.quantity ?? 1, ingredient.unit))
                 let line = amount.isEmpty ? ingredient.name : "\(amount) \(ingredient.name)"
                 if IngredientParser.parse(line).confidence == .low { flagged.append(line) }
             }

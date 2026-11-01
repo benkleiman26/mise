@@ -18,7 +18,7 @@ final class CanonicalMatcherTests: XCTestCase {
             let aliases: [String]?
             let aisle: Aisle
             let isStaple: Bool?
-            let defaultUnit: Unit?
+            let defaultUnit: Mise.Unit?
         }
         let items: [Item]
     }

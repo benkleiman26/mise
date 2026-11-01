@@ -54,7 +54,7 @@ extension Unit {
     }
 
     /// What a shopper reads on the list. Discrete units are pluralized by
-    /// `Measurement.formatted`, so these are the singular forms.
+    /// `Quantity.formatted`, so these are the singular forms.
     var abbreviation: String {
         switch self {
         case .count: ""
@@ -88,7 +88,7 @@ extension Unit {
 
 /// A quantity with an optional unit. `unit` is nil for a line like "2 eggs",
 /// where the number stands on its own.
-struct Measurement: Equatable, Sendable {
+struct Quantity: Equatable, Sendable {
     var quantity: Double
     var unit: Unit?
 
@@ -128,13 +128,13 @@ enum UnitConverter {
     /// across recipes, summing when the units are in one family and listing both
     /// when they are not. The result is ordered so the biggest measurement leads,
     /// because that is the one the shopper acts on.
-    static func combine(_ measurements: [Measurement]) -> [Measurement] {
+    static func combine(_ measurements: [Quantity]) -> [Quantity] {
         guard !measurements.isEmpty else { return [] }
 
         // One bucket per thing that can legally be added together: each volume
         // group merges, each mass group merges, and every discrete unit stands
         // alone. A nil unit is its own bucket too.
-        var buckets: [BucketKey: [Measurement]] = [:]
+        var buckets: [BucketKey: [Quantity]] = [:]
         var order: [BucketKey] = []
         for measurement in measurements {
             let key = BucketKey(measurement.unit)
@@ -149,11 +149,11 @@ enum UnitConverter {
     }
 
     /// Renders a combined result the way section 4 asks: "1 cup + 2 tbsp".
-    static func format(_ measurements: [Measurement]) -> String {
+    static func format(_ measurements: [Quantity]) -> String {
         combine(measurements).map(format).joined(separator: " + ")
     }
 
-    static func format(_ measurement: Measurement) -> String {
+    static func format(_ measurement: Quantity) -> String {
         let amount = fraction(measurement.quantity)
         guard let unit = measurement.unit, unit != .count else { return amount }
         let name = unit.abbreviation
@@ -182,13 +182,13 @@ enum UnitConverter {
     /// Sums one bucket into a single measurement, expressed in the largest unit
     /// present that still leaves a quantity of at least one. A shopper reading
     /// "1 1/4 cups" is better served than one reading "20 tbsp".
-    private static func merge(_ group: [Measurement]) -> Measurement {
-        guard let first = group.first else { return Measurement(0) }
+    private static func merge(_ group: [Quantity]) -> Quantity {
+        guard let first = group.first else { return Quantity(0) }
         guard group.count > 1 else { return first }
 
         guard let unit = first.unit, let _ = unit.baseMultiplier else {
             // Discrete, or no unit: every member shares the unit by construction.
-            return Measurement(group.reduce(0) { $0 + $1.quantity }, first.unit)
+            return Quantity(group.reduce(0) { $0 + $1.quantity }, first.unit)
         }
 
         let total = group.reduce(0.0) { sum, measurement in
@@ -206,13 +206,13 @@ enum UnitConverter {
         for candidate in candidates {
             guard let base = candidate.baseMultiplier else { continue }
             let amount = total / base
-            if amount >= 1 - epsilon { return Measurement(round(amount), candidate) }
+            if amount >= 1 - epsilon { return Quantity(round(amount), candidate) }
         }
 
         // Everything rounds below one, so use the smallest unit present.
         let smallest = candidates.last ?? unit
         let base = smallest.baseMultiplier ?? 1
-        return Measurement(round(total / base), smallest)
+        return Quantity(round(total / base), smallest)
     }
 
     /// Rounds away floating point dust without rounding away real quantities.

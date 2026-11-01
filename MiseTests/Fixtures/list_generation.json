@@ -1,0 +1,75 @@
+{
+  "format": "list-generation-fixtures",
+  "version": 1,
+  "note": "Section 5.3's five rules, as scenarios over the real seed library. Each plan names actual recipe ids, so tools/resource-lint recomputes the expected list from the real recipe data, the real canonical table and the unit arithmetic, rather than taking these numbers on trust. Section 2 calls the list the hero; this is where that claim is checked.",
+  "scenarios": [
+    {
+      "name": "two salmon dinners in one week",
+      "why": "rule 3. The same ingredient from two recipes becomes one line, which is the Mealime failure section 1a names.",
+      "plan": [
+        { "recipe": "seed-sheet-pan-salmon", "servings": 4 },
+        { "recipe": "seed-teriyaki-salmon-bowls", "servings": 4 }
+      ],
+      "pantryHave": "allStaples",
+      "expect": [
+        { "item": "broccoli", "aisle": "produce", "formatted": "4 cups", "sources": 1 },
+        { "item": "green beans", "aisle": "produce", "formatted": "1 lb", "sources": 1 },
+        { "item": "lemon", "aisle": "produce", "formatted": "1", "sources": 1 },
+        { "item": "salmon", "aisle": "seafood", "formatted": "3 lb", "sources": 2 }
+      ],
+      "expectAbsent": ["olive oil", "garlic", "kosher salt", "soy sauce", "white rice"]
+    },
+    {
+      "name": "two taco nights",
+      "why": "rule 3 again, where the quantities cannot be added. Cabbage is half a head and three cups; cilantro is half a bunch and a quarter cup. Section 4 says keep both rather than guess.",
+      "plan": [
+        { "recipe": "seed-shrimp-tacos", "servings": 4 },
+        { "recipe": "seed-fish-tacos-cod", "servings": 4 }
+      ],
+      "pantryHave": "allStaples",
+      "expect": [
+        { "item": "cabbage", "aisle": "produce", "formatted": "1/2 + 3 cups", "sources": 2 },
+        { "item": "cilantro", "aisle": "produce", "formatted": "1/2 bunch + 1/4 cup", "sources": 2 },
+        { "item": "lime", "aisle": "produce", "formatted": "3", "sources": 2 },
+        { "item": "cod", "aisle": "seafood", "formatted": "1 1/4 lb", "sources": 1 },
+        { "item": "shrimp", "aisle": "seafood", "formatted": "1 lb", "sources": 1 },
+        { "item": "corn tortillas", "aisle": "bakery", "formatted": "16", "sources": 2 }
+      ],
+      "expectAbsent": ["mayonnaise", "panko", "eggs"]
+    },
+    {
+      "name": "cooking for eight",
+      "why": "rule 1. The recipe serves four, so everything doubles. Section 4 makes servings per meal rather than global, which is one of the things Mealime got wrong.",
+      "plan": [{ "recipe": "seed-sheet-pan-salmon", "servings": 8 }],
+      "pantryHave": "allStaples",
+      "expect": [
+        { "item": "green beans", "aisle": "produce", "formatted": "2 lb", "sources": 1 },
+        { "item": "lemon", "aisle": "produce", "formatted": "2", "sources": 1 },
+        { "item": "salmon", "aisle": "seafood", "formatted": "3 lb", "sources": 1 }
+      ],
+      "expectAbsent": ["olive oil"]
+    },
+    {
+      "name": "a household that has nothing in yet",
+      "why": "rule 4 from the other side. Staples come off the list because the pantry says we have them, not because they are hardcoded anywhere. With an empty pantry they are all on it.",
+      "plan": [{ "recipe": "seed-sheet-pan-salmon", "servings": 4 }],
+      "pantryHave": [],
+      "expect": [
+        { "item": "garlic", "aisle": "produce", "formatted": "2 cloves", "sources": 1 },
+        { "item": "green beans", "aisle": "produce", "formatted": "1 lb", "sources": 1 },
+        { "item": "lemon", "aisle": "produce", "formatted": "1", "sources": 1 },
+        { "item": "salmon", "aisle": "seafood", "formatted": "1 1/2 lb", "sources": 1 },
+        { "item": "black pepper", "aisle": "bakingAndSpices", "formatted": "1/2 tsp", "sources": 1 },
+        { "item": "kosher salt", "aisle": "bakingAndSpices", "formatted": "1 tsp", "sources": 1 },
+        { "item": "olive oil", "aisle": "oilsAndCondiments", "formatted": "3 tbsp", "sources": 1 }
+      ]
+    },
+    {
+      "name": "an empty week",
+      "why": "no meals planned is a normal state, not an error. The List tab's empty state depends on it.",
+      "plan": [],
+      "pantryHave": "allStaples",
+      "expect": []
+    }
+  ]
+}

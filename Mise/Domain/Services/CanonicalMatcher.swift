@@ -134,6 +134,12 @@ struct CanonicalMatcher: Sendable {
         return CanonicalMatcher(items: items, learnedAliases: learned)
     }
 
+    /// The item with this id, for callers that already hold a link and only
+    /// need the name and aisle back.
+    func item(id: UUID) -> CanonicalCandidate? {
+        items.first { $0.id == id }
+    }
+
     func match(_ ingredientName: String) -> CanonicalMatch {
         let normalized = Self.normalize(ingredientName)
         guard !normalized.isEmpty else {

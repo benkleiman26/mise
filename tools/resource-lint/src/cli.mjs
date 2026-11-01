@@ -10,6 +10,7 @@ import { lintCanonicalItems, lintSeedRecipes } from './lint.mjs';
 import { lintUnitFixtures } from './units.mjs';
 import { lintIngredientFixtures } from './ingredients.mjs';
 import { lintMatchingFixtures, lintSeedResolution } from './matching.mjs';
+import { lintListFixtures } from './list.mjs';
 
 const root = path.join(import.meta.dirname, '..', '..', '..', 'Mise', 'Resources');
 const canonicalFile = path.join(root, 'canonical_items.json');
@@ -80,6 +81,18 @@ if (existsSync(matchingFixtures)) {
   failures += problems.length;
 } else {
   console.log('canonical_matching.json: not present yet');
+}
+
+const listFixtures = path.join(import.meta.dirname, '..', '..', '..', 'MiseTests', 'Fixtures', 'list_generation.json');
+if (existsSync(listFixtures) && existsSync(seedFile)) {
+  const doc = await readJson(listFixtures);
+  const seed = await readJson(seedFile);
+  const problems = lintListFixtures(doc, seed, canonical);
+  console.log(`list_generation.json: ${doc.scenarios?.length ?? 0} scenarios`);
+  for (const problem of problems) console.error(`  ${problem}`);
+  failures += problems.length;
+} else {
+  console.log('list_generation.json: not present yet');
 }
 
 if (failures) {

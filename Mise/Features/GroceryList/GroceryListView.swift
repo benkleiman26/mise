@@ -94,36 +94,39 @@ struct GroceryListView: View {
         }
     }
 
+    /// A tap target, not a `Button`. A button filling the row claims the drag
+    /// before the list sees it, and the list stops scrolling. `contentShape`
+    /// plus `onTapGesture` gives the whole row the tap without the gesture
+    /// fight.
     private func row(_ item: GroceryItem, in store: GroceryListStore) -> some View {
-        Button {
-            store.toggle(item)
-        } label: {
-            HStack(alignment: .firstTextBaseline, spacing: 12) {
-                Image(systemName: item.isChecked ? "checkmark.circle.fill" : "circle")
-                    .foregroundStyle(item.isChecked ? Color.accentColor : .secondary)
-                    .imageScale(.large)
+        HStack(alignment: .firstTextBaseline, spacing: 12) {
+            Image(systemName: item.isChecked ? "checkmark.circle.fill" : "circle")
+                .foregroundStyle(item.isChecked ? Color.accentColor : .secondary)
+                .imageScale(.large)
 
-                VStack(alignment: .leading, spacing: 2) {
-                    Text(item.displayName)
-                        .strikethrough(item.isChecked)
-                        .foregroundStyle(item.isChecked ? .secondary : .primary)
-                    if let detail = amount(item) {
-                        Text(detail)
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
-                    }
-                }
-
-                Spacer()
-
-                if item.isManual {
-                    Image(systemName: "hand.raised")
+            VStack(alignment: .leading, spacing: 2) {
+                Text(item.displayName)
+                    .strikethrough(item.isChecked)
+                    .foregroundStyle(item.isChecked ? .secondary : .primary)
+                if let detail = amount(item) {
+                    Text(detail)
                         .font(.caption)
-                        .foregroundStyle(.tertiary)
+                        .foregroundStyle(.secondary)
                 }
             }
+
+            Spacer()
+
+            if item.isManual {
+                Image(systemName: "hand.raised")
+                    .font(.caption)
+                    .foregroundStyle(.tertiary)
+            }
         }
-        .buttonStyle(.plain)
+        .contentShape(Rectangle())
+        .onTapGesture {
+            store.toggle(item)
+        }
     }
 
     /// The note wins when it is set, because that is where a row with two

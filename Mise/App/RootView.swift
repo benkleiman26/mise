@@ -4,35 +4,40 @@ import SwiftUI
 /// gear on Plan. Cook mode is presented full screen from a recipe and is Phase 3.
 ///
 /// The tab selection lives here because the loop the app exists for crosses
-/// tabs: pick recipes, then make the list. "Make list" lands the user on the
+/// tabs: pick recipes, then make the list. "Make the list" lands the user on the
 /// list rather than leaving them to find it.
+///
+/// Built with the `Tab` values rather than `.tabItem` and `.tag`. The older
+/// spelling still compiles against the iOS 27 SDK and is what the first version
+/// used, and on iOS 26 the content inside it would not scroll. The enum is
+/// called `Screen` because `Tab` is now SwiftUI's own type.
 struct RootView: View {
-    enum Tab: Hashable {
+    enum Screen: Hashable {
         case plan, list, recipes, pantry
     }
 
-    @State private var tab: Tab = .plan
+    @State private var screen: Screen = .plan
 
     var body: some View {
-        TabView(selection: $tab) {
-            PlanView(
-                onBrowseRecipes: { tab = .recipes },
-                onListMade: { tab = .list }
-            )
-            .tabItem { Label("Plan", systemImage: "calendar") }
-            .tag(Tab.plan)
+        TabView(selection: $screen) {
+            Tab("Plan", systemImage: "calendar", value: Screen.plan) {
+                PlanView(
+                    onBrowseRecipes: { screen = .recipes },
+                    onListMade: { screen = .list }
+                )
+            }
 
-            GroceryListView()
-                .tabItem { Label("List", systemImage: "checklist") }
-                .tag(Tab.list)
+            Tab("List", systemImage: "checklist", value: Screen.list) {
+                GroceryListView()
+            }
 
-            RecipesView()
-                .tabItem { Label("Recipes", systemImage: "book") }
-                .tag(Tab.recipes)
+            Tab("Recipes", systemImage: "book", value: Screen.recipes) {
+                RecipesView()
+            }
 
-            PantryView()
-                .tabItem { Label("Pantry", systemImage: "cabinet") }
-                .tag(Tab.pantry)
+            Tab("Pantry", systemImage: "cabinet", value: Screen.pantry) {
+                PantryView()
+            }
         }
     }
 }

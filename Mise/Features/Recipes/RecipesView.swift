@@ -80,6 +80,8 @@ struct RecipesView: View {
                     .background(.thinMaterial, in: Capsule())
                     .padding(.bottom, 12)
                     .transition(.opacity)
+                    // It sits over the list, so it must never take a touch.
+                    .allowsHitTesting(false)
             }
         }
         .animation(.default, value: justAdded)

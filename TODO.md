@@ -171,6 +171,28 @@ entry, and the week plan. Section 5.1 and 5.2.
 - [ ] No density override on canonical items yet, so cups to grams is always
       refused. Section 4 allows the override; nothing needs it before Phase 2.
 
+## The first usable loop
+
+Landed on 2026-11-01, never compiled in the cloud. Everything in this section
+needs a Mac run before it can be called done.
+
+- [ ] `xcodebuild test` has never seen `PlanStore`, `GroceryListStore`,
+      `RecipeDetailView`, or the rewritten `RecipesView`, `PlanView`,
+      `GroceryListView` and `RootView`. The four domain services underneath
+      them are green; the wiring above them is unverified.
+- [ ] No tests cover the two new stores. They need an in-memory container and a
+      seeded household, which is what `SeedInstallerTests` already sets up.
+- [ ] `GroceryItem` holds one quantity, and a generated row can carry two. The
+      written form goes in `note` as a stopgap. See DECISIONS.md.
+- [ ] A regenerated list rebuilds every row, so a manual item loses its `note`.
+      Harmless today because nothing writes a note on a manual item.
+- [ ] Making a list with no meals planned still creates an empty `GroceryList`
+      record. It shows as the empty state, so it is invisible, but it is junk.
+- [ ] Nothing shows which meals an item came from, although
+      `sourceRecipeIDs` is stored for it. Section 5.3 asks for that tap.
+- [ ] The rest of Phase 1 is untouched: collections, tags, smart lists, facet
+      chips, sort orders, manual recipe entry and the paste a link flow.
+
 ## Environment
 
 - [ ] No Swift toolchain or Xcode in the cloud environment, so no Swift code can

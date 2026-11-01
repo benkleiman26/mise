@@ -52,6 +52,10 @@ protocol MealPlanRepository {
     func count() throws -> Int
     func insert(_ plan: MealPlan)
     func delete(_ plan: MealPlan)
+    /// Removing a meal from `plan.entries` only breaks the link: the record
+    /// would stay in the store with no plan. The caller needs a way to delete
+    /// one, and it cannot reach the context itself.
+    func deleteEntry(_ meal: PlannedMeal)
     func save() throws
 }
 
@@ -63,6 +67,10 @@ protocol GroceryListRepository {
     func count() throws -> Int
     func insert(_ list: GroceryList)
     func delete(_ list: GroceryList)
+    /// Same reason as `MealPlanRepository.deleteEntry`: regenerating a list
+    /// replaces its rows, and a row dropped from the array would otherwise
+    /// linger in the store forever.
+    func deleteItem(_ item: GroceryItem)
     func save() throws
 }
 

@@ -529,3 +529,65 @@ are visible, so the three test files say `Mise.Unit`.
 
 If that qualification starts appearing outside tests, for example in the Share
 Extension in Phase 4, rename the enum then rather than spreading the prefix.
+
+## The first usable version is the loop, not Phase 1's full library screen
+
+The engine was finished before any screen used it: the four domain services were
+written and tested, and the app still showed three empty states. Phase 1 as
+section 5.1 describes it is a large screen, with collections, tags, facet chips,
+sort orders and manual entry.
+
+The loop the owner asked for is smaller than that: choose recipes, see them as a
+week, get one grocery list. So the loop was built first and the rest of Phase 1
+left for later. What landed is search, a recipe detail screen with one button,
+a week list with per meal servings, and the list itself, grouped by aisle and
+tappable.
+
+The ordering matters because everything after this is easier to judge once the
+app can be used end to end. A missing facet chip is visible and can wait; a
+list generator that merges the wrong rows is not visible at all until a real
+plan runs through it.
+
+## The tab selection lives in RootView, so "Make the list" can land on the list
+
+The grocery list is a different tab from the plan that produces it. Making the
+list and leaving the user on the plan screen would mean the one action the app
+exists for appears to do nothing.
+
+`RootView` owns the selected tab and hands the Plan screen two closures, one to
+reach the recipes and one to show the list. The alternative, a shared navigation
+store in the environment, is more machinery than two closures for a decision
+that only ever moves between four fixed tabs.
+
+Adding a recipe deliberately does not change tabs, because people add several in
+a row. It shows a short confirmation instead.
+
+## Deleting a child record needs a repository method, not a context
+
+Dropping a `PlannedMeal` out of `plan.entries`, or a `GroceryItem` out of
+`list.items`, only breaks the link. The record stays in the store with a nil
+parent, invisible to every screen and permanent. A cascade delete rule only
+fires when the parent itself is deleted.
+
+Section 3's rule is that nothing outside `Domain/Repositories` touches a
+`ModelContext`, so the stores cannot delete a child themselves. Rather than
+break that rule, `MealPlanRepository` gained `deleteEntry` and
+`GroceryListRepository` gained `deleteItem`.
+
+This is the first case of a repository needing a method about a child rather
+than its aggregate root. If more of them appear, the right shape is probably a
+single `delete(_:)` that takes any `PersistentModel`, but one method each is
+honest about what is actually needed today.
+
+## A grocery row with two quantities keeps its written form in `note`
+
+`ListGenerator` can emit a row with two quantities, when a recipe asks for a
+bunch of parsley and another asks for a quarter cup of it and the two cannot be
+added. `GroceryItem` holds one `quantity` and one `unit`.
+
+Rather than widen the model mid build, the first quantity goes in the two
+fields and the full written form, "1 bunch + 1/4 cup", goes in `note`, which the
+list screen prefers when it is set. The shopper sees the whole thing.
+
+The model should grow a proper quantity list when something else needs it, and
+TODO.md says so.

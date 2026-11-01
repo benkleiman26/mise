@@ -58,10 +58,18 @@ final class SwiftDataCanonicalItemRepository: SwiftDataRepository<CanonicalItem>
 final class SwiftDataPantryRepository: SwiftDataRepository<PantryEntry>, PantryRepository {}
 
 @MainActor
-final class SwiftDataMealPlanRepository: SwiftDataRepository<MealPlan>, MealPlanRepository {}
+final class SwiftDataMealPlanRepository: SwiftDataRepository<MealPlan>, MealPlanRepository {
+    func deleteEntry(_ meal: PlannedMeal) {
+        context.delete(meal)
+    }
+}
 
 @MainActor
-final class SwiftDataGroceryListRepository: SwiftDataRepository<GroceryList>, GroceryListRepository {}
+final class SwiftDataGroceryListRepository: SwiftDataRepository<GroceryList>, GroceryListRepository {
+    func deleteItem(_ item: GroceryItem) {
+        context.delete(item)
+    }
+}
 
 @MainActor
 final class SwiftDataHouseholdRepository: SwiftDataRepository<Household>, HouseholdRepository {}

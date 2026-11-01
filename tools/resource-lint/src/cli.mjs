@@ -9,6 +9,7 @@ import path from 'node:path';
 import { lintCanonicalItems, lintSeedRecipes } from './lint.mjs';
 import { lintUnitFixtures } from './units.mjs';
 import { lintIngredientFixtures } from './ingredients.mjs';
+import { lintMatchingFixtures, lintSeedResolution } from './matching.mjs';
 
 const root = path.join(import.meta.dirname, '..', '..', '..', 'Mise', 'Resources');
 const canonicalFile = path.join(root, 'canonical_items.json');
@@ -59,6 +60,26 @@ if (existsSync(ingredientFixtures)) {
   failures += problems.length;
 } else {
   console.log('ingredient_parsing.json: not present yet');
+}
+
+if (existsSync(seedFile)) {
+  const seed = await readJson(seedFile);
+  const problems = lintSeedResolution(seed, canonical);
+  const lines = seed.recipes.reduce((n, r) => n + (r.ingredients?.length ?? 0), 0);
+  console.log(`seed ingredient resolution: ${lines - problems.length} of ${lines} lines resolve to the item the seed names`);
+  for (const problem of problems) console.error(`  ${problem}`);
+  failures += problems.length;
+}
+
+const matchingFixtures = path.join(import.meta.dirname, '..', '..', '..', 'MiseTests', 'Fixtures', 'canonical_matching.json');
+if (existsSync(matchingFixtures)) {
+  const doc = await readJson(matchingFixtures);
+  const problems = lintMatchingFixtures(doc, canonical);
+  console.log(`canonical_matching.json: ${doc.cases?.length ?? 0} cases, ${doc.learnedAliases?.length ?? 0} learned aliases`);
+  for (const problem of problems) console.error(`  ${problem}`);
+  failures += problems.length;
+} else {
+  console.log('canonical_matching.json: not present yet');
 }
 
 if (failures) {

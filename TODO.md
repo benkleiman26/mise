@@ -146,9 +146,20 @@ below about re-running or re-fetching is history rather than a possible action.
       never been executed. Two known divergences are expected and asserted:
       "shredded cheddar" comes back as cheddar with preparation "shredded", and
       a `count` unit comes back as no unit, which is the same thing.
-- [ ] `CanonicalMatcher` is the remaining Phase 1 service and is not started.
-      It is what turns a parsed name into a canonical item, so it is where the
-      aliases in `canonical_items.json` finally get used.
+- [x] `CanonicalMatcher` written, with 31 cases in
+      `MiseTests/Fixtures/canonical_matching.json`. Every case is checked
+      against the real canonical table: the item exists, the aisle is right,
+      and the stated rung of the ladder is the one it actually matches on.
+- [x] All 379 seed ingredient lines resolve to the item the seed data names,
+      and none needs review. Enforced by `tools/resource-lint`, so it cannot
+      break without a failure here.
+- [ ] All three services are written and none has been compiled. One Mac
+      session should build and run them together.
+- [ ] The matcher has no edit distance rung, so a typo like "cilatro" resolves
+      to nothing. Section 5.3 only asks for exact, alias and fuzzy, and
+      containment covers fuzzy; add edit distance if real imports need it.
+- [ ] Learned aliases live only in the matcher instance. Persisting them is
+      Phase 2, when the user actually categorises something.
 - [ ] No density override on canonical items yet, so cups to grams is always
       refused. Section 4 allows the override; nothing needs it before Phase 2.
 

@@ -1,0 +1,60 @@
+{
+  "format": "canonical-matching-fixtures",
+  "version": 1,
+  "note": "What CanonicalMatcher should resolve an ingredient name to. Section 5.3 rule 2 sets the ladder: exact name, then alias, then fuzzy, and what is left goes to aisle other and gets flagged so the user can categorise it once. tools/resource-lint checks every expected item actually exists in canonical_items.json with the aisle claimed here, and that each fuzzy case really does satisfy the containment rule it says it does.",
+  "reasons": {
+    "exactName": "the ingredient name is a canonical item's name",
+    "alias": "it is one of that item's aliases",
+    "normalized": "it matched once size and freshness words were dropped",
+    "contained": "the canonical name's words all appear in the ingredient, and the head noun agrees",
+    "none": "no match. Aisle other, flagged for the user."
+  },
+  "cases": [
+    { "input": "olive oil", "item": "olive oil", "aisle": "oilsAndCondiments", "reason": "exactName", "confidence": "high" },
+    { "input": "kosher salt", "item": "kosher salt", "aisle": "bakingAndSpices", "reason": "exactName", "confidence": "high" },
+    { "input": "Kosher Salt", "item": "kosher salt", "aisle": "bakingAndSpices", "reason": "exactName", "confidence": "high",
+      "why": "matching ignores case" },
+    { "input": "  spaghetti  ", "item": "spaghetti", "aisle": "pastaAndSauces", "reason": "exactName", "confidence": "high" },
+
+    { "input": "salt", "item": "kosher salt", "aisle": "bakingAndSpices", "reason": "alias", "confidence": "high" },
+    { "input": "extra virgin olive oil", "item": "olive oil", "aisle": "oilsAndCondiments", "reason": "alias", "confidence": "high" },
+    { "input": "boneless skinless chicken thighs", "item": "chicken thighs", "aisle": "meat", "reason": "alias", "confidence": "high",
+      "why": "section 4's own example of a name as written resolving to a canonical item" },
+    { "input": "garlic cloves", "item": "garlic", "aisle": "produce", "reason": "alias", "confidence": "high" },
+    { "input": "green onions", "item": "scallions", "aisle": "produce", "reason": "alias", "confidence": "high" },
+    { "input": "chickpeas", "item": "canned chickpeas", "aisle": "cannedAndJarred", "reason": "alias", "confidence": "high" },
+    { "input": "chicken stock", "item": "chicken broth", "aisle": "cannedAndJarred", "reason": "alias", "confidence": "high" },
+    { "input": "flour", "item": "all-purpose flour", "aisle": "bakingAndSpices", "reason": "alias", "confidence": "high" },
+
+    { "input": "extra-virgin olive oil", "item": "olive oil", "aisle": "oilsAndCondiments", "reason": "alias", "confidence": "high",
+      "why": "a hyphen is punctuation, so this is the alias \"extra virgin olive oil\" once normalized" },
+    { "input": "flat-leaf parsley", "item": "parsley", "aisle": "produce", "reason": "alias", "confidence": "high" },
+    { "input": "fresh cilantro", "item": "cilantro", "aisle": "produce", "reason": "alias", "confidence": "high" },
+    { "input": "large lemon", "item": "lemon", "aisle": "produce", "reason": "normalized", "confidence": "high",
+      "why": "the size word the parser deliberately leaves in the name, dropped here instead" },
+    { "input": "medium yellow onion", "item": "yellow onion", "aisle": "produce", "reason": "normalized", "confidence": "high" },
+    { "input": "small zucchini", "item": "zucchini", "aisle": "produce", "reason": "normalized", "confidence": "high" },
+    { "input": "lemons", "item": "lemon", "aisle": "produce", "reason": "alias", "confidence": "high" },
+    { "input": "carrots", "item": "carrot", "aisle": "produce", "reason": "alias", "confidence": "high" },
+    { "input": "scallion", "item": "scallions", "aisle": "produce", "reason": "normalized", "confidence": "high",
+      "why": "the canonical name is plural and the line is singular" },
+
+    { "input": "low-sodium soy sauce", "item": "soy sauce", "aisle": "oilsAndCondiments", "reason": "contained", "confidence": "medium" },
+    { "input": "whole milk greek yogurt", "item": "greek yogurt", "aisle": "dairyAndEggs", "reason": "contained", "confidence": "medium" },
+    { "input": "toasted sesame oil", "item": "sesame oil", "aisle": "oilsAndCondiments", "reason": "alias", "confidence": "high" },
+    { "input": "san marzano canned crushed tomatoes", "item": "canned crushed tomatoes", "aisle": "cannedAndJarred", "reason": "contained", "confidence": "medium" },
+    { "input": "good quality balsamic vinegar", "item": "balsamic vinegar", "aisle": "oilsAndCondiments", "reason": "contained", "confidence": "medium" },
+    { "input": "wild caught salmon", "item": "salmon", "aisle": "seafood", "reason": "contained", "confidence": "medium" },
+
+    { "input": "milk chocolate", "item": null, "aisle": "other", "reason": "none", "confidence": "low",
+      "why": "the trap containment alone would fall into. The head noun is chocolate, not milk, so this is not milk." },
+    { "input": "dragonfruit powder", "item": null, "aisle": "other", "reason": "none", "confidence": "low" },
+    { "input": "black garlic miso caramel", "item": null, "aisle": "other", "reason": "none", "confidence": "low",
+      "why": "words from three canonical items and none of them is the thing" },
+    { "input": "", "item": null, "aisle": "other", "reason": "none", "confidence": "low" }
+  ],
+  "learnedAliases": [
+    { "input": "pecorino romano cheese", "teach": "pecorino", "item": "pecorino", "aisle": "deliAndCheese",
+      "why": "section 5.3: an unmatched item is categorised once by the user, and that teaches the alias table" }
+  ]
+}

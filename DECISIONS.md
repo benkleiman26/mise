@@ -475,3 +475,40 @@ A "head" of garlic or a "sprig" of thyme stays in the name rather than becoming
 an invented unit, and confidence drops to medium to record that a real amount
 was not captured. Inventing units would quietly break every merge that depends
 on them being a closed set, which is most of section 5.3.
+
+## Fuzzy matching requires the head noun to agree
+
+Section 5.3's third rung is a fuzzy match. The rule is containment: every word
+of the canonical item's name appears in the ingredient, and both end on the same
+word.
+
+The second half is the whole guard. Containment alone resolves "milk chocolate"
+to milk, because the word is right there, and the shopper comes home with the
+wrong thing. English food names put the thing itself last, so comparing the
+final word separates "coconut milk", which is milk, from "milk chocolate", which
+is not. There is a test named after that case.
+
+Where several items are contained, the most specific wins, so "coconut milk"
+beats "milk" rather than racing it.
+
+A containment hit is medium confidence and gets reviewed. An exact name, an
+alias, or something the user taught us goes through silently. That split is what
+section 1a asks for: confirm only the lines we are unsure about.
+
+## Teaching returns a new matcher rather than mutating one
+
+Section 5.3 says an unmatched ingredient is categorised once by the user and
+that teaches the alias table. `teaching(_:as:)` returns a matcher that knows the
+new phrase, leaving the original alone, so a list generation already in flight
+cannot have the rules change underneath it.
+
+## The seed library's resolution is a lint rule, not just a test
+
+Section 5.1 requires every seed recipe to carry canonical item links so the list
+generator works on first launch. `tools/resource-lint` now resolves all 379 seed
+ingredient lines against the real table and fails if any one of them stops
+resolving to the item the seed data names.
+
+That runs without Xcode, so editing either JSON file cannot quietly break the
+thing section 2 calls the hero feature. All 379 currently resolve, and none of
+them needs review.

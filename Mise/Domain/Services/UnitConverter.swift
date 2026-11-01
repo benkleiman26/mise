@@ -157,8 +157,17 @@ enum UnitConverter {
         let amount = fraction(measurement.quantity)
         guard let unit = measurement.unit, unit != .count else { return amount }
         let name = unit.abbreviation
-        let plural = unit.pluralizes && measurement.quantity > 1 + epsilon ? "\(name)s" : name
+        let plural = unit.pluralizes && measurement.quantity > 1 + epsilon ? Self.pluralize(name) : name
         return "\(amount) \(plural)"
+    }
+
+    /// English plurals for the handful of unit names that need more than an s.
+    /// "2 bunchs" is not a thing, and the parser cannot read it back either.
+    static func pluralize(_ name: String) -> String {
+        for ending in ["ch", "sh", "s", "x", "z"] where name.hasSuffix(ending) {
+            return name + "es"
+        }
+        return name + "s"
     }
 
     // MARK: - Private

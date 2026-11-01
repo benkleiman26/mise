@@ -19,6 +19,8 @@ const CONFIDENCE = ['high', 'medium', 'low'];
 const DESCRIPTORS = new Set([
   'large', 'medium', 'small', 'extra', 'jumbo', 'mini', 'baby',
   'fresh', 'freshly', 'ripe', 'good', 'quality', 'organic', 'raw',
+  // State, not identity. Cooked rice is still rice to buy.
+  'cooked', 'uncooked', 'leftover',
 ]);
 
 export function normalize(text) {
@@ -166,14 +168,21 @@ export function lintMatchingFixtures(doc, canonical) {
         }
         break;
       }
-      case 'contained':
+      case 'contained': {
         if (!containmentMatches(entry.input, item.name)) {
           fail(`${where}: claims containment with "${item.name}", but the words or the head noun do not line up`);
         }
         if (aliasKeys.has(normalizedInput) || nameKeys.has(normalizedInput)) {
           fail(`${where}: claims containment, but it matches exactly, so the reason is wrong`);
         }
+        // Containment is the last rung. If dropping descriptors already lands
+        // on a match, that is the answer, and it is a more confident one.
+        const strippedFirst = withoutDescriptors(entry.input);
+        if (strippedFirst !== normalizedInput && index.has(strippedFirst)) {
+          fail(`${where}: claims containment, but dropping descriptors gives "${strippedFirst}", which matches first`);
+        }
         break;
+      }
       default:
         break;
     }

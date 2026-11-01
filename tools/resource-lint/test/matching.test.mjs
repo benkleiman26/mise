@@ -142,3 +142,25 @@ describe('the rules themselves', () => {
     assert.equal(resolve('canned coconut milk', CANONICAL.items, index).name, 'coconut milk');
   });
 });
+
+describe('regressions from the first real compile', () => {
+  test('a containment claim that descriptor stripping already answers is refused', () => {
+    // This is what let "good quality balsamic vinegar" sit in the corpus
+    // labelled contained when the Swift correctly called it normalized.
+    const doc = {
+      ...FIXTURES,
+      cases: [
+        ...FIXTURES.cases,
+        { input: 'good quality balsamic vinegar', item: 'balsamic vinegar', aisle: 'oilsAndCondiments', reason: 'contained', confidence: 'medium' },
+      ],
+    };
+    assert.match(lintMatchingFixtures(doc, CANONICAL).join(' '), /dropping descriptors gives "balsamic vinegar", which matches first/);
+  });
+
+  test('cooked is a descriptor, so shipped recipes do not ask the user about rice', () => {
+    const index = buildIndex(CANONICAL.items);
+    assert.equal(resolve('cooked white rice', CANONICAL.items, index).name, 'white rice');
+    assert.equal(resolve('cooked quinoa', CANONICAL.items, index).name, 'quinoa');
+    assert.equal(withoutDescriptors('cooked white rice'), 'white rice');
+  });
+});

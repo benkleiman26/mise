@@ -237,7 +237,10 @@ enum IngredientParser {
 
         func readDigits() -> Double? {
             var digits = ""
-            while index < text.endIndex, text[index].isNumber || text[index] == "." {
+            // ASCII only. `Character.isNumber` is true for "½" too, so a
+            // permissive loop swallows "1½" whole and then fails to read it,
+            // which is how "1½ cups white rice" came back with no quantity.
+            while index < text.endIndex, (text[index].isASCII && text[index].isNumber) || text[index] == "." {
                 digits.append(text[index])
                 index = text.index(after: index)
             }
@@ -296,7 +299,8 @@ enum IngredientParser {
             while probe < text.endIndex, text[probe] == " " { probe = text.index(after: probe) }
             var digits = ""
             var scan = probe
-            while scan < text.endIndex, text[scan].isNumber || text[scan] == "." || vulgarFractions[text[scan]] != nil {
+            while scan < text.endIndex,
+                  (text[scan].isASCII && text[scan].isNumber) || text[scan] == "." || vulgarFractions[text[scan]] != nil {
                 digits.append(text[scan])
                 scan = text.index(after: scan)
             }

@@ -89,8 +89,24 @@ struct CanonicalMatcher: Sendable {
             }
         }
 
-        // Names first, then aliases, so a name always wins a collision. The
-        // resource linter already refuses a table where the two overlap.
+        func addExact(_ phrase: String, _ item: CanonicalCandidate, _ reason: MatchReason) {
+            let key = Self.normalize(phrase)
+            if !key.isEmpty, index[key] == nil {
+                index[key] = Entry(item: item, source: phrase, reason: reason)
+            }
+        }
+
+        // Spellings that are written out come first, then the plurals and
+        // singulars generated from them. Otherwise a plural derived from a name
+        // claims the key before the alias that spells it out, and "lemons"
+        // reports as a variant of "lemon" rather than as the alias it is.
+        //
+        // Names beat aliases at each stage. The resource linter already refuses
+        // a table where the two overlap, so this only orders, never discards.
+        for item in items { addExact(item.name, item, .exactName) }
+        for item in items {
+            for alias in item.aliases { addExact(alias, item, .alias) }
+        }
         for item in items { add(item.name, item, .exactName) }
         for item in items {
             for alias in item.aliases { add(alias, item, .alias) }
@@ -200,6 +216,9 @@ struct CanonicalMatcher: Sendable {
     static let descriptors: Set<String> = [
         "large", "medium", "small", "extra", "jumbo", "mini", "baby",
         "fresh", "freshly", "ripe", "good", "quality", "organic", "raw",
+        // State, not identity. A recipe calling for cooked rice still sends
+        // you to the shelf for rice.
+        "cooked", "uncooked", "leftover",
     ]
 
     static func normalize(_ text: String) -> String {

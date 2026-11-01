@@ -43,8 +43,11 @@
     { "input": "whole milk greek yogurt", "item": "greek yogurt", "aisle": "dairyAndEggs", "reason": "contained", "confidence": "medium" },
     { "input": "toasted sesame oil", "item": "sesame oil", "aisle": "oilsAndCondiments", "reason": "alias", "confidence": "high" },
     { "input": "san marzano canned crushed tomatoes", "item": "canned crushed tomatoes", "aisle": "cannedAndJarred", "reason": "contained", "confidence": "medium" },
-    { "input": "good quality balsamic vinegar", "item": "balsamic vinegar", "aisle": "oilsAndCondiments", "reason": "contained", "confidence": "medium" },
+    { "input": "good quality balsamic vinegar", "item": "balsamic vinegar", "aisle": "oilsAndCondiments", "reason": "normalized", "confidence": "high",
+      "why": "good and quality are descriptors, so dropping them lands on the name exactly. That beats containment, which is why the validator now refuses a containment claim that descriptor stripping already answers." },
     { "input": "wild caught salmon", "item": "salmon", "aisle": "seafood", "reason": "contained", "confidence": "medium" },
+    { "input": "cooked white rice", "item": "white rice", "aisle": "riceGrainsBeans", "reason": "normalized", "confidence": "high",
+      "why": "three shipped recipes call for this. Cooked rice is still rice to buy, so it must not interrupt the user on first launch." },
 
     { "input": "milk chocolate", "item": null, "aisle": "other", "reason": "none", "confidence": "low",
       "why": "the trap containment alone would fall into. The head noun is chocolate, not milk, so this is not milk." },

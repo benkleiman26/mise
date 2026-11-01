@@ -42,11 +42,16 @@ export function fraction(quantity) {
   return text.endsWith('0') ? text.slice(0, -1) : text;
 }
 
+/** English plurals: an s is wrong after ch, sh, s, x or z. */
+export function pluralize(name) {
+  return /(?:ch|sh|s|x|z)$/.test(name) ? `${name}es` : `${name}s`;
+}
+
 export function formatOne([quantity, unit], families) {
   const amount = fraction(quantity);
   if (!unit || unit === 'count') return amount;
   const name = ABBREVIATION[unit] ?? unit;
-  return `${amount} ${PLURALIZES.has(unit) && quantity > 1 + EPSILON ? `${name}s` : name}`;
+  return `${amount} ${PLURALIZES.has(unit) && quantity > 1 + EPSILON ? pluralize(name) : name}`;
 }
 
 const familyOf = (unit, families) => {

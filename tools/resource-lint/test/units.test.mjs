@@ -2,7 +2,7 @@ import { strict as assert } from 'node:assert';
 import { test, describe } from 'node:test';
 import { readFileSync } from 'node:fs';
 
-import { combine, fraction, lintUnitFixtures } from '../src/units.mjs';
+import { combine, fraction, lintUnitFixtures, pluralize } from '../src/units.mjs';
 
 const FIXTURES = JSON.parse(readFileSync(new URL('../../../MiseTests/Fixtures/unit_conversion.json', import.meta.url), 'utf8'));
 
@@ -106,5 +106,20 @@ describe('fraction', () => {
   test('handles zero and whole numbers', () => {
     assert.equal(fraction(0), '0');
     assert.equal(fraction(3), '3');
+  });
+});
+
+describe('pluralize', () => {
+  test('uses es after ch, sh, s, x and z', () => {
+    // "2 bunchs" was rendered into a seed line the parser then could not read.
+    assert.equal(pluralize('bunch'), 'bunches');
+    assert.equal(pluralize('pinch'), 'pinches');
+  });
+
+  test('uses a plain s otherwise', () => {
+    assert.equal(pluralize('cup'), 'cups');
+    assert.equal(pluralize('can'), 'cans');
+    assert.equal(pluralize('clove'), 'cloves');
+    assert.equal(pluralize('package'), 'packages');
   });
 });

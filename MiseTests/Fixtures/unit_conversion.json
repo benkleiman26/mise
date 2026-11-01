@@ -76,6 +76,13 @@
       "formatted": "3 cans"
     },
     {
+      "note": "a unit ending in ch takes es. Rendering 2 bunchs broke the parser reading it back.",
+      "input": [[2, "bunch"], [1, "bunch"]],
+      "expected": [[3, "bunch"]],
+      "formatted": "3 bunches"
+    },
+    { "input": [[2, "pinch"], [1, "pinch"]], "expected": [[3, "pinch"]], "formatted": "3 pinches" },
+    {
       "note": "a bare count, as in 2 eggs plus 1 egg",
       "input": [[2, null], [1, null]],
       "expected": [[3, null]],

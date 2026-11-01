@@ -128,24 +128,27 @@ below about re-running or re-fetching is history rather than a possible action.
 
 ## Phase 1
 
+The three domain services are done and verified. What remains in Phase 1 is all
+user interface, so it belongs on the Mac: library browsing with collections,
+tags, smart lists and facet chips, recipe detail with serving scaling, manual
+entry, and the week plan. Section 5.1 and 5.2.
+
+
 - [x] `UnitConverter` written, with `MiseTests/Fixtures/unit_conversion.json`
       stating its behaviour and `tools/resource-lint` verifying every expected
       value against the multiplier table.
 - [ ] **The Swift has never been compiled.** No toolchain here. `UnitConverter`
       and `UnitConverterTests` need a build and a `Cmd + U` on the Mac. The
       fixtures are checked; the Swift transcription of them is not.
-- [ ] Confirm `MiseTests/Fixtures/*.json` lands in the test target's resources.
-      Same assumption that was worth checking for the app's own JSON, and
-      `UnitConverterTests` fails with a clear message if it did not.
+- [x] The fixture JSON reaches the test bundle. Confirmed by the tests running
+      at all.
 - [x] `IngredientParser` written, with a 52 case corpus in
       `MiseTests/Fixtures/ingredient_parsing.json`. `tools/resource-lint`
       checks every case is self consistent: units are real, quantities match
       what the line says, and each piece of expected output appears in the
       input, so no case can expect something that was never there.
-- [ ] The Swift tests also round trip all 379 seed ingredient lines, which has
-      never been executed. Two known divergences are expected and asserted:
-      "shredded cheddar" comes back as cheddar with preparation "shredded", and
-      a `count` unit comes back as no unit, which is the same thing.
+- [x] The 379 line round trip passes, as do the 379 line resolution check and
+      the corpus for each service.
 - [x] `CanonicalMatcher` written, with 31 cases in
       `MiseTests/Fixtures/canonical_matching.json`. Every case is checked
       against the real canonical table: the item exists, the aisle is right,
@@ -153,8 +156,10 @@ below about re-running or re-fetching is history rather than a possible action.
 - [x] All 379 seed ingredient lines resolve to the item the seed data names,
       and none needs review. Enforced by `tools/resource-lint`, so it cannot
       break without a failure here.
-- [ ] All three services are written. The first compile found two Foundation
-      name collisions, now fixed, and nothing has been run yet.
+- [x] **All three services verified on the Mac, 2026-11-01.** 61 tests pass,
+      exit code 0, against Xcode 27 on the iPhone 18 Pro simulator. Getting
+      there took two compile rounds and five real bugs, all recorded in the
+      commit history.
 - [ ] `Unit` shadows `Foundation.Unit`, so test files say `Mise.Unit`. Fine
       while it is only tests. If the Share Extension needs the same prefix in
       Phase 4, rename the enum instead of spreading it.
@@ -195,7 +200,5 @@ seeding is idempotent on disk and not only in the in-memory tests.
       The generic over `PersistentModel` and `HouseholdRecord` compiles.
 - [x] The two JSON resources reached the app bundle, which was the assumption
       most likely to be silently wrong.
-- [ ] `Cmd + U` was never run, so the 26 unit tests have not been executed on a
-      Mac. The app working is stronger evidence than the tests would be, but
-      run them before Phase 1 builds on top of this.
+- [x] The full suite now runs on the Mac, 61 tests, all passing.
 - [ ] No app icon, and no loading state while seeding runs after first render.

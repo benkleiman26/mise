@@ -1,0 +1,96 @@
+{
+  "format": "ingredient-parsing-fixtures",
+  "version": 1,
+  "note": "What IngredientParser should make of real ingredient lines. Sources: the examples in spec sections 1a, 5.6a and 5.7, the shapes NYT Cooking and Mealime actually produce, and the kinds of line someone types into the manual entry form. tools/resource-lint checks each case is self-consistent: the unit exists, the quantity is sane, and every piece of expected output actually appears in the input, so no case can expect something that was never there.",
+  "confidenceMeaning": {
+    "high": "Save it without asking. Section 1a: confirm only the lines we are unsure about.",
+    "medium": "Usable, but show it on the review screen.",
+    "low": "We got something out of it, but a person should look."
+  },
+  "cases": [
+    { "input": "1 large lemon", "quantity": 1, "unit": null, "name": "large lemon", "confidence": "high",
+      "why": "section 5.6a's example of a well formed NYT line. Size words stay in the name, which section 4 says is kept as written; resolving them is CanonicalMatcher's job." },
+    { "input": "2 tablespoons olive oil", "quantity": 2, "unit": "tbsp", "name": "olive oil", "confidence": "high" },
+    { "input": "3 tbsp sesame oil", "quantity": 3, "unit": "tbsp", "name": "sesame oil", "confidence": "high",
+      "why": "the line section 1a says Mealime failed to merge with the one below" },
+    { "input": "2 tsp sesame oil", "quantity": 2, "unit": "tsp", "name": "sesame oil", "confidence": "high" },
+    { "input": "1 1/2 pounds salmon fillet", "quantity": 1.5, "unit": "lb", "name": "salmon fillet", "confidence": "high" },
+    { "input": "1/2 cup heavy cream", "quantity": 0.5, "unit": "cup", "name": "heavy cream", "confidence": "high" },
+    { "input": "1/4 teaspoon kosher salt", "quantity": 0.25, "unit": "tsp", "name": "kosher salt", "confidence": "high" },
+    { "input": "8 ounces cremini mushrooms", "quantity": 8, "unit": "oz", "name": "cremini mushrooms", "confidence": "high" },
+    { "input": "750 g potatoes", "quantity": 750, "unit": "g", "name": "potatoes", "confidence": "high" },
+    { "input": "1.5 kg chicken thighs", "quantity": 1.5, "unit": "kg", "name": "chicken thighs", "confidence": "high" },
+    { "input": "250 ml whole milk", "quantity": 250, "unit": "ml", "name": "whole milk", "confidence": "high" },
+    { "input": "2 fluid ounces lemon juice", "quantity": 2, "unit": "floz", "name": "lemon juice", "confidence": "high" },
+
+    { "input": "½ cup soy sauce", "quantity": 0.5, "unit": "cup", "name": "soy sauce", "confidence": "high",
+      "why": "unicode fractions arrive from pasted web text" },
+    { "input": "¼ teaspoon black pepper", "quantity": 0.25, "unit": "tsp", "name": "black pepper", "confidence": "high" },
+    { "input": "1½ cups white rice", "quantity": 1.5, "unit": "cup", "name": "white rice", "confidence": "high" },
+    { "input": "⅔ cup panko", "quantity": 0.6667, "unit": "cup", "name": "panko", "confidence": "high" },
+
+    { "input": "2 cloves garlic, minced", "quantity": 2, "unit": "clove", "name": "garlic", "preparation": "minced", "confidence": "high" },
+    { "input": "1 onion, finely diced", "quantity": 1, "unit": null, "name": "onion", "preparation": "finely diced", "confidence": "high" },
+    { "input": "1 pound green beans, trimmed", "quantity": 1, "unit": "lb", "name": "green beans", "preparation": "trimmed", "confidence": "high" },
+    { "input": "1 bunch (about 1 pound) asparagus, tough ends removed and stalks cut into 1/2-inch pieces",
+      "quantity": 1, "unit": "bunch", "name": "asparagus", "preparation": "tough ends removed and stalks cut into 1/2-inch pieces",
+      "parenthetical": "about 1 pound", "confidence": "high",
+      "why": "section 1a's example of exactly what Mealime kept as a raw string and never merged" },
+    { "input": "4 scallions, white and green parts separated, thinly sliced", "quantity": 4, "unit": null, "name": "scallions",
+      "preparation": "white and green parts separated, thinly sliced", "confidence": "high",
+      "why": "everything after the first comma is preparation, commas and all" },
+
+    { "input": "1/2 cup chopped parsley", "quantity": 0.5, "unit": "cup", "name": "parsley", "preparation": "chopped", "confidence": "medium",
+      "why": "preparation before the name instead of after a comma. Common, and less certain than the comma form." },
+    { "input": "2 cups shredded mozzarella", "quantity": 2, "unit": "cup", "name": "mozzarella", "preparation": "shredded", "confidence": "medium" },
+    { "input": "1 tablespoon grated ginger", "quantity": 1, "unit": "tbsp", "name": "ginger", "preparation": "grated", "confidence": "medium" },
+
+    { "input": "2 (15 oz) cans chickpeas", "quantity": 2, "unit": "can", "name": "chickpeas", "parenthetical": "15 oz", "confidence": "high",
+      "why": "section 5.7: the shape Mealime stores as a free text quantity" },
+    { "input": "1 (14.5 ounce) can diced tomatoes", "quantity": 1, "unit": "can", "name": "diced tomatoes", "parenthetical": "14.5 ounce", "confidence": "high" },
+    { "input": "2 15-ounce cans black beans", "quantity": 2, "unit": "can", "name": "black beans", "confidence": "medium",
+      "why": "the can size runs into the quantity with no parentheses to separate it" },
+    { "input": "1 (13.5 oz) can coconut milk, full fat", "quantity": 1, "unit": "can", "name": "coconut milk",
+      "preparation": "full fat", "parenthetical": "13.5 oz", "confidence": "high" },
+
+    { "input": "1 teaspoon chili flakes (optional)", "quantity": 1, "unit": "tsp", "name": "chili flakes", "isOptional": true, "confidence": "high" },
+    { "input": "Optional: 2 tablespoons toasted sesame seeds", "quantity": 2, "unit": "tbsp", "name": "toasted sesame seeds", "isOptional": true, "confidence": "high" },
+    { "input": "1/4 cup cilantro, chopped, optional", "quantity": 0.25, "unit": "cup", "name": "cilantro", "preparation": "chopped", "isOptional": true, "confidence": "high" },
+
+    { "input": "Salt", "quantity": null, "unit": null, "name": "Salt", "confidence": "high" },
+    { "input": "Freshly ground black pepper", "quantity": null, "unit": null, "name": "Freshly ground black pepper", "confidence": "high" },
+    { "input": "Olive oil, for drizzling", "quantity": null, "unit": null, "name": "Olive oil", "preparation": "for drizzling", "confidence": "high" },
+    { "input": "Flaky sea salt, to taste", "quantity": null, "unit": null, "name": "Flaky sea salt", "preparation": "to taste", "confidence": "high" },
+    { "input": "Lime wedges, for serving", "quantity": null, "unit": null, "name": "Lime wedges", "preparation": "for serving", "confidence": "high" },
+
+    { "input": "1 to 2 cloves garlic", "quantity": 1, "unit": "clove", "name": "garlic", "confidence": "medium",
+      "why": "a range takes the lower bound: buying too little is recoverable at the stove, buying too much is waste" },
+    { "input": "2-3 tablespoons olive oil", "quantity": 2, "unit": "tbsp", "name": "olive oil", "confidence": "medium" },
+    { "input": "1–2 pounds potatoes", "quantity": 1, "unit": "lb", "name": "potatoes", "confidence": "medium",
+      "why": "an en dash, which is what a copy and paste from the web gives" },
+
+    { "input": "1 head garlic", "quantity": 1, "unit": null, "name": "head garlic", "confidence": "medium",
+      "why": "head is not one of the sixteen units in section 4, so it stays in the name rather than being invented as a unit" },
+    { "input": "2 sprigs thyme", "quantity": 2, "unit": null, "name": "sprigs thyme", "confidence": "medium" },
+    { "input": "1 stalk celery, sliced", "quantity": 1, "unit": null, "name": "stalk celery", "preparation": "sliced", "confidence": "medium" },
+    { "input": "A handful of basil", "quantity": null, "unit": null, "name": "A handful of basil", "confidence": "low" },
+
+    { "input": "2 eggs", "quantity": 2, "unit": null, "name": "eggs", "confidence": "high" },
+    { "input": "4 corn tortillas", "quantity": 4, "unit": null, "name": "corn tortillas", "confidence": "high" },
+    { "input": "1 package extra firm tofu", "quantity": 1, "unit": "package", "name": "extra firm tofu", "confidence": "high" },
+    { "input": "1 pkg frozen peas", "quantity": 1, "unit": "package", "name": "frozen peas", "confidence": "high" },
+
+    { "input": "Kosher salt and black pepper, to taste", "quantity": null, "unit": null, "name": "Kosher salt and black pepper",
+      "preparation": "to taste", "confidence": "low",
+      "why": "two items on one line. We keep it whole and flag it rather than guessing at a split." },
+    { "input": "Juice of 1 lemon", "quantity": null, "unit": null, "name": "Juice of 1 lemon", "confidence": "low",
+      "why": "the number belongs to the lemon, not to the juice, so a leading-number rule would read it wrong" },
+    { "input": "1 cup plus 2 tablespoons all-purpose flour", "quantity": 1, "unit": "cup", "name": "plus 2 tablespoons all-purpose flour",
+      "confidence": "low", "why": "a compound quantity. Parsed badly on purpose, and flagged, rather than silently dropping the extra." },
+
+    { "input": "   2   cups    water   ", "quantity": 2, "unit": "cup", "name": "water", "confidence": "high",
+      "why": "whitespace from a paste" },
+    { "input": "2 Tablespoons Butter", "quantity": 2, "unit": "tbsp", "name": "Butter", "confidence": "high",
+      "why": "units match case insensitively, the name keeps its case" }
+  ]
+}

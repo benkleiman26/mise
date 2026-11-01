@@ -436,3 +436,42 @@ Section 4's own example, "1 cup + 2 tbsp", is read as showing the join format
 for two quantities that cannot be added, since those two particular quantities
 are both volume and therefore do add, to 1 1/8 cups. The format is used where
 the rule actually bites: a volume beside a mass, or two different discrete units.
+
+## The parser reports confidence, because a confident wrong answer is the worst outcome
+
+Section 5.1 shows every parsed line for confirmation and section 1a asks us to
+query only the lines we are unsure about. Those only work if the parser knows
+when it is guessing, so `confidence` is part of what it returns rather than
+something a caller infers.
+
+It only ever falls. A line with a range, a leading participle and two
+ingredients on it lands on the worst of those doubts, not the last one checked.
+
+Three things drop it to `low`: a number still sitting in the name, which means
+the split went wrong; the word "and" in the name, which usually means two
+ingredients on one line; and a vague measure such as "a handful". Each is a case
+where producing something plausible would be worse than admitting the problem.
+
+## A range takes its lower bound
+
+"1 to 2 cloves garlic" is read as one clove. Buying too little is recoverable at
+the stove and buying too much is waste, and section 2 puts the shopper first.
+Confidence drops to medium so the line is reviewable.
+
+## A participle leading the name is preparation, unless the unit is a container
+
+"1/2 cup chopped parsley" is parsley you chop, so "chopped" is preparation. "1
+can diced tomatoes" is a tin of diced tomatoes, a thing you buy, so the name
+stays whole. The rule is the unit: can, package and bunch keep their participle.
+
+Words that also name a product are kept out of the verb list entirely.
+"Toasted" is the clearest case, since toasted sesame oil and toasted sesame
+seeds are both things on a shelf, and stripping it would send the shopper after
+the wrong item.
+
+## Section 4's sixteen units are the only units
+
+A "head" of garlic or a "sprig" of thyme stays in the name rather than becoming
+an invented unit, and confidence drops to medium to record that a real amount
+was not captured. Inventing units would quietly break every merge that depends
+on them being a closed set, which is most of section 5.3.

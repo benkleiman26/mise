@@ -137,9 +137,18 @@ below about re-running or re-fetching is history rather than a possible action.
 - [ ] Confirm `MiseTests/Fixtures/*.json` lands in the test target's resources.
       Same assumption that was worth checking for the app's own JSON, and
       `UnitConverterTests` fails with a clear message if it did not.
-- [ ] `IngredientParser` not started. It needs the same treatment: a fixture
-      corpus of real ingredient strings with expected parses, verified here,
-      then the Swift against it.
+- [x] `IngredientParser` written, with a 52 case corpus in
+      `MiseTests/Fixtures/ingredient_parsing.json`. `tools/resource-lint`
+      checks every case is self consistent: units are real, quantities match
+      what the line says, and each piece of expected output appears in the
+      input, so no case can expect something that was never there.
+- [ ] The Swift tests also round trip all 379 seed ingredient lines, which has
+      never been executed. Two known divergences are expected and asserted:
+      "shredded cheddar" comes back as cheddar with preparation "shredded", and
+      a `count` unit comes back as no unit, which is the same thing.
+- [ ] `CanonicalMatcher` is the remaining Phase 1 service and is not started.
+      It is what turns a parsed name into a canonical item, so it is where the
+      aliases in `canonical_items.json` finally get used.
 - [ ] No density override on canonical items yet, so cups to grams is always
       refused. Section 4 allows the override; nothing needs it before Phase 2.
 

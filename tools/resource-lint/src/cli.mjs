@@ -8,6 +8,7 @@ import path from 'node:path';
 
 import { lintCanonicalItems, lintSeedRecipes } from './lint.mjs';
 import { lintUnitFixtures } from './units.mjs';
+import { lintIngredientFixtures } from './ingredients.mjs';
 
 const root = path.join(import.meta.dirname, '..', '..', '..', 'Mise', 'Resources');
 const canonicalFile = path.join(root, 'canonical_items.json');
@@ -47,6 +48,17 @@ if (existsSync(unitFixtures)) {
   failures += problems.length;
 } else {
   console.log('unit_conversion.json: not present yet');
+}
+
+const ingredientFixtures = path.join(import.meta.dirname, '..', '..', '..', 'MiseTests', 'Fixtures', 'ingredient_parsing.json');
+if (existsSync(ingredientFixtures)) {
+  const doc = await readJson(ingredientFixtures);
+  const problems = lintIngredientFixtures(doc);
+  console.log(`ingredient_parsing.json: ${doc.cases?.length ?? 0} cases`);
+  for (const problem of problems) console.error(`  ${problem}`);
+  failures += problems.length;
+} else {
+  console.log('ingredient_parsing.json: not present yet');
 }
 
 if (failures) {

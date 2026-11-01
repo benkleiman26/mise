@@ -9,10 +9,8 @@ Known gaps, found while building. Section 11 asks for this list to be kept.
 - [ ] **Chrome bookmarks export** (`bookmarks.html`) of the open recipe tabs, to
       keep in `data/`. Section 12, Phase 0a. Once it is there, run
       `cd tools/bulk-import && npm run inventory` for the counts.
-- [ ] **Run the NYT Recipe Box export.** `tools/nyt-export/` is written and
-      tested but has never run against the real site. Start with
-      `__nyt.probe()`, and if all three extraction strategies return zero, send
-      that output back rather than guessing at the markup.
+- [x] The NYT Recipe Box export ran on 2026-09-15: 169 recipes with folders and
+      cooked flags. See the NYT export section below.
 - [x] Bundle identifier settled as `com.benkleiman.mise`. No Apple Developer
       team id is needed until Phase 5, since everything before that runs in the
       simulator.
@@ -24,6 +22,10 @@ Known gaps, found while building. Section 11 asks for this list to be kept.
       floor. Install an iOS 18 runtime before the Phase 5 TestFlight build.
 
 ## Mealime export
+
+Mealime shut down on 2026-10-21. The rescue completed on 2026-09-14, five weeks
+ahead of it, and `data/mealime/` is the only copy of that data now. Everything
+below about re-running or re-fetching is history rather than a possible action.
 
 - [x] The guessed API routes were wrong because there is no API. The rescue now
       runs in the browser against the recipe CDN. See DECISIONS.md.
@@ -51,9 +53,14 @@ Known gaps, found while building. Section 11 asks for this list to be kept.
       not depend on Mealime's CDN outliving the service.
 - [x] The `mise` repository is public, so the export tool is already runnable by
       any Mealime user. Section 9, Phase 0a.
-- [ ] Nothing announces the tool to Mealime users yet. A post in the places
-      section 12 mentions (Reddit, the Mealime support community) would need to
-      go up well before 2026-10-21 to be useful to anyone.
+- [ ] The tool was never announced to other Mealime users, and that window has
+      closed: Mealime shut down on 2026-10-21 and the API it read is gone, so
+      `tools/mealime-export` can no longer rescue anyone's data.
+
+      What is still worth having is the other half, the app's "Import from
+      Mealime" screen in section 5.7, which reads a `mealime-export.json` that
+      someone saved before the shutdown. Anyone who ran any export still has a
+      file. Keep that path; drop the idea of a timely rescue post.
 
 ## NYT export
 
@@ -130,9 +137,8 @@ Known gaps, found while building. Section 11 asks for this list to be kept.
 
 - [x] `canonical_items.json`: 297 items across the 18 aisles, 71 staples,
       validated by `tools/resource-lint`.
-- [ ] `seed_recipes.json` has 12 recipes. Section 5.1 asks for 40 to 60, so 28
-      to 48 more in Phase 1. The owner's 213 rescued recipes cover his own
-      library, so this set matters for strangers rather than for him.
+- [x] `seed_recipes.json` holds 45 recipes, within the 40 to 60 section 5.1
+      asks for. Validated by `tools/resource-lint`.
 - [ ] No recipe images for the seed set. The app needs a sensible placeholder,
       or the recipe cards look broken on first launch.
 - [ ] Aisle order in `canonical_items.json` is the spec's default, not the

@@ -129,12 +129,8 @@ struct GroceryListView: View {
         }
     }
 
-    /// The note wins when it is set, because that is where a row with two
-    /// quantities keeps its full written form.
     private func amount(_ item: GroceryItem) -> String? {
-        if let note = item.note, !note.isEmpty { return note }
-        guard let quantity = item.quantity, quantity > 0 else { return nil }
-        return UnitConverter.format(Quantity(quantity, item.unit))
+        item.quantities.isEmpty ? nil : item.formatted
     }
 
     private func footerText(_ store: GroceryListStore) -> String {

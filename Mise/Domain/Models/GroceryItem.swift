@@ -15,8 +15,12 @@ final class GroceryItem {
 
     var canonicalItemID: UUID?
     var displayName: String
-    var quantity: Double?
-    var unit: Unit?
+    /// One quantity, or several when they are in different families and
+    /// section 4 says to keep both: "1 bunch + 1/4 cup".
+    var quantities: [Quantity]
+    /// The part of `quantities` the user typed in. Kept apart so regenerating
+    /// adds it once rather than compounding it.
+    var manualQuantities: [Quantity]
     var aisle: Aisle
     var isChecked: Bool
     var sourceRecipeIDs: [UUID]
@@ -25,14 +29,17 @@ final class GroceryItem {
 
     var list: GroceryList?
 
+    /// What the shopper reads under the name.
+    var formatted: String { UnitConverter.format(quantities) }
+
     init(
         id: UUID = UUID(),
         householdID: UUID,
         position: Int,
         canonicalItemID: UUID? = nil,
         displayName: String,
-        quantity: Double? = nil,
-        unit: Unit? = nil,
+        quantities: [Quantity] = [],
+        manualQuantities: [Quantity] = [],
         aisle: Aisle = .other,
         isChecked: Bool = false,
         sourceRecipeIDs: [UUID] = [],
@@ -48,8 +55,8 @@ final class GroceryItem {
         self.position = position
         self.canonicalItemID = canonicalItemID
         self.displayName = displayName
-        self.quantity = quantity
-        self.unit = unit
+        self.quantities = quantities
+        self.manualQuantities = manualQuantities
         self.aisle = aisle
         self.isChecked = isChecked
         self.sourceRecipeIDs = sourceRecipeIDs

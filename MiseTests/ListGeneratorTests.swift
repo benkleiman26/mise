@@ -273,6 +273,61 @@ final class ListGeneratorTests: XCTestCase {
         )
     }
 
+    /// Asked for on 2026-11-01: a hand added item that names something the plan
+    /// already produced joins that row instead of sitting beside it.
+    func testAManualItemMergesIntoTheRowItNames() {
+        let salmon = Self.candidates.first { $0.name == "salmon" }!
+        let recipe = RecipeInput(id: UUID(), title: "Salmon", baseServings: 4, ingredients: [
+            IngredientInput(name: "salmon", quantity: 1.5, unit: .lb, canonicalItemID: salmon.id),
+        ])
+        let generator = ListGenerator(matcher: Self.matcher)
+        let plan = [PlannedMealInput(recipe: recipe, servings: 4)]
+
+        var first = generator.generate(plan: plan).items
+        XCTAssertEqual(first.count, 1)
+        XCTAssertEqual(first[0].formatted, "1 1/2 lb")
+
+        // The user types "1 lb salmon" on a list that already has salmon.
+        first[0].quantities = UnitConverter.combine(first[0].quantities + [Quantity(1, .lb)])
+        first[0].manualQuantities = [Quantity(1, .lb)]
+
+        let again = generator.generate(plan: plan, carryingOver: first).items
+        XCTAssertEqual(again.count, 1, "one row, not two")
+        XCTAssertEqual(again[0].formatted, "2 1/2 lb", "the recipe's 1 1/2 lb plus the hand added 1 lb")
+
+        // The crux: regenerating again must not add the hand added pound twice.
+        let third = generator.generate(plan: plan, carryingOver: again).items
+        XCTAssertEqual(third.count, 1)
+        XCTAssertEqual(third[0].formatted, "2 1/2 lb", "the hand added part is added once, not compounded")
+    }
+
+    /// A hand added item that matches nothing on the list stays its own row.
+    func testAManualItemThatMatchesNothingStaysItsOwnRow() {
+        let salmon = Self.candidates.first { $0.name == "salmon" }!
+        let recipe = RecipeInput(id: UUID(), title: "Salmon", baseServings: 4, ingredients: [
+            IngredientInput(name: "salmon", quantity: 1.5, unit: .lb, canonicalItemID: salmon.id),
+        ])
+        let generator = ListGenerator(matcher: Self.matcher)
+        let plan = [PlannedMealInput(recipe: recipe, servings: 4)]
+
+        var first = generator.generate(plan: plan).items
+        first.append(GroceryDraftItem(
+            displayName: "dish soap",
+            quantities: [Quantity(1)],
+            aisle: .household,
+            isManual: true,
+            manualQuantities: [Quantity(1)]
+        ))
+
+        let again = generator.generate(plan: plan, carryingOver: first).items
+        XCTAssertEqual(again.count, 2)
+        XCTAssertEqual(again.first { $0.displayName == "dish soap" }?.formatted, "1")
+
+        let third = generator.generate(plan: plan, carryingOver: again).items
+        XCTAssertEqual(third.count, 2, "it does not multiply across regenerations")
+        XCTAssertEqual(third.first { $0.displayName == "dish soap" }?.formatted, "1")
+    }
+
     /// A changed quantity means there is more to buy, so the tick would be a lie.
     func testAChangedQuantityLosesItsTick() {
         let salmon = Self.candidates.first { $0.name == "salmon" }!

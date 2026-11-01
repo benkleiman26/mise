@@ -88,7 +88,7 @@ extension Unit {
 
 /// A quantity with an optional unit. `unit` is nil for a line like "2 eggs",
 /// where the number stands on its own.
-struct Quantity: Equatable, Sendable {
+struct Quantity: Codable, Equatable, Sendable {
     var quantity: Double
     var unit: Unit?
 

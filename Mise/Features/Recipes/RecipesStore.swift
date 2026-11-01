@@ -20,17 +20,40 @@ final class RecipesStore {
         self.recipes = recipes
     }
 
-    /// Title first, then the tags, then the ingredient names, because "what can
-    /// I make with chicken" is the question people actually ask.
+    /// Every word typed has to appear somewhere in the recipe, rather than the
+    /// whole phrase appearing as one run of characters.
+    ///
+    /// Found on 2026-11-01: searching "lemon past" returned nothing while
+    /// "Lemon Garlic Butter Pasta" sat in the list, because no title contains
+    /// the literal string "lemon past". People type the words they remember,
+    /// not the title, and they stop typing halfway through a word.
+    ///
+    /// Title, summary, tags and ingredient names are all searched, because
+    /// "what can I make with chicken" is a question people actually ask.
     var visible: [Recipe] {
-        let needle = query.trimmingCharacters(in: .whitespacesAndNewlines)
-        guard !needle.isEmpty else { return items }
+        let terms = Self.terms(in: query)
+        guard !terms.isEmpty else { return items }
 
         return items.filter { recipe in
-            if recipe.title.localizedCaseInsensitiveContains(needle) { return true }
-            if recipe.tags.contains(where: { $0.localizedCaseInsensitiveContains(needle) }) { return true }
-            return recipe.ingredients.contains { $0.name.localizedCaseInsensitiveContains(needle) }
+            let haystack = Self.searchText(for: recipe)
+            return terms.allSatisfy { haystack.contains($0) }
         }
+    }
+
+    /// Split on anything that is not a letter or a digit, so "lemon, garlic"
+    /// and "lemon garlic" behave the same.
+    private static func terms(in query: String) -> [String] {
+        query
+            .lowercased()
+            .split { !$0.isLetter && !$0.isNumber }
+            .map(String.init)
+    }
+
+    private static func searchText(for recipe: Recipe) -> String {
+        var parts = [recipe.title, recipe.summary]
+        parts.append(contentsOf: recipe.tags)
+        parts.append(contentsOf: recipe.ingredients.map(\.name))
+        return parts.joined(separator: " ").lowercased()
     }
 
     func load() {

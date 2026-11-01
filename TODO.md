@@ -182,10 +182,16 @@ green on the Mac: 70 tests, no failures, up from 61 before `ListGenerator`.
       yet, so the list has never been read by a person who then went shopping.
 - [ ] No tests cover the two new stores. They need an in-memory container and a
       seeded household, which is what `SeedInstallerTests` already sets up.
-- [ ] `GroceryItem` holds one quantity, and a generated row can carry two. The
-      written form goes in `note` as a stopgap. See DECISIONS.md.
-- [ ] A regenerated list rebuilds every row, so a manual item loses its `note`.
-      Harmless today because nothing writes a note on a manual item.
+- [x] `GroceryItem` now stores the real quantity list rather than one quantity
+      and a `note` holding the written form. The `note` field is free for an
+      actual note.
+- [ ] **The owner's own recipes are not in the app.** 213 rescued from Mealime
+      and 169 from NYT Cooking sit in `data/` on the Mac, and the app ships
+      only the 45 seed recipes. Searching for a favourite finds nothing, which
+      is the first thing the owner noticed on 2026-11-01. An importer that
+      reads those two exports is the single largest thing still missing.
+- [ ] Tapping a grocery row does not show which meals need it, although
+      `sourceRecipeIDs` is on every row. Asked for on 2026-11-01, for later.
 - [ ] Making a list with no meals planned still creates an empty `GroceryList`
       record. It shows as the empty state, so it is invisible, but it is junk.
 - [ ] Nothing shows which meals an item came from, although

@@ -72,6 +72,34 @@ struct GroceryDraftItem: Equatable, Sendable {
     /// The ingredient resolved to nothing, so the user categorises it once and
     /// that teaches the alias table. Section 5.3 rule 2.
     var needsCategorising: Bool
+    /// The part of `quantities` the user typed in rather than the plan
+    /// producing it. Kept apart so regenerating adds it once instead of
+    /// compounding it every time.
+    var manualQuantities: [Quantity]
+
+    init(
+        canonicalItemID: UUID? = nil,
+        displayName: String,
+        quantities: [Quantity] = [],
+        aisle: Aisle,
+        sourceRecipeIDs: [UUID] = [],
+        isOptional: Bool = false,
+        isManual: Bool = false,
+        isChecked: Bool = false,
+        needsCategorising: Bool = false,
+        manualQuantities: [Quantity] = []
+    ) {
+        self.canonicalItemID = canonicalItemID
+        self.displayName = displayName
+        self.quantities = quantities
+        self.aisle = aisle
+        self.sourceRecipeIDs = sourceRecipeIDs
+        self.isOptional = isOptional
+        self.isManual = isManual
+        self.isChecked = isChecked
+        self.needsCategorising = needsCategorising
+        self.manualQuantities = manualQuantities
+    }
 
     /// What the shopper reads: "3 lb", or "1/2 bunch + 1/4 cup".
     var formatted: String { UnitConverter.format(quantities) }
@@ -141,14 +169,36 @@ struct ListGenerator {
             }
         }
 
+        // Section 4: manual items survive regeneration. When one names
+        // something the plan already produced, it merges into that row rather
+        // than sitting beside it, which is what a shopper reading the list
+        // expects. The hand added amount is folded into the group before the
+        // items are built, so the check state comparison below sees the total
+        // the user actually saw last time.
+        var standaloneManual: [GroceryDraftItem] = []
+        for entry in previous where entry.isManual || !entry.manualQuantities.isEmpty {
+            let hand = entry.manualQuantities.isEmpty ? entry.quantities : entry.manualQuantities
+            let key: GroupKey = entry.canonicalItemID.map(GroupKey.canonical)
+                ?? .unresolved(CanonicalMatcher.normalize(entry.displayName))
+
+            if groups[key] != nil {
+                groups[key]?.addManual(hand)
+            } else {
+                var kept = entry
+                kept.quantities = hand
+                kept.manualQuantities = hand
+                kept.isManual = true
+                standaloneManual.append(kept)
+            }
+        }
+
         // Rule 3.
         var items = order.compactMap { key -> GroceryDraftItem? in
             guard let group = groups[key] else { return nil }
             return group.item(checkedIn: previous)
         }
 
-        // Section 4: manual items survive regeneration.
-        items.append(contentsOf: previous.filter(\.isManual))
+        items.append(contentsOf: standaloneManual)
 
         return GeneratedList(sections: sectioned(items))
     }
@@ -207,6 +257,8 @@ struct ListGenerator {
         let needsCategorising: Bool
 
         private var quantities: [Quantity] = []
+        /// What the user added by hand to this same line.
+        private var manual: [Quantity] = []
         private var sources: [UUID] = []
         /// Only optional if every recipe asking for it says so. One recipe that
         /// needs it makes it needed.
@@ -225,18 +277,25 @@ struct ListGenerator {
             if !isOptional { everyUseOptional = false }
         }
 
+        mutating func addManual(_ hand: [Quantity]) {
+            manual.append(contentsOf: hand)
+        }
+
         func item(checkedIn previous: [GroceryDraftItem]) -> GroceryDraftItem {
-            let merged = UnitConverter.combine(quantities)
+            let merged = UnitConverter.combine(quantities + manual)
             var item = GroceryDraftItem(
                 canonicalItemID: canonicalItemID,
                 displayName: displayName,
                 quantities: merged,
                 aisle: aisle,
                 sourceRecipeIDs: sources,
-                isOptional: everyUseOptional && !quantities.isEmpty,
+                // Asking for it by hand makes it needed, whatever the recipes
+                // say about it being optional.
+                isOptional: everyUseOptional && !quantities.isEmpty && manual.isEmpty,
                 isManual: false,
                 isChecked: false,
-                needsCategorising: needsCategorising
+                needsCategorising: needsCategorising,
+                manualQuantities: UnitConverter.combine(manual)
             )
 
             // Section 4: regenerating preserves the check state of unchanged

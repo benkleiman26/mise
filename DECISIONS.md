@@ -617,3 +617,39 @@ the right default for free.
 This only applies on a first seed. Seeding is idempotent by design, so an
 install that already has 71 `have` entries keeps them. Deleting the app and
 running again is the way to pick the new defaults up.
+
+## A hand added item joins the row it names, and remembers which part is yours
+
+Asked for on 2026-11-01, after the first real list showed "lemon 1" from a
+recipe and "lemons 2" typed by hand as two rows.
+
+Merging them naively would be wrong in a way that only shows up on the second
+regeneration. If the merged row stores one total and is then carried over as a
+manual item, the next run adds the hand typed part to the recipe part again,
+and the amount grows every time the list is made.
+
+So `GroceryDraftItem` and `GroceryItem` both carry `manualQuantities`
+alongside `quantities`: the total the shopper reads, and the part of it the
+user typed. Regenerating rebuilds the recipe part from the plan and folds the
+hand added part back in exactly once.
+
+Folding happens before the check state comparison, so a merged row that has not
+changed keeps its tick rather than losing it on every regeneration.
+
+A hand added item that matches nothing on the list, like dish soap, still
+becomes its own row, which is what section 5.3 asks for.
+
+This replaced the `note` stopgap: `GroceryItem` now stores the real quantity
+list, so a row with two quantities that cannot be added is stored as two
+quantities rather than as one quantity and a sentence.
+
+## Search matches the words typed, not the phrase
+
+Searching "lemon past" returned nothing while "Lemon Garlic Butter Pasta" was
+sitting in the list, because the filter asked whether the title contained that
+run of characters, and no title does.
+
+Every word typed now has to appear somewhere in the recipe's title, summary,
+tags or ingredient names, in any order and as a prefix of a longer word. People
+type the words they remember rather than the title, and they stop typing
+halfway through a word.

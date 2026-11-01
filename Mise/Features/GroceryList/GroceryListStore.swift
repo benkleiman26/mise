@@ -85,16 +85,12 @@ final class GroceryListStore {
                     position: index,
                     canonicalItemID: item.canonicalItemID,
                     displayName: item.displayName,
-                    quantity: item.quantities.first?.quantity,
-                    unit: item.quantities.first?.unit,
+                    quantities: item.quantities,
+                    manualQuantities: item.manualQuantities,
                     aisle: item.aisle,
                     isChecked: item.isChecked,
                     sourceRecipeIDs: item.sourceRecipeIDs,
-                    isManual: item.isManual,
-                    // A row can carry two quantities when they cannot be added,
-                    // and the model holds one. The written form goes in the note
-                    // so nothing is lost. See TODO.md.
-                    note: item.quantities.count > 1 ? item.formatted : nil
+                    isManual: item.isManual
                 )
                 row.list = list
                 list.items.append(row)
@@ -138,18 +134,33 @@ final class GroceryListStore {
 
             let parsed = IngredientParser.parse(name)
             let match = try makeMatcher().match(parsed.name)
-            let row = GroceryItem(
-                householdID: householdID,
-                position: (list.items.map(\.position).max() ?? -1) + 1,
-                canonicalItemID: match.item?.id,
-                displayName: parsed.name.isEmpty ? name : parsed.name,
-                quantity: parsed.quantity,
-                unit: parsed.unit,
-                aisle: match.aisle,
-                isManual: true
-            )
-            row.list = list
-            list.items.append(row)
+            let display = parsed.name.isEmpty ? name : parsed.name
+            let hand = parsed.quantity.map { [Quantity($0, parsed.unit)] } ?? []
+
+            // Asked for on 2026-11-01: typing something already on the list
+            // adds to that row rather than making a second one. The hand added
+            // part is recorded separately so the next regeneration adds it
+            // once instead of compounding it.
+            if let existing = row(in: list, matching: match.item?.id, named: display) {
+                existing.quantities = UnitConverter.combine(existing.quantities + hand)
+                existing.manualQuantities = UnitConverter.combine(existing.manualQuantities + hand)
+                // There is more to buy than when it was ticked.
+                existing.isChecked = false
+                existing.updatedAt = .now
+            } else {
+                let row = GroceryItem(
+                    householdID: householdID,
+                    position: (list.items.map(\.position).max() ?? -1) + 1,
+                    canonicalItemID: match.item?.id,
+                    displayName: display,
+                    quantities: hand,
+                    manualQuantities: hand,
+                    aisle: match.aisle,
+                    isManual: true
+                )
+                row.list = list
+                list.items.append(row)
+            }
             list.updatedAt = .now
             try lists.save()
             show(list)
@@ -180,6 +191,16 @@ final class GroceryListStore {
             return Section(aisle: aisle, items: items)
         }
         generatedAt = list.generatedAt
+    }
+
+    /// The row a hand typed item belongs on, by canonical item when both have
+    /// one and by normalized name otherwise. Same test `ListGenerator` uses, so
+    /// adding by hand and regenerating agree about what counts as one line.
+    private func row(in list: GroceryList, matching id: UUID?, named name: String) -> GroceryItem? {
+        list.items.first { row in
+            if let mine = id, let theirs = row.canonicalItemID { return mine == theirs }
+            return CanonicalMatcher.normalize(row.displayName) == CanonicalMatcher.normalize(name)
+        }
     }
 
     private func currentList() throws -> GroceryList? {
@@ -255,13 +276,14 @@ final class GroceryListStore {
         GroceryDraftItem(
             canonicalItemID: item.canonicalItemID,
             displayName: item.displayName,
-            quantities: item.quantity.map { [Quantity($0, item.unit)] } ?? [],
+            quantities: item.quantities,
             aisle: item.aisle,
             sourceRecipeIDs: item.sourceRecipeIDs,
             isOptional: false,
             isManual: item.isManual,
             isChecked: item.isChecked,
-            needsCategorising: item.canonicalItemID == nil && !item.isManual
+            needsCategorising: item.canonicalItemID == nil && !item.isManual,
+            manualQuantities: item.manualQuantities
         )
     }
 

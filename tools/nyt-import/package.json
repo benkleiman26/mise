@@ -1,0 +1,13 @@
+{
+  "name": "nyt-import",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Turn fetched NYT Cooking recipes into a file Mise can import.",
+  "scripts": {
+    "test": "node --test",
+    "urls": "node src/cli.mjs urls",
+    "convert": "node src/cli.mjs convert"
+  },
+  "engines": { "node": ">=20" }
+}

@@ -873,3 +873,31 @@ could not tell an alias deliberately removed from one a person added.
 
 The resource file still matters: a name worth shipping to everyone belongs
 there. But the file is now the floor rather than the only way up.
+
+## NYT recipes are fetched in the browser, for the same reason the rescue was
+
+The Recipe Box export captured urls and nothing else, because the box renders
+client side and there is no API. Getting the recipes themselves means loading
+169 pages that are behind a subscription.
+
+So the fetching runs in the owner's signed-in browser, as the Mealime rescue
+did, and the reshaping runs in Node afterwards. The same read only guards are
+in the code: GET requests, to `cooking.nytimes.com` only, both checked rather
+than promised in a comment.
+
+The script keeps everything in memory and writes the download from that same
+object. The Mealime rescue did not, counted from memory, wrote from
+sessionStorage, and told the owner it had 163 recipes while downloading 96. A
+count shown to a person has to be read from the place the deliverable is
+written from.
+
+Images are recorded as urls and never downloaded. The photos are the Times's.
+
+## Imported recipe ids come out of the url, not the title
+
+`cooking.nytimes.com/recipes/1020052-lemon-garlic-butter-pasta` is recipe
+1020052 whatever it is called this year. Keying on the title would make a
+retitled recipe a second copy on the next import, and NYT does retitle.
+
+The Mealime side keys on its own id for the same reason and falls back to the
+title only when there is no id at all.

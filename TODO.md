@@ -196,11 +196,9 @@ green on the Mac: 70 tests, no failures, up from 61 before `ListGenerator`.
       and Settings imports the result. The converter ran against the real
       library on 2026-11-02: 213 read, 213 converted, nothing skipped, 2436
       ingredient lines. 159 have no cooking time and 3 have no steps.
-- [ ] **NYT import.** The NYT export captured urls, folders and cooked flags
-      only, because the Recipe Box renders client side and has no API. Turning
-      169 urls into recipes means fetching each page and reading its JSON-LD,
-      and those pages are paywalled, so it has to run in the owner's signed in
-      browser the way the export did.
+- [x] **NYT import** is built: `tools/nyt-export/browser/fetch-recipes.js`
+      fetches the pages in the owner's browser, `tools/nyt-import` reshapes
+      what it downloads. 10 tests. Not yet run against the real 169.
 - [ ] Imported recipes have no photos. 424 are in `data/mealime/images/`,
       named by recipe id, and `Recipe.imageData` is ready for them.
 - [x] An imported recipe with no cooking time no longer shows "0 min". 159 of
@@ -217,10 +215,9 @@ green on the Mac: 70 tests, no failures, up from 61 before `ListGenerator`.
       deleted explicitly now, and each import sweeps anything already stranded
       and reports the count. A non-zero sweep after a clean run means it leaked
       again.
-- [ ] Nothing else that deletes a parent has been checked for the same leak:
-      `MealPlan` to `PlannedMeal` and `GroceryList` to `GroceryItem` both rely
-      on the same cascade rule, and the grocery path already deletes its
-      children explicitly for a different reason. The plan path does not.
+- [x] Checked on 2026-11-02: the plan and grocery paths already delete their
+      children explicitly, so the import was the only place relying on the
+      cascade rule. Nothing else in the app deletes a parent record.
 - [ ] "Salt and pepper" is one line asking for two things, and there are 11 of
       them. Splitting on "and" is only safe for a short list of known pairs.
 - [ ] The import's match rate should be measurable without a simulator. A

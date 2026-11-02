@@ -819,3 +819,34 @@ and no amount of work on the matching would ever have moved the dead half. The
 tell was available from the first comparison: a number that stays exactly the
 same across a change that should have moved it is evidence about the
 measurement, not about the thing measured.
+
+## Seeding refreshes an item that is already there, instead of skipping it
+
+Three rounds of alias work moved the unmatched count from 344 to 218 to 128 to
+123. The last round added 126 aliases and moved it by five.
+
+The reason was one line in `SeedInstaller`: `if existing.contains(id) { continue }`.
+Seeding was written to be idempotent, and it was, in the strongest possible
+sense: an item already in the store was never touched again. Every alias added
+to an existing item after first launch went into the resource file and never
+into the store. `CanonicalMatcher` is built from the store.
+
+Only brand new items ever took effect, which is why each round moved the number
+a little and never as much as it should have. The signal was there from the
+second round and I read it as a matching problem three times.
+
+Seeding now refreshes an existing item's aliases, aisle, staple flag and
+default unit when they differ from the resource file, and reports how many it
+touched. The report is on the Settings screen, so a launch that quietly rewrote
+part of the table says so.
+
+The table is going to keep growing every time an import finds a gap in it, so
+the refresh is worth more than the saving. A second launch with nothing changed
+still writes nothing, which a test holds to.
+
+This makes the resource file authoritative over the store for these four
+fields. That is right today because nothing in the app edits a grocery item.
+When section 5.3's "categorise this once and it learns" lands, what the user
+teaches has to live somewhere the seed will not overwrite, and that is a
+separate field rather than a merge into this one: a merge cannot tell a
+deliberate removal from a user's addition.

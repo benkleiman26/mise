@@ -167,7 +167,13 @@ entry, and the week plan. Section 5.1 and 5.2.
       to nothing. Section 5.3 only asks for exact, alias and fuzzy, and
       containment covers fuzzy; add edit distance if real imports need it.
 - [ ] Learned aliases live only in the matcher instance. Persisting them is
-      Phase 2, when the user actually categorises something.
+      Phase 2, when the user actually categorises something. They need their
+      own field: seeding now overwrites `aliases` from the resource file, so
+      anything the user teaches would be lost on the next update.
+- [ ] Seed recipes have the same shape of problem as the canonical items did:
+      an existing one is skipped rather than refreshed, so editing a built in
+      recipe's text and shipping it does nothing for anyone who already has it.
+      Lower stakes than the item table, but the same bug.
 - [ ] No density override on canonical items yet, so cups to grams is always
       refused. Section 4 allows the override; nothing needs it before Phase 2.
 

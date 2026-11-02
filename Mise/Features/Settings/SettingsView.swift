@@ -50,6 +50,9 @@ struct SettingsView: View {
                 Section {
                     LabeledContent("Recipes", value: "\(store?.recipeCount ?? 0)")
                     LabeledContent("Grocery items known", value: "\(store?.canonicalItemCount ?? 0)")
+                    if let updated = container.seedReport?.canonicalItemsUpdated, updated > 0 {
+                        LabeledContent("Brought up to date this launch", value: "\(updated)")
+                    }
                     LabeledContent("Pantry entries", value: "\(store?.pantryCount ?? 0)")
                 } header: {
                     Text("Library")

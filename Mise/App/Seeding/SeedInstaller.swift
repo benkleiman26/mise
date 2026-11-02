@@ -94,7 +94,32 @@ struct SeedInstaller {
 
         for seed in catalog.canonicalItems {
             let id = StableID.canonicalItem(name: seed.name)
-            if existing.contains(id) { continue }
+
+            // An item that is already here still has to be brought up to date.
+            //
+            // Skipping it outright was the original rule, and it meant every
+            // alias added to an existing item after first launch was never
+            // written. 126 aliases from the owner's real import sat in the
+            // resource file doing nothing, because the matcher reads the store
+            // and the store was two versions behind. The table is going to
+            // keep growing every time an import finds a gap in it, so the
+            // refresh matters more than the saving.
+            if existing.contains(id) {
+                guard let item = try canonicalItems.find(id: id) else { continue }
+                if item.aliases != seed.aliases
+                    || item.aisle != seed.aisle
+                    || item.isStaple != seed.isStaple
+                    || item.defaultUnit != seed.defaultUnit {
+                    item.aliases = seed.aliases
+                    item.aisle = seed.aisle
+                    item.isStaple = seed.isStaple
+                    item.defaultUnit = seed.defaultUnit
+                    item.updatedAt = .now
+                    report.canonicalItemsUpdated += 1
+                }
+                byName[SeedCatalog.key(seed.name)] = item
+                continue
+            }
 
             let item = CanonicalItem(
                 id: id,
@@ -254,6 +279,10 @@ struct SeedInstaller {
 /// What a seed run did. Shown in Settings so the phase is verifiable by looking
 /// at the app, and asserted on in the tests.
 struct SeedReport: Sendable, Equatable {
+    /// Grocery items that were already here and have been brought up to date
+    /// with the resource file. Non-zero after an update that widened the
+    /// table, zero on every launch after that.
+    var canonicalItemsUpdated = 0
     var householdsInserted = 0
     var usersInserted = 0
     var preferencesInserted = 0

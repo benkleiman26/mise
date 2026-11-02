@@ -261,4 +261,39 @@ final class SeedInstallerTests: XCTestCase {
         let secondIDs = try Set(SwiftDataRecipeRepository(context: otherContext).all().map(\.id))
         XCTAssertEqual(firstIDs, secondIDs)
     }
+
+    /// The bug that cost three rounds of alias work: an item that already
+    /// exists was skipped outright, so every alias added to the table after
+    /// first launch was written to the resource file and never to the store.
+    /// The matcher reads the store.
+    func testAnExistingItemIsBroughtUpToDateRatherThanSkipped() throws {
+        try makeInstaller().install(catalog)
+
+        let name = try XCTUnwrap(catalog.canonicalItems.first?.name)
+        let id = StableID.canonicalItem(name: name)
+        let item = try XCTUnwrap(canonicalItems.find(id: id))
+
+        // Something the user's store is now behind on.
+        item.aliases = []
+        item.isStaple = false
+        try canonicalItems.save()
+
+        let second = try makeInstaller().install(catalog)
+
+        let refreshed = try XCTUnwrap(canonicalItems.find(id: id))
+        XCTAssertEqual(refreshed.aliases, catalog.canonicalItems[0].aliases)
+        XCTAssertEqual(refreshed.isStaple, catalog.canonicalItems[0].isStaple)
+        XCTAssertGreaterThan(second.canonicalItemsUpdated, 0)
+        XCTAssertEqual(second.canonicalItemsInserted, 0, "nothing new was added, only refreshed")
+    }
+
+    /// Refreshing must stay quiet when there is nothing to refresh, or every
+    /// launch writes to the store for no reason.
+    func testASecondInstallWithNothingChangedUpdatesNothing() throws {
+        try makeInstaller().install(catalog)
+        let second = try makeInstaller().install(catalog)
+
+        XCTAssertEqual(second.canonicalItemsInserted, 0)
+        XCTAssertEqual(second.canonicalItemsUpdated, 0)
+    }
 }

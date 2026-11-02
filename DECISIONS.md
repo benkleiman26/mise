@@ -793,3 +793,29 @@ Duplication that nothing checks is how two implementations quietly disagree,
 which is the exact failure the import pipeline was designed to avoid. So
 `npm test` in `tools/resource-lint` now reads the word list out of the Swift
 file and fails if the two have drifted.
+
+## A cascade delete rule was not enough, and the evidence was a count that would not move
+
+Three imports of the same library reported 344, then 218, then 128 unmatched
+ingredient names. The top of all three lists was identical: "red pepper" 14,
+"garbanzo beans (chickpeas)" 14, "crumbled feta cheese" 10. Aliases for every
+one of those had been added after the first run.
+
+A count that does not move when the thing it counts has been fixed is not a
+count of what you think it is. Those rows were never reparsed because they
+were no longer attached to anything: the import deleted each recipe and
+`@Relationship(deleteRule: .cascade)` did not take the ingredients with it.
+Around two thousand rows, invisible to every screen, counted by every query,
+growing by that much again on each import.
+
+Two changes. Children are now deleted explicitly before their recipe, rather
+than trusting the rule. And each import sweeps up anything already stranded
+and reports how many, so the same leak cannot hide again: a non-zero "stale
+rows cleared" after the first run means something is still leaking.
+
+The diagnostic lesson is the one worth keeping. The unmatched count was
+measuring two different populations added together, live rows and dead ones,
+and no amount of work on the matching would ever have moved the dead half. The
+tell was available from the first comparison: a number that stays exactly the
+same across a change that should have moved it is evidence about the
+measurement, not about the thing measured.

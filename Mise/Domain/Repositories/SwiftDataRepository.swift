@@ -49,7 +49,23 @@ class SwiftDataRepository<Entity> where Entity: PersistentModel, Entity: Househo
 }
 
 @MainActor
-final class SwiftDataRecipeRepository: SwiftDataRepository<Recipe>, RecipeRepository {}
+final class SwiftDataRecipeRepository: SwiftDataRepository<Recipe>, RecipeRepository {
+    func deleteIngredient(_ ingredient: Ingredient) {
+        context.delete(ingredient)
+    }
+
+    func deleteStep(_ step: RecipeStep) {
+        context.delete(step)
+    }
+
+    func orphanedIngredients() throws -> [Ingredient] {
+        try context.fetch(FetchDescriptor<Ingredient>()).filter { $0.recipe == nil }
+    }
+
+    func orphanedSteps() throws -> [RecipeStep] {
+        try context.fetch(FetchDescriptor<RecipeStep>()).filter { $0.recipe == nil }
+    }
+}
 
 @MainActor
 final class SwiftDataCanonicalItemRepository: SwiftDataRepository<CanonicalItem>, CanonicalItemRepository {}

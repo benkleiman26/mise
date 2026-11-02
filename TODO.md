@@ -207,11 +207,14 @@ green on the Mac: 70 tests, no failures, up from 61 before `ListGenerator`.
       wants that tap to teach the alias table.
 - [x] Web page furniture the Mealime "import from a link" captured is dropped
       by the converter, and the run reports how many lines went.
-- [ ] Deleting a recipe may not be taking its ingredients with it. After the
-      second import, several unmatched names kept the exact counts they had
-      before the aliases for them were added, which is what orphaned rows
-      would look like. Check with
-      `SELECT COUNT(*) FROM ZINGREDIENT WHERE ZRECIPE IS NULL`.
+- [x] Deleting a recipe was not taking its ingredients with it. Children are
+      deleted explicitly now, and each import sweeps anything already stranded
+      and reports the count. A non-zero sweep after a clean run means it leaked
+      again.
+- [ ] Nothing else that deletes a parent has been checked for the same leak:
+      `MealPlan` to `PlannedMeal` and `GroceryList` to `GroceryItem` both rely
+      on the same cascade rule, and the grocery path already deletes its
+      children explicitly for a different reason. The plan path does not.
 - [ ] "Salt and pepper" is one line asking for two things, and there are 11 of
       them. Splitting on "and" is only safe for a short list of known pairs.
 - [ ] The import's match rate should be measurable without a simulator. A

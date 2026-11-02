@@ -302,6 +302,15 @@ struct CanonicalMatcher: Sendable {
         "low", "sodium", "full", "fat", "reduced", "nonfat",
         "unsweetened", "sweetened", "salted", "unsalted", "seasoned",
         "mild", "hot", "spicy", "light", "dark",
+        // Containers and measures that survived the parser. "small bunch green
+        // onions" and "block cheddar cheese" are a bunch and a block of things
+        // already in the table. "clove" is deliberately absent: cloves are
+        // also a spice.
+        "bunch", "bunches", "block", "blocks", "loaf", "loaves",
+        "piece", "pieces", "slice", "slices", "head", "heads",
+        "pint", "pints", "quart", "quarts", "tube", "tubes",
+        "can", "cans", "jar", "jars", "box", "boxes", "bag", "bags",
+        "package", "packages", "packet", "packets", "container", "containers",
         // Joining words left behind once the above are gone.
         "and", "of",
     ]

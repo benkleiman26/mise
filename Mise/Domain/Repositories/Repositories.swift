@@ -19,6 +19,17 @@ protocol RecipeRepository {
     func count() throws -> Int
     func insert(_ recipe: Recipe)
     func delete(_ recipe: Recipe)
+    /// Deleting a recipe is supposed to take its ingredients and steps with
+    /// it. On 2026-11-02 a reimport of 213 recipes proved it does not reliably
+    /// do so: the recipes went and 2000 ingredient rows stayed, attached to
+    /// nothing, invisible to every screen and counted by every query.
+    ///
+    /// So the children go explicitly, and anything already stranded can be
+    /// swept up.
+    func deleteIngredient(_ ingredient: Ingredient)
+    func deleteStep(_ step: RecipeStep)
+    func orphanedIngredients() throws -> [Ingredient]
+    func orphanedSteps() throws -> [RecipeStep]
     func save() throws
 }
 

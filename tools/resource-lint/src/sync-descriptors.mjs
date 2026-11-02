@@ -13,8 +13,10 @@ const here = dirname(fileURLToPath(import.meta.url));
 const repoRoot = resolve(here, '..', '..', '..');
 
 const swift = await readFile(resolve(repoRoot, 'Mise/Domain/Services/CanonicalMatcher.swift'), 'utf8');
-const block = swift.split('static let descriptors: Set<String> = [')[1]?.split(']')[0] ?? '';
-const fromSwift = new Set([...block.matchAll(/"([^"]+)"/g)].map((m) => m[1]));
+const block = swift.split('static let descriptors: Set<String> = [')[1]?.split('\n    ]')[0] ?? '';
+// Comment lines quote example phrases, which are not descriptor words.
+const code = block.split('\n').filter((line) => !line.trim().startsWith('//')).join('\n');
+const fromSwift = new Set([...code.matchAll(/"([^"]+)"/g)].map((m) => m[1]));
 
 const { DESCRIPTORS } = await import('./matching.mjs');
 const fromJS = DESCRIPTORS ?? new Set();

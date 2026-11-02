@@ -149,13 +149,29 @@ final class ImportStore {
         for imported in document.recipes {
             let id = importer.id(for: imported, source: source)
             if existing.contains(id) {
-                if let old = try recipes.find(id: id) { recipes.delete(old) }
+                if let old = try recipes.find(id: id) {
+                    // The cascade rule is not enough on its own. Deleting the
+                    // recipe alone left every ingredient row behind, attached
+                    // to nothing, where it still counted as an unmatched
+                    // ingredient and could never be reparsed.
+                    for ingredient in old.ingredients { recipes.deleteIngredient(ingredient) }
+                    for step in old.steps { recipes.deleteStep(step) }
+                    recipes.delete(old)
+                }
                 report.recipesUpdated += 1
             } else {
                 report.recipesInserted += 1
             }
         }
         try recipes.save()
+
+        // Anything stranded by an earlier import, which is how this was found.
+        let strandedIngredients = try recipes.orphanedIngredients()
+        let strandedSteps = try recipes.orphanedSteps()
+        for ingredient in strandedIngredients { recipes.deleteIngredient(ingredient) }
+        for step in strandedSteps { recipes.deleteStep(step) }
+        report.orphansSwept = strandedIngredients.count + strandedSteps.count
+        if report.orphansSwept > 0 { try recipes.save() }
 
         for imported in document.recipes {
             recipes.insert(importer.build(imported, source: source, into: &report))

@@ -54,6 +54,9 @@ struct RecipeImporter {
         /// Ingredient names that resolved to no canonical item. These land in
         /// aisle `other` on the list until the user categorises them.
         var unmatchedIngredients: [String] = []
+        /// Ingredient and step rows left behind by an earlier import, cleared
+        /// out. Anything above zero here means something leaked.
+        var orphansSwept = 0
 
         var total: Int { recipesInserted + recipesUpdated }
     }

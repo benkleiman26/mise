@@ -489,7 +489,11 @@
         "coarse sea salt",
         "flaky sea salt",
         "flaky salt",
-        "maldon salt"
+        "maldon salt",
+        "salt and pepper",
+        "kosher salt and pepper",
+        "salt and freshly ground black pepper",
+        "coarse salt"
       ],
       "defaultUnit": "lb",
       "isStaple": true
@@ -949,7 +953,8 @@
       "aliases": [
         "dill pickles",
         "dill pickle brine",
-        "pickle brine"
+        "pickle brine",
+        "caper brine"
       ],
       "defaultUnit": "oz"
     },
@@ -1337,7 +1342,9 @@
       "name": "frozen peas",
       "aisle": "frozen",
       "aliases": [
-        "peas"
+        "peas",
+        "green peas",
+        "fresh green peas"
       ],
       "defaultUnit": "package",
       "isStaple": true
@@ -2026,7 +2033,9 @@
         "safflower oil",
         "safflower",
         "neutral-flavored oil",
-        "cooking oil"
+        "cooking oil",
+        "swish of neutral oil",
+        "oil"
       ],
       "defaultUnit": "floz",
       "isStaple": true
@@ -2082,7 +2091,11 @@
     {
       "name": "egg noodles",
       "aisle": "pastaAndSauces",
-      "defaultUnit": "lb"
+      "defaultUnit": "lb",
+      "aliases": [
+        "dried wide wheat noodles",
+        "wide wheat noodles"
+      ]
     },
     {
       "name": "farfalle",
@@ -2104,7 +2117,10 @@
       "name": "fusilli",
       "aisle": "pastaAndSauces",
       "aliases": [
-        "rotini"
+        "rotini",
+        "fusilli corti bucati",
+        "short cut pasta",
+        "short pasta"
       ],
       "defaultUnit": "lb"
     },
@@ -2203,7 +2219,8 @@
       "name": "tagliatelle",
       "aisle": "pastaAndSauces",
       "aliases": [
-        "tagliatelle nests"
+        "tagliatelle nests",
+        "dried tagliatelle nests"
       ]
     },
     {
@@ -2615,7 +2632,9 @@
         "spring mix",
         "salad greens",
         "mixed salad greens",
-        "mesclun"
+        "mesclun",
+        "mixed fresh herb leaves",
+        "finely chopped herbs"
       ]
     },
     {
@@ -2653,7 +2672,8 @@
         "flat-leaf parsley",
         "italian parsley",
         "parsley leaves",
-        "flat-leaf parsley leaves"
+        "flat-leaf parsley leaves",
+        "parsley leaves and stems"
       ],
       "defaultUnit": "bunch"
     },
@@ -2732,7 +2752,9 @@
         "green onions",
         "spring onions",
         "green onion",
-        "bunch green onions"
+        "bunch green onions",
+        "small bunch green onions",
+        "bunches green onions"
       ],
       "defaultUnit": "bunch",
       "isStaple": true
@@ -3195,7 +3217,8 @@
       "aisle": "snacks",
       "aliases": [
         "roasted peanuts",
-        "salted peanuts"
+        "salted peanuts",
+        "salted roasted peanuts"
       ]
     },
     {

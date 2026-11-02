@@ -150,6 +150,9 @@ struct SettingsView: View {
                 LabeledContent("Added", value: "\(report.recipesInserted)")
                 LabeledContent("Replaced", value: "\(report.recipesUpdated)")
                 LabeledContent("Ingredient lines", value: "\(report.ingredientsRead)")
+                if report.orphansSwept > 0 {
+                    LabeledContent("Stale rows cleared", value: "\(report.orphansSwept)")
+                }
                 if report.ingredientsNeedingReview > 0 {
                     LabeledContent("Lines worth a look", value: "\(report.ingredientsNeedingReview)")
                 }

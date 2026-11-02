@@ -32,7 +32,10 @@ export const DESCRIPTORS = new Set([
   'stems', 'sprig', 'sprigs', 'tender', 'store', 'bought', 'homemade', 'jarred',
   'refrigerated', 'shelf', 'stable', 'frozen', 'dried', 'whole', 'ground', 'low', 'sodium',
   'full', 'fat', 'reduced', 'nonfat', 'unsweetened', 'sweetened', 'salted', 'unsalted',
-  'seasoned', 'mild', 'hot', 'spicy', 'light', 'dark', 'and', 'of'
+  'seasoned', 'mild', 'hot', 'spicy', 'light', 'dark', 'bunch', 'bunches', 'block', 'blocks',
+  'loaf', 'loaves', 'piece', 'pieces', 'slice', 'slices', 'head', 'heads', 'pint', 'pints',
+  'quart', 'quarts', 'tube', 'tubes', 'can', 'cans', 'jar', 'jars', 'box', 'boxes', 'bag',
+  'bags', 'package', 'packages', 'packet', 'packets', 'container', 'containers', 'and', 'of'
 ]);
 
 export function normalize(text) {

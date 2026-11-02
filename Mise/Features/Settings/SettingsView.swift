@@ -14,6 +14,11 @@ struct SettingsView: View {
     var body: some View {
         NavigationStack {
             List {
+                // First, not last. This is the only thing in Settings anyone
+                // comes here to do, and in a sheet a downward drag dismisses
+                // rather than scrolls, so the fold is a real barrier.
+                importSection
+
                 if let problem = container.startupProblem {
                     Section("Something went wrong") {
                         Text(problem)
@@ -51,8 +56,6 @@ struct SettingsView: View {
                 } footer: {
                     seedFooter
                 }
-
-                importSection
 
                 Section("About") {
                     LabeledContent("Version", value: store?.appVersion ?? "0")

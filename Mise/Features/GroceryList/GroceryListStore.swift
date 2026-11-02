@@ -213,16 +213,7 @@ final class GroceryListStore {
     }
 
     private func makeMatcher() throws -> CanonicalMatcher {
-        CanonicalMatcher(items: try canonicalItems.all().map {
-            CanonicalCandidate(
-                id: $0.id,
-                name: $0.name,
-                aliases: $0.aliases,
-                aisle: $0.aisle,
-                isStaple: $0.isStaple,
-                defaultUnit: $0.defaultUnit
-            )
-        })
+        CanonicalMatcher(items: try canonicalItems.all().map(CanonicalCandidate.init))
     }
 
     private func makeGenerator() throws -> ListGenerator {

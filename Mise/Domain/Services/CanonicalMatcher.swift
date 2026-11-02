@@ -35,14 +35,26 @@ struct CanonicalCandidate: Equatable, Sendable, Identifiable {
     let id: UUID
     let name: String
     let aliases: [String]
+    /// Spellings the user taught. They match the same way the shipped ones do;
+    /// the reason reported differs so a review screen can tell them apart.
+    let learnedAliases: [String]
     let aisle: Aisle
     let isStaple: Bool
     let defaultUnit: Unit?
 
-    init(id: UUID, name: String, aliases: [String] = [], aisle: Aisle, isStaple: Bool = false, defaultUnit: Unit? = nil) {
+    init(
+        id: UUID,
+        name: String,
+        aliases: [String] = [],
+        learnedAliases: [String] = [],
+        aisle: Aisle,
+        isStaple: Bool = false,
+        defaultUnit: Unit? = nil
+    ) {
         self.id = id
         self.name = name
         self.aliases = aliases
+        self.learnedAliases = learnedAliases
         self.aisle = aisle
         self.isStaple = isStaple
         self.defaultUnit = defaultUnit
@@ -106,6 +118,9 @@ struct CanonicalMatcher: Sendable {
         for item in items { addExact(item.name, item, .exactName) }
         for item in items {
             for alias in item.aliases { addExact(alias, item, .alias) }
+        }
+        for item in items {
+            for taught in item.learnedAliases { addExact(taught, item, .learned) }
         }
         for item in items { add(item.name, item, .exactName) }
         for item in items {

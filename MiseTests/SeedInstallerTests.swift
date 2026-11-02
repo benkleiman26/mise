@@ -296,4 +296,25 @@ final class SeedInstallerTests: XCTestCase {
         XCTAssertEqual(second.canonicalItemsInserted, 0)
         XCTAssertEqual(second.canonicalItemsUpdated, 0)
     }
+
+    /// Seeding owns `aliases` and must never own `learnedAliases`. If it did,
+    /// every refresh of the resource file would throw away what the cook
+    /// taught the app, which is section 5.3 rule 2's whole point.
+    func testRefreshingAnItemLeavesWhatTheUserTaughtAlone() throws {
+        try makeInstaller().install(catalog)
+
+        let name = try XCTUnwrap(catalog.canonicalItems.first?.name)
+        let id = StableID.canonicalItem(name: name)
+        let item = try XCTUnwrap(canonicalItems.find(id: id))
+
+        item.learnedAliases = ["whatever he calls it"]
+        item.aliases = []
+        try canonicalItems.save()
+
+        _ = try makeInstaller().install(catalog)
+
+        let refreshed = try XCTUnwrap(canonicalItems.find(id: id))
+        XCTAssertEqual(refreshed.aliases, catalog.canonicalItems[0].aliases, "the shipped spellings come back")
+        XCTAssertEqual(refreshed.learnedAliases, ["whatever he calls it"], "what he taught stays")
+    }
 }

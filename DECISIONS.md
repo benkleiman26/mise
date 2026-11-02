@@ -850,3 +850,26 @@ When section 5.3's "categorise this once and it learns" lands, what the user
 teaches has to live somewhere the seed will not overwrite, and that is a
 separate field rather than a merge into this one: a merge cannot tell a
 deliberate removal from a user's addition.
+
+## The app learns an ingredient name, so the list stops coming back to me
+
+Four rounds of editing the resource file by hand took the owner's unmatched
+ingredient count from 344 to 52. Each round was the same shape: he ran a query,
+sent a list, I added aliases, he reimported. That loop does not end, because
+every new recipe from a new author brings new phrasings, and most of what is
+left is genuinely odd enough that only the cook knows what it meant.
+
+Section 5.3 rule 2 always asked for this: flag what did not match, let the user
+say what it is once, and remember. It is built now. Settings has a
+"Categorise ingredients" screen listing every unmatched name, most used first,
+with the recipes it came from so the cook can tell what it was. Tapping one
+offers the grocery items, and choosing one applies it to every recipe already
+waiting on that name rather than only to the next import.
+
+What the user teaches goes in `learnedAliases`, a separate field from the
+shipped `aliases`, because seeding overwrites the shipped ones whenever the
+resource file changes. A merge into one field would not survive that, and
+could not tell an alias deliberately removed from one a person added.
+
+The resource file still matters: a name worth shipping to everyone belongs
+there. But the file is now the floor rather than the only way up.

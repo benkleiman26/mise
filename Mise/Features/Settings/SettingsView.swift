@@ -60,6 +60,16 @@ struct SettingsView: View {
                     seedFooter
                 }
 
+                Section {
+                    NavigationLink {
+                        CategoriseView()
+                    } label: {
+                        Label("Categorise ingredients", systemImage: "tag")
+                    }
+                } footer: {
+                    Text("Ingredients that match no grocery item sit in the Other aisle and never merge. Telling Mise what one is teaches it for good.")
+                }
+
                 Section("About") {
                     LabeledContent("Version", value: store?.appVersion ?? "0")
                 }
@@ -161,7 +171,7 @@ struct SettingsView: View {
                 }
                 if !report.unmatchedIngredients.isEmpty {
                     NavigationLink {
-                        unmatchedList(report.unmatchedIngredients)
+                        CategoriseView()
                     } label: {
                         LabeledContent("Not yet categorised", value: "\(report.unmatchedIngredients.count)")
                     }
@@ -186,14 +196,6 @@ struct SettingsView: View {
             return "Put a Mise recipe import file in Mise's folder and it will be offered here. Importing the same file again replaces those recipes rather than adding a second copy."
         }
         return "Importing the same file again replaces those recipes rather than adding a second copy of them."
-    }
-
-    private func unmatchedList(_ names: [String]) -> some View {
-        List(names, id: \.self) { name in
-            Text(name)
-        }
-        .navigationTitle("Not yet categorised")
-        .navigationBarTitleDisplayMode(.inline)
     }
 
     @ViewBuilder

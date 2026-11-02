@@ -14,7 +14,18 @@ final class CanonicalItem {
 
     /// Lowercase and singular, per DECISIONS.md.
     var name: String
+    /// Spellings that ship with the app. Seeding overwrites these from the
+    /// resource file whenever it changes, so nothing the user adds may live
+    /// here.
     var aliases: [String]
+    /// Spellings the user taught by categorising an ingredient, which seeding
+    /// never touches. Section 5.3 rule 2: categorise it once and the table
+    /// knows it from then on.
+    ///
+    /// Kept apart from `aliases` rather than merged into them because a merge
+    /// cannot tell an alias deliberately removed from the resource file from
+    /// one a person added.
+    var learnedAliases: [String] = []
     var aisle: Aisle
     /// Staples default to a pantry status of `have`, which is what keeps salt
     /// and olive oil off every list. Section 1a lists that as one of Mealime's
@@ -27,6 +38,7 @@ final class CanonicalItem {
         householdID: UUID,
         name: String,
         aliases: [String] = [],
+        learnedAliases: [String] = [],
         aisle: Aisle,
         isStaple: Bool = false,
         defaultUnit: Unit? = nil,
@@ -39,6 +51,7 @@ final class CanonicalItem {
         self.updatedAt = updatedAt
         self.name = name
         self.aliases = aliases
+        self.learnedAliases = learnedAliases
         self.aisle = aisle
         self.isStaple = isStaple
         self.defaultUnit = defaultUnit

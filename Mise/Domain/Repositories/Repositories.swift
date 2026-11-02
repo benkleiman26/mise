@@ -29,6 +29,9 @@ protocol RecipeRepository {
     func deleteIngredient(_ ingredient: Ingredient)
     func deleteStep(_ step: RecipeStep)
     func orphanedIngredients() throws -> [Ingredient]
+    /// Every ingredient that resolved to no grocery item, so the user can say
+    /// what it is once. Section 5.3 rule 2.
+    func uncategorisedIngredients() throws -> [Ingredient]
     func orphanedSteps() throws -> [RecipeStep]
     func save() throws
 }

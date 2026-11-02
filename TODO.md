@@ -166,10 +166,11 @@ entry, and the week plan. Section 5.1 and 5.2.
 - [ ] The matcher has no edit distance rung, so a typo like "cilatro" resolves
       to nothing. Section 5.3 only asks for exact, alias and fuzzy, and
       containment covers fuzzy; add edit distance if real imports need it.
-- [ ] Learned aliases live only in the matcher instance. Persisting them is
-      Phase 2, when the user actually categorises something. They need their
-      own field: seeding now overwrites `aliases` from the resource file, so
-      anything the user teaches would be lost on the next update.
+- [x] Learned aliases persist, in their own field that seeding never touches.
+- [ ] Nothing undoes a categorisation. Choosing the wrong grocery item means
+      editing the store by hand.
+- [ ] A name can only be taught to an existing grocery item. There is no way
+      to add a new one from that screen, which the long tail will want.
 - [ ] Seed recipes have the same shape of problem as the canonical items did:
       an existing one is skipped rather than refreshed, so editing a built in
       recipe's text and shipping it does nothing for anyone who already has it.
@@ -208,9 +209,8 @@ green on the Mac: 70 tests, no failures, up from 61 before `ListGenerator`.
       detail screen says it was not recorded.
 - [ ] Nothing can edit a recipe, so a missing cooking time cannot be filled in.
       Manual entry and editing are the rest of Phase 1.
-- [ ] Nothing in the app lets the user categorise an unmatched ingredient, so
-      the import's "not yet categorised" list is read only. Section 5.3 rule 2
-      wants that tap to teach the alias table.
+- [x] The user can categorise an unmatched ingredient, and it applies to every
+      recipe already waiting on that name. Section 5.3 rule 2.
 - [x] Web page furniture the Mealime "import from a link" captured is dropped
       by the converter, and the run reports how many lines went.
 - [x] Deleting a recipe was not taking its ingredients with it. Children are

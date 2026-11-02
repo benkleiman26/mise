@@ -58,6 +58,11 @@ final class SwiftDataRecipeRepository: SwiftDataRepository<Recipe>, RecipeReposi
         context.delete(step)
     }
 
+    func uncategorisedIngredients() throws -> [Ingredient] {
+        try context.fetch(FetchDescriptor<Ingredient>())
+            .filter { $0.canonicalItemID == nil && $0.recipe != nil }
+    }
+
     func orphanedIngredients() throws -> [Ingredient] {
         try context.fetch(FetchDescriptor<Ingredient>()).filter { $0.recipe == nil }
     }

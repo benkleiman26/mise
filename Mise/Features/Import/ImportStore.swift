@@ -122,16 +122,7 @@ final class ImportStore {
 
         let importer = RecipeImporter(
             householdID: household.id,
-            matcher: CanonicalMatcher(items: try canonicalItems.all().map {
-                CanonicalCandidate(
-                    id: $0.id,
-                    name: $0.name,
-                    aliases: $0.aliases,
-                    aisle: $0.aisle,
-                    isStaple: $0.isStaple,
-                    defaultUnit: $0.defaultUnit
-                )
-            })
+            matcher: CanonicalMatcher(items: try canonicalItems.all().map(CanonicalCandidate.init))
         )
 
         var report = RecipeImporter.Report()

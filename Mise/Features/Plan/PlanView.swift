@@ -50,6 +50,11 @@ struct PlanView: View {
             }
             .sheet(isPresented: $isShowingSettings) {
                 SettingsView()
+                    // A downward drag in a sheet is drag to dismiss, which
+                    // competes with scrolling the list inside it. Settings has
+                    // a Done button, so the drag is not needed to close it and
+                    // scrolling can have the gesture outright.
+                    .interactiveDismissDisabled()
             }
         }
         .task {

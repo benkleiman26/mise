@@ -186,8 +186,9 @@ green on the Mac: 70 tests, no failures, up from 61 before `ListGenerator`.
       and a `note` holding the written form. The `note` field is free for an
       actual note.
 - [x] **Mealime import.** `tools/mealime-import` converts the rescued library,
-      and Settings imports the result. Written 2026-11-01, not yet run against
-      the real 213.
+      and Settings imports the result. The converter ran against the real
+      library on 2026-11-02: 213 read, 213 converted, nothing skipped, 2436
+      ingredient lines. 159 have no cooking time and 3 have no steps.
 - [ ] **NYT import.** The NYT export captured urls, folders and cooked flags
       only, because the Recipe Box renders client side and has no API. Turning
       169 urls into recipes means fetching each page and reading its JSON-LD,
@@ -195,8 +196,12 @@ green on the Mac: 70 tests, no failures, up from 61 before `ListGenerator`.
       browser the way the export did.
 - [ ] Imported recipes have no photos. 424 are in `data/mealime/images/`,
       named by recipe id, and `Recipe.imageData` is ready for them.
-- [ ] An imported recipe with no cooking time shows "0 min". It should say the
-      time was not recorded.
+- [x] An imported recipe with no cooking time no longer shows "0 min". 159 of
+      the owner's 213 have none, because Mealime leaves it null on a recipe you
+      typed in yourself. The library and plan rows leave the time out and the
+      detail screen says it was not recorded.
+- [ ] Nothing can edit a recipe, so a missing cooking time cannot be filled in.
+      Manual entry and editing are the rest of Phase 1.
 - [ ] Nothing in the app lets the user categorise an unmatched ingredient, so
       the import's "not yet categorised" list is read only. Section 5.3 rule 2
       wants that tap to teach the alias table.

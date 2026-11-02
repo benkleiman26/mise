@@ -20,8 +20,17 @@ struct RecipeDetailView: View {
                         .foregroundStyle(.secondary)
                 }
                 LabeledContent("Serves", value: "\(recipe.baseServings)")
-                LabeledContent("Prep", value: "\(recipe.prepMinutes) min")
-                LabeledContent("Cook", value: "\(recipe.cookMinutes) min")
+                // An imported recipe usually has no times on it at all, and a
+                // row reading "0 min" would be making one up.
+                if recipe.prepMinutes > 0 {
+                    LabeledContent("Prep", value: "\(recipe.prepMinutes) min")
+                }
+                if recipe.cookMinutes > 0 {
+                    LabeledContent("Cook", value: "\(recipe.cookMinutes) min")
+                }
+                if recipe.totalMinutes == 0 {
+                    LabeledContent("Time", value: "Not recorded")
+                }
                 if !recipe.tags.isEmpty {
                     LabeledContent("Tags", value: recipe.tags.joined(separator: ", "))
                 }

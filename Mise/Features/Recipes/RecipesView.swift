@@ -97,7 +97,7 @@ struct RecipesView: View {
                     .foregroundStyle(.secondary)
                     .lineLimit(2)
             }
-            Text("\(recipe.totalMinutes) min, serves \(recipe.baseServings)")
+            Text(recipe.summaryLine)
                 .font(.caption)
                 .foregroundStyle(.secondary)
         }

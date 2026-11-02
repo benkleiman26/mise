@@ -88,9 +88,11 @@ struct PlanView: View {
                     VStack(alignment: .leading, spacing: 6) {
                         Text(entry.recipe.title)
                             .font(.headline)
-                        Text("\(entry.recipe.totalMinutes) min")
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
+                        if let timing = entry.recipe.timingText {
+                            Text(timing)
+                                .font(.caption)
+                                .foregroundStyle(.secondary)
+                        }
 
                         // Section 1a: servings per meal, not one number for the
                         // whole household.

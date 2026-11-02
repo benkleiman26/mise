@@ -97,6 +97,24 @@ final class Recipe {
     /// every recipe, which `SeedCatalogTests` checks.
     var totalMinutes: Int { prepMinutes + cookMinutes }
 
+    /// "24 min", or nil when nobody ever wrote the time down.
+    ///
+    /// 159 of the owner's 213 rescued Mealime recipes have no cooking time,
+    /// because Mealime leaves it null on a recipe you typed in yourself.
+    /// Printing "0 min" on three quarters of a library states a cooking time
+    /// that was never recorded, so the screens leave it out instead.
+    var timingText: String? {
+        totalMinutes > 0 ? "\(totalMinutes) min" : nil
+    }
+
+    /// The line under a recipe's title: "24 min, serves 4", or just the
+    /// servings when the time is unknown.
+    var summaryLine: String {
+        let servings = "serves \(baseServings)"
+        guard let timing = timingText else { return servings }
+        return "\(timing), \(servings)"
+    }
+
     /// SwiftData does not promise an order for a to-many relationship, so every
     /// ordered child carries a `position` and callers read it through here.
     var orderedIngredients: [Ingredient] { ingredients.sorted { $0.position < $1.position } }

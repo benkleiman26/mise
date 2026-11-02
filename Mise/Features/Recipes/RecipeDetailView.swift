@@ -42,8 +42,11 @@ struct RecipeDetailView: View {
                 if recipe.totalMinutes == 0 {
                     LabeledContent("Time", value: "Not recorded")
                 }
+                if !recipe.kinds.isEmpty {
+                    LabeledContent("Kind", value: recipe.kinds.map(\.displayName).joined(separator: ", "))
+                }
                 if !recipe.tags.isEmpty {
-                    LabeledContent("Tags", value: recipe.tags.joined(separator: ", "))
+                    LabeledContent("Collections", value: recipe.tags.joined(separator: ", "))
                 }
             }
 

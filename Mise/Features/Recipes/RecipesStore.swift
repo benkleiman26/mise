@@ -36,6 +36,7 @@ final class RecipesStore {
 
     var query: String = ""
     var selectedTags: Set<String> = []
+    var selectedKinds: Set<DishType> = []
     var onlyFavourites = false
     var onlyCooked = false
     var timeLimit: TimeLimit?
@@ -46,14 +47,29 @@ final class RecipesStore {
     }
 
     var hasFilters: Bool {
-        !selectedTags.isEmpty || onlyFavourites || onlyCooked || timeLimit != nil
+        !selectedTags.isEmpty || !selectedKinds.isEmpty || onlyFavourites || onlyCooked || timeLimit != nil
     }
 
     func clearFilters() {
         selectedTags = []
+        selectedKinds = []
         onlyFavourites = false
         onlyCooked = false
         timeLimit = nil
+    }
+
+    /// Every dish type present in the library, with counts, in the order the
+    /// enum declares rather than by popularity, so the row does not reshuffle
+    /// itself as the library grows.
+    var kinds: [(kind: DishType, count: Int)] {
+        var counts: [DishType: Int] = [:]
+        for recipe in items {
+            for kind in Set(recipe.kinds) { counts[kind, default: 0] += 1 }
+        }
+        return DishType.allCases.compactMap { kind in
+            guard let count = counts[kind], count > 0 else { return nil }
+            return (kind: kind, count: count)
+        }
     }
 
     /// Every tag in the library with how many recipes carry it, most used
@@ -89,6 +105,13 @@ final class RecipesStore {
                 // 159 of the owner's have none. Claiming them would make the
                 // filter a lie.
                 guard recipe.totalMinutes > 0, recipe.totalMinutes <= limit.rawValue else { return false }
+            }
+            if !selectedKinds.isEmpty {
+                // Any of the chosen kinds, not all: "pasta or soup" is what
+                // picking two of these means, since a dish is rarely both and
+                // asking for both would always come back empty.
+                let own = Set(recipe.kinds)
+                guard !own.isDisjoint(with: selectedKinds) else { return false }
             }
             if !selectedTags.isEmpty {
                 // Every chosen tag has to be on it. Narrowing is what a second

@@ -946,3 +946,36 @@ A time filter leaves out a recipe with no time recorded. 159 of the owner's 213
 Mealime recipes have none, and sweeping them into "under 30 minutes" would make
 the filter a claim it cannot support. For the same reason "quickest first" puts
 them last: zero minutes means not recorded, not instant.
+
+## Dish types are worked out from the recipe, not taken from the tags
+
+Asked for on 2026-11-02: pastas, soups and stews, sheet pan dinners, bowls.
+
+The imported tags cannot answer that. They are the owner's NYT folders and
+Mealime collections, which are whatever he happened to file things under, and
+a lot of recipes have none at all. "What are we in the mood for" is a different
+question from "where did I put this", and both are worth having.
+
+So a classifier reads the title, the ingredients and the method and names the
+dish. Rules rather than a model: it has to run over 427 recipes at launch with
+no network, a wrong answer has to be explainable, and the vocabulary of home
+cooking is small enough that keywords get most of the way.
+
+Three decisions inside it are worth keeping:
+
+**The title is worth far more than the method.** "Pasta with Roasted Tomatoes"
+is pasta. "Serve with pasta" at the end of a chicken recipe is a serving
+suggestion. A word away from the title needs to appear twice before it counts.
+
+**A plainly one thing dish does not collect weaker labels.** Baked ziti is
+pasta, not pasta and a bake and rice and beans because the method mentions
+them.
+
+**Nothing fits is an allowed answer.** A recipe called "Tuesday" gets no type.
+A wrong facet is worse than a missing one: it sends the cook looking in the
+wrong place and quietly hides the dish from where it belongs.
+
+The answer is stored on the recipe rather than computed, because filtering
+reruns on every keystroke, and the backfill runs at launch over anything that
+has none. 427 recipes were already imported before the classifier existed and
+reimporting them to pick it up would have been a poor trade.

@@ -184,16 +184,20 @@ struct RecipeImporter {
             recipe.ingredients.append(ingredient)
         }
 
-        for (position, text) in imported.steps.enumerated() {
+        for (position, stepText) in imported.steps.enumerated() {
             let step = RecipeStep(
                 id: StableID.step(recipeSeedID: seedKey, position: position),
                 householdID: householdID,
                 position: position,
-                text: text
+                text: stepText
             )
             step.recipe = recipe
             recipe.steps.append(step)
         }
+
+        // Once the ingredients and steps are on it, so the classifier has the
+        // method to read and not only the title.
+        recipe.dishTypes = DishTypeClassifier.classify(recipe).map(\.rawValue)
 
         return recipe
     }

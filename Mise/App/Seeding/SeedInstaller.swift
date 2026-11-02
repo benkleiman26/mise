@@ -31,9 +31,26 @@ struct SeedInstaller {
         let itemsByName = try installCanonicalItems(catalog, household: household, report: &report)
         try installRecipes(catalog, household: household, itemsByName: itemsByName, report: &report)
         try installStaplePantryEntries(catalog, household: household, itemsByName: itemsByName, report: &report)
+        try classifyRecipes(report: &report)
 
         try households.save()
         return report
+    }
+
+    /// Gives a dish type to anything that has none.
+    ///
+    /// It runs on every launch and does nothing on almost all of them, which is
+    /// the point: 427 recipes were already imported before the classifier
+    /// existed and reimporting them to pick it up would have been a poor trade
+    /// for the owner. A recipe classified once is skipped from then on.
+    private func classifyRecipes(report: inout SeedReport) throws {
+        for recipe in try recipes.all() where recipe.dishTypes.isEmpty {
+            let kinds = DishTypeClassifier.classify(recipe)
+            guard !kinds.isEmpty else { continue }
+            recipe.dishTypes = kinds.map(\.rawValue)
+            recipe.updatedAt = .now
+            report.recipesClassified += 1
+        }
     }
 
     // MARK: - Household
@@ -283,6 +300,9 @@ struct SeedReport: Sendable, Equatable {
     /// with the resource file. Non-zero after an update that widened the
     /// table, zero on every launch after that.
     var canonicalItemsUpdated = 0
+    /// Recipes that had no dish types and have been given them. Non-zero on
+    /// the launch after the classifier lands or after an import, zero after.
+    var recipesClassified = 0
     var householdsInserted = 0
     var usersInserted = 0
     var preferencesInserted = 0

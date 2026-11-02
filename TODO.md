@@ -246,6 +246,13 @@ green on the Mac: 70 tests, no failures, up from 61 before `ListGenerator`.
 - [ ] Still to come in Phase 1: manual recipe entry, editing an imported
       recipe, the paste a link flow, and smart lists that save a set of
       filters under a name.
+- [ ] Dish types cannot be corrected by hand. When the classifier gets one
+      wrong the only fix is a rule change and a relaunch. Editing a recipe
+      should let the cook set them, and that edit has to survive the backfill,
+      which currently skips anything that already has one.
+- [ ] The classifier never runs again on a recipe that already has a type, so
+      improving a rule does not reach the existing library. A "reclassify
+      everything" action in Settings would, and would be two lines.
 - [ ] Nothing marks a meal as cooked, so "Cooked" only ever shows what the NYT
       import brought in. Cook mode is Phase 3 and owns that.
 

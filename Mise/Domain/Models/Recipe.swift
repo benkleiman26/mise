@@ -22,6 +22,13 @@ final class Recipe {
 
     /// Flat and lowercase, per section 5.1.
     var tags: [String]
+    /// What kind of dish this is, as `DishType` raw values. Worked out from
+    /// the recipe rather than imported, because the tags that came with the
+    /// library are the owner's own folders and answer a different question.
+    ///
+    /// Stored rather than computed: filtering reruns on every keystroke and
+    /// reclassifying 427 recipes each time would be felt.
+    var dishTypes: [String] = []
     /// Shown as a tab when present, the way Mealime does it. Section 1a.
     var cookware: [String]
 
@@ -56,6 +63,7 @@ final class Recipe {
         cookMinutes: Int = 0,
         baseServings: Int,
         tags: [String] = [],
+        dishTypes: [String] = [],
         cookware: [String] = [],
         imageURL: URL? = nil,
         imageData: Data? = nil,
@@ -80,6 +88,7 @@ final class Recipe {
         self.cookMinutes = cookMinutes
         self.baseServings = baseServings
         self.tags = tags
+        self.dishTypes = dishTypes
         self.cookware = cookware
         self.imageURL = imageURL
         self.imageData = imageData
@@ -96,6 +105,8 @@ final class Recipe {
     /// Section 4 lists this as computed, and the seed file agrees with it for
     /// every recipe, which `SeedCatalogTests` checks.
     var totalMinutes: Int { prepMinutes + cookMinutes }
+
+    var kinds: [DishType] { dishTypes.compactMap(DishType.init(rawValue:)) }
 
     /// "24 min", or nil when nobody ever wrote the time down.
     ///

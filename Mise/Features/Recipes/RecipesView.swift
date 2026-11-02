@@ -53,8 +53,11 @@ struct RecipesView: View {
 
         List {
             Section {
+                kindRow(store)
+                    .listRowInsets(EdgeInsets(top: 4, leading: 0, bottom: 0, trailing: 0))
+                    .listRowBackground(Color.clear)
                 facets(store)
-                    .listRowInsets(EdgeInsets(top: 4, leading: 0, bottom: 4, trailing: 0))
+                    .listRowInsets(EdgeInsets(top: 0, leading: 0, bottom: 4, trailing: 0))
                     .listRowBackground(Color.clear)
             }
 
@@ -174,6 +177,32 @@ struct RecipesView: View {
                 }
             }
             .padding(.horizontal, 20)
+        }
+    }
+
+    /// What kind of dish, which is the question people actually start from.
+    @ViewBuilder
+    private func kindRow(_ store: RecipesStore) -> some View {
+        let kinds = store.kinds
+        if !kinds.isEmpty {
+            ScrollView(.horizontal, showsIndicators: false) {
+                HStack(spacing: 8) {
+                    ForEach(kinds, id: \.kind) { entry in
+                        chip(
+                            "\(entry.kind.displayName) \(entry.count)",
+                            systemImage: entry.kind.systemImage,
+                            on: store.selectedKinds.contains(entry.kind)
+                        ) {
+                            if store.selectedKinds.contains(entry.kind) {
+                                store.selectedKinds.remove(entry.kind)
+                            } else {
+                                store.selectedKinds.insert(entry.kind)
+                            }
+                        }
+                    }
+                }
+                .padding(.horizontal, 20)
+            }
         }
     }
 

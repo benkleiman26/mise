@@ -65,7 +65,7 @@ final class PlanStore {
                 householdID: plan.householdID,
                 position: (plan.entries.map(\.position).max() ?? -1) + 1,
                 recipeID: recipe.id,
-                servings: servings ?? (try defaultServings())
+                servings: try servings ?? defaultServings()
             )
             meal.plan = plan
             plan.entries.append(meal)

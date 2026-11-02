@@ -205,6 +205,15 @@ green on the Mac: 70 tests, no failures, up from 61 before `ListGenerator`.
 - [ ] Nothing in the app lets the user categorise an unmatched ingredient, so
       the import's "not yet categorised" list is read only. Section 5.3 rule 2
       wants that tap to teach the alias table.
+- [ ] About 20 of the unmatched lines are web page furniture the Mealime "import
+      from a link" captured: "5 (from 113 ratings)", "Recent Posts", "^ Back to
+      Top", "Pinch of Yum logo". The converter should drop them, carefully, since
+      dropping a real ingredient is worse than keeping a junk one.
+- [ ] "Salt and pepper" is one line asking for two things, and there are 11 of
+      them. Splitting on "and" is only safe for a short list of known pairs.
+- [ ] The import's match rate should be measurable without a simulator. A
+      command in `tools/resource-lint` that runs the table over an import file
+      would make the next pass a loop rather than a round trip.
 - [ ] Tapping a grocery row does not show which meals need it, although
       `sourceRecipeIDs` is on every row. Asked for on 2026-11-01, for later.
 - [ ] Making a list with no meals planned still creates an empty `GroceryList`

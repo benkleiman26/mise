@@ -170,7 +170,10 @@ final class SeedInstallerTests: XCTestCase {
         let itemsByID = try Dictionary(uniqueKeysWithValues: canonicalItems.all().map { ($0.id, $0) })
         let entries = try pantry.all()
 
-        XCTAssertEqual(entries.count, 71)
+        // Tied to the table rather than to a number that was true once. The
+        // table grew from 297 items to 389 on 2026-11-02 when the owner's real
+        // library turned up 344 names it did not know.
+        XCTAssertEqual(entries.count, catalog.canonicalItems.filter(\.isStaple).count)
 
         for entry in entries {
             let item = try XCTUnwrap(itemsByID[entry.canonicalItemID])

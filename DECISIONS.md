@@ -728,3 +728,36 @@ folder the user can see is a folder they can get a backup out of.
 
 The alternative, reading a path baked into the app, would have worked today in
 the simulator and nowhere else.
+
+## The real library found four bugs the seed data never could
+
+Importing the owner's 213 rescued Mealime recipes produced 2436 ingredient
+lines, of which 344 matched no grocery item. The list of those 344 was worth
+more than the count, because they were not all the same kind of failure.
+
+**The parser was dropping names.** "2 garlic cloves" reads the unit off the end
+of the phrase and left no name at all, so the whole raw line got stored as the
+ingredient. Thirty five lines were garlic written that way. The seed library
+writes "2 cloves garlic", so no fixture had ever covered the other order.
+
+**The comma rule was eating ingredients.** "6 boneless, skinless chicken
+thighs" split at the first comma and recorded the ingredient as "boneless".
+The chicken was thrown away. The rule now asks whether anything before the
+comma could be an ingredient at all once the quantity, unit and adjectives are
+removed, and leaves the line alone when the answer is no.
+
+**Measures with no unit were staying in the name.** "3 thyme sprigs" reached
+the list as "thyme sprigs", which never merges with the thyme another recipe
+asks for. The word is now dropped and confidence lowered, because losing the
+measure is better than losing the merge.
+
+**"X or Y" is one thing to buy.** "safflower or canola oil" is one bottle. The
+first option is the one the writer led with.
+
+The table grew from 297 items to 389 with 105 new aliases. That is the least
+interesting of the four and was the only one visible from the count alone.
+
+The lesson is that 45 seed recipes written in one house style cannot find
+parser bugs. 213 recipes from dozens of authors found four in an afternoon.
+Any future importer should expect the same, and the first import of a new
+source is worth reading line by line rather than trusting the totals.

@@ -75,6 +75,24 @@ enum IngredientParser {
         "bottle", "bottles", "box", "boxes", "bag", "bags", "loaf", "loaves",
     ]
 
+    /// Adjectives that cannot be an ingredient by themselves.
+    ///
+    /// "6 boneless, skinless chicken thighs" is one ingredient with a comma in
+    /// the middle of its description, not a name followed by preparation. The
+    /// first comma rule would record it as "boneless" and throw the chicken
+    /// away, which is what the owner's library did to nine lines.
+    static let danglingModifiers: Set<String> = [
+        "boneless", "skinless", "bone-in", "skin-on", "boned", "trimmed",
+        "large", "small", "medium", "jumbo", "baby", "mini", "extra", "x-large",
+        "firm", "extra-firm", "soft", "silken", "hard", "lean", "fatty",
+        "fresh", "dried", "frozen", "canned", "ripe", "overripe", "whole",
+        "thin", "thick", "short", "long", "wide", "narrow",
+        "cooked", "uncooked", "raw", "precooked", "leftover",
+        "salted", "unsalted", "sweetened", "unsweetened", "seasoned", "unseasoned",
+        "hot", "cold", "warm", "lukewarm", "light", "dark", "mild", "spicy",
+        "low-fat", "full-fat", "nonfat", "reduced-fat", "low-sodium", "organic",
+    ]
+
     /// Words that make a quantity no quantity at all.
     static let vagueWords: Set<String> = ["handful", "handfuls", "splash", "drizzle", "dash", "few", "some"]
 
@@ -143,7 +161,9 @@ enum IngredientParser {
             }
         }
 
-        let name = working.trimmingCharacters(in: CharacterSet(charactersIn: " ,;:")).trimmingCharacters(in: .whitespaces)
+        let tidied = tidy(working.trimmingCharacters(in: CharacterSet(charactersIn: " ,;:")).trimmingCharacters(in: .whitespaces))
+        let name = tidied.name
+        if tidied.changed { confidence = confidence.lowered(to: .medium) }
         confidence = confidence.lowered(to: judge(name: name, quantity: quantity))
 
         return ParsedIngredient(
@@ -192,11 +212,39 @@ enum IngredientParser {
 
     /// Everything after the first comma. NYT writes preparation that way, and
     /// section 5.6a says so, so the whole tail is kept commas and all.
+    ///
+    /// Unless what comes before the comma is not a name. "6 boneless, skinless
+    /// chicken thighs" splits into "6 boneless" and "skinless chicken thighs",
+    /// and the ingredient is the second half. The test is whether anything
+    /// before the comma could be an ingredient at all once the quantity, the
+    /// unit and the adjectives are taken out of it.
     private static func stripTrailingPreparation(_ text: inout String) -> String? {
         guard let comma = text.firstIndex(of: ",") else { return nil }
+        let head = String(text[text.startIndex..<comma]).trimmingCharacters(in: .whitespaces)
+        guard headNamesSomething(head) else { return nil }
+
         let tail = String(text[text.index(after: comma)...]).trimmingCharacters(in: .whitespaces)
-        text = String(text[text.startIndex..<comma]).trimmingCharacters(in: .whitespaces)
+        text = head
         return tail.isEmpty ? nil : tail
+    }
+
+    /// Whether the words before a comma amount to an ingredient, rather than
+    /// being a number and some adjectives waiting for their noun.
+    private static func headNamesSomething(_ head: String) -> Bool {
+        let words = head.split(separator: " ")
+            .map { $0.lowercased().trimmingCharacters(in: CharacterSet(charactersIn: ".,()")) }
+            .filter { !$0.isEmpty }
+
+        let remaining = words.filter { word in
+            if danglingModifiers.contains(word) { return false }
+            if unitSpellings[word] != nil { return false }
+            if unmeasuredWords.contains(word) { return false }
+            if vagueWords.contains(word) { return false }
+            // A number, a fraction, or "1/2".
+            if word.allSatisfy({ $0.isNumber || $0 == "/" || $0 == "." || vulgarFractions[$0] != nil }) { return false }
+            return true
+        }
+        return !remaining.isEmpty
     }
 
     private static func stripLeadingPreparation(_ text: inout String) -> String? {
@@ -336,19 +384,36 @@ enum IngredientParser {
                                skippedTokens: 0, sawUnmeasuredWord: false)
         }
 
+        // "2 garlic cloves" rather than "2 cloves garlic". Recipe writers use
+        // both and the second one was reading the unit off the end and leaving
+        // no name at all, so the whole raw line got stored instead. Thirty five
+        // lines of the owner's library were garlic written this way.
+        let last = tokens[tokens.count - 1].lowercased().trimmingCharacters(in: CharacterSet(charactersIn: ".,"))
+        let first = tokens[0].lowercased().trimmingCharacters(in: CharacterSet(charactersIn: ".,"))
+        if tokens.count >= 2, let unit = unitSpellings[last], unitSpellings[first] == nil {
+            return UnitReading(unit: unit, remainder: tokens.dropLast().joined(separator: " "),
+                               skippedTokens: 0, sawUnmeasuredWord: false)
+        }
+
         let searchDepth = min(3, tokens.count)
         for position in 0..<searchDepth {
             let word = tokens[position].lowercased().trimmingCharacters(in: CharacterSet(charactersIn: ".,"))
-            if let unit = unitSpellings[word] {
-                return UnitReading(unit: unit, remainder: tokens.dropFirst(position + 1).joined(separator: " "),
-                                   skippedTokens: position, sawUnmeasuredWord: false)
-            }
+
             // Stop at the first word that reads like part of the name, so a
             // unit further along belongs to something else.
             if position == 0, unmeasuredWords.contains(word) {
                 return UnitReading(unit: nil, remainder: text, skippedTokens: 0, sawUnmeasuredWord: true)
             }
             if position > 0, !looksLikeSize(tokens[position - 1]) { break }
+
+            if let unit = unitSpellings[word] {
+                let remainder = tokens.dropFirst(position + 1).joined(separator: " ")
+                // Taking the unit would leave nothing to shop for, so the words
+                // in front of it are the name after all.
+                guard !remainder.isEmpty else { break }
+                return UnitReading(unit: unit, remainder: remainder,
+                                   skippedTokens: position, sawUnmeasuredWord: false)
+            }
         }
 
         return UnitReading(unit: nil, remainder: text, skippedTokens: 0, sawUnmeasuredWord: false)
@@ -357,6 +422,54 @@ enum IngredientParser {
     /// "15-ounce" and "14.5" read as package sizes rather than as the name.
     private static func looksLikeSize(_ token: String) -> Bool {
         token.contains(where: \.isNumber)
+    }
+
+    /// A last pass over the name, for shapes the owner's real library threw up
+    /// that the pieces above leave behind.
+    ///
+    /// Each of these loses something, so each lowers confidence. A measure we
+    /// could not keep is better dropped from the name than left in it: "3 thyme
+    /// sprigs" has to reach the list as thyme, or it never merges with the
+    /// thyme another recipe asks for.
+    private static func tidy(_ name: String) -> (name: String, changed: Bool) {
+        var working = name
+        var changed = false
+
+        // "1 (15-ounce) can of black beans" leaves "of black beans" behind once
+        // the bracket and the unit are gone.
+        if working.lowercased().hasPrefix("of ") {
+            working = String(working.dropFirst(3))
+            changed = true
+        }
+
+        // "safflower or canola oil" is one bottle to buy. The first option is
+        // the one the writer led with.
+        if let choice = working.range(of: " or ", options: .caseInsensitive) {
+            working = String(working[working.startIndex..<choice.lowerBound])
+            changed = true
+        }
+
+        var tokens = working.split(separator: " ").map(String.init)
+        func key(_ token: String) -> String {
+            token.lowercased().trimmingCharacters(in: CharacterSet(charactersIn: ".,()"))
+        }
+
+        // A measure we do not have a unit for, written either side of the name:
+        // "2 slices whole grain bread", "3 thyme sprigs".
+        if let first = tokens.first, tokens.count > 1, unmeasuredWords.contains(key(first)) {
+            tokens.removeFirst()
+            changed = true
+        }
+        if let last = tokens.last, tokens.count > 1, unmeasuredWords.contains(key(last)) {
+            tokens.removeLast()
+            changed = true
+        }
+
+        working = tokens.joined(separator: " ")
+            .trimmingCharacters(in: CharacterSet(charactersIn: " ,;:"))
+            .trimmingCharacters(in: .whitespaces)
+
+        return (working.isEmpty ? name : working, changed)
     }
 
     /// The last word on confidence, from what the name ended up being.

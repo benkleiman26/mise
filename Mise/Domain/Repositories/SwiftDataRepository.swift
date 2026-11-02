@@ -39,7 +39,29 @@ class SwiftDataRepository<Entity> where Entity: PersistentModel, Entity: Househo
     }
 
     func delete(_ entity: Entity) {
+        recordDeletion(of: entity)
         context.delete(entity)
+    }
+
+    /// Leaves a tombstone, so the other phone learns the record is gone.
+    ///
+    /// Without one, sync has nothing to compare: the absence of a row is not
+    /// information, and the next push from the other device would put the
+    /// record straight back. A meal removed here would return, and a grocery
+    /// item deleted in the shop would reappear.
+    ///
+    /// It is recorded even before anyone has signed in, because the deletes
+    /// that happen before the first sync are exactly the ones that would
+    /// otherwise come back when it starts.
+    func recordDeletion<Record: HouseholdRecord>(of record: Record) {
+        context.insert(
+            Deletion(
+                householdID: record.householdID,
+                entity: Record.syncEntity,
+                recordID: record.id,
+                deviceID: DeviceIdentity.current
+            )
+        )
     }
 
     func save() throws {
@@ -51,10 +73,12 @@ class SwiftDataRepository<Entity> where Entity: PersistentModel, Entity: Househo
 @MainActor
 final class SwiftDataRecipeRepository: SwiftDataRepository<Recipe>, RecipeRepository {
     func deleteIngredient(_ ingredient: Ingredient) {
+        recordDeletion(of: ingredient)
         context.delete(ingredient)
     }
 
     func deleteStep(_ step: RecipeStep) {
+        recordDeletion(of: step)
         context.delete(step)
     }
 
@@ -81,6 +105,7 @@ final class SwiftDataPantryRepository: SwiftDataRepository<PantryEntry>, PantryR
 @MainActor
 final class SwiftDataMealPlanRepository: SwiftDataRepository<MealPlan>, MealPlanRepository {
     func deleteEntry(_ meal: PlannedMeal) {
+        recordDeletion(of: meal)
         context.delete(meal)
     }
 }
@@ -88,6 +113,7 @@ final class SwiftDataMealPlanRepository: SwiftDataRepository<MealPlan>, MealPlan
 @MainActor
 final class SwiftDataGroceryListRepository: SwiftDataRepository<GroceryList>, GroceryListRepository {
     func deleteItem(_ item: GroceryItem) {
+        recordDeletion(of: item)
         context.delete(item)
     }
 }

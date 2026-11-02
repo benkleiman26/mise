@@ -10,17 +10,22 @@ protocol HouseholdRecord: AnyObject {
     var householdID: UUID { get set }
     var createdAt: Date { get set }
     var updatedAt: Date { get set }
+
+    /// Which table this is on the wire. Required rather than optional, so a
+    /// model added later cannot quietly become the one thing sync does not
+    /// carry.
+    static var syncEntity: SyncEntity { get }
 }
 
-extension Recipe: HouseholdRecord {}
-extension Ingredient: HouseholdRecord {}
-extension RecipeStep: HouseholdRecord {}
-extension CanonicalItem: HouseholdRecord {}
-extension PantryEntry: HouseholdRecord {}
-extension MealPlan: HouseholdRecord {}
-extension PlannedMeal: HouseholdRecord {}
-extension GroceryList: HouseholdRecord {}
-extension GroceryItem: HouseholdRecord {}
-extension Household: HouseholdRecord {}
-extension User: HouseholdRecord {}
-extension HouseholdPreferences: HouseholdRecord {}
+extension Recipe: HouseholdRecord { static var syncEntity: SyncEntity { .recipe } }
+extension Ingredient: HouseholdRecord { static var syncEntity: SyncEntity { .ingredient } }
+extension RecipeStep: HouseholdRecord { static var syncEntity: SyncEntity { .recipeStep } }
+extension CanonicalItem: HouseholdRecord { static var syncEntity: SyncEntity { .canonicalItem } }
+extension PantryEntry: HouseholdRecord { static var syncEntity: SyncEntity { .pantryEntry } }
+extension MealPlan: HouseholdRecord { static var syncEntity: SyncEntity { .mealPlan } }
+extension PlannedMeal: HouseholdRecord { static var syncEntity: SyncEntity { .plannedMeal } }
+extension GroceryList: HouseholdRecord { static var syncEntity: SyncEntity { .groceryList } }
+extension GroceryItem: HouseholdRecord { static var syncEntity: SyncEntity { .groceryItem } }
+extension Household: HouseholdRecord { static var syncEntity: SyncEntity { .household } }
+extension User: HouseholdRecord { static var syncEntity: SyncEntity { .user } }
+extension HouseholdPreferences: HouseholdRecord { static var syncEntity: SyncEntity { .householdPreferences } }

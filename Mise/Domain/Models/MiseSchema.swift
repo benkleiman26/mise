@@ -17,6 +17,7 @@ enum MiseSchema {
         Household.self,
         User.self,
         HouseholdPreferences.self,
+        Deletion.self,
     ]
 
     static var schema: Schema { Schema(models) }

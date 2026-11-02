@@ -27,3 +27,6 @@ npm-debug.log*
 # See tools/mealime-export/README.md.
 /data/**
 !/data/README.md
+
+# Supabase project url and anon key. The repository is public.
+Secrets.xcconfig

@@ -1093,3 +1093,46 @@ several megabytes. The library shows them at 56 points and the recipe screen at
 200, so most of that is weight in the database and nothing on screen. Anything
 over 1200 on its longest side is redrawn at 1200; anything already smaller is
 left exactly as it came, because re-encoding a small image only loses quality.
+
+## Sync carries a bag of fields, not a typed row per table
+
+Two phones in one household will not be running the same version of the app.
+One updates on Tuesday and the other on Friday, and in between they have to go
+on working. A column per field in Postgres, or a typed struct per table on the
+wire, means the older phone refuses a record it could have mostly understood
+and the newer phone's extra fields are dropped on the way through.
+
+So the wire format is `{entity, id, household_id, updated_at, fields}` with the
+fields as JSON, and a reader keeps the fields it does not recognise and writes
+them back untouched. Postgres is holding records for one household, not
+answering questions about them, so it does not need to know what a recipe is.
+
+The cost is that the database cannot validate anything and a typo in a field
+name is not caught by the schema. That is paid for by tests on the encoding
+rather than by the server.
+
+## Deletions get their own records, because absence is not information
+
+A meal removed on one phone leaves nothing behind. The next time the other
+phone pushes its copy, the meal comes back, and a grocery item ticked off and
+deleted in the shop reappears in the aisle.
+
+So every delete writes a `Deletion`, including deletes that happen before
+anyone has signed in, because those are exactly the ones that would otherwise
+return when sync starts. The repositories record them rather than each caller,
+since the four child-delete methods added earlier bypass the generic one and
+would each have been a place to forget.
+
+## The server's clock decides where a device is up to
+
+Devices page through changes by the server's `server_at`, never by when a phone
+thought an edit happened. Two phones' clocks disagree, sometimes by minutes,
+and a cursor taken from the wrong clock loses changes with nothing looking
+wrong: the device asks for everything after a time that has not arrived yet on
+the server and is told there is nothing.
+
+Conflicts are still settled by `updated_at`, last writer wins, per record. That
+is acceptable here because the records are small and separate. Two people
+ticking different items off a list never collide, and losing the earlier of two
+edits made to the same recipe seconds apart is a fair trade against the
+machinery that would avoid it.

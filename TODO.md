@@ -202,9 +202,8 @@ green on the Mac: 70 tests, no failures, up from 61 before `ListGenerator`.
 - [x] Imported Mealime recipes carry their rescued photo, copied next to the
       import file and stored on the recipe. Written 2026-11-02, not yet run
       against the real 424.
-- [ ] NYT recipes have no photos and will not get them: the pictures are the
-      Times's and the importer records their urls without downloading them.
-      The placeholder covers it.
+- [x] NYT recipes carry their photo, downloaded during conversion from the
+      public image CDN the recipe page itself loads them from.
 - [ ] Photos go into the store at whatever size Mealime served, under
       `.externalStorage`. If the database gets uncomfortable, downscaling to
       something like 800px on the long edge during conversion is the fix.

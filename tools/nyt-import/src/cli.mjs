@@ -11,6 +11,7 @@ import { readdir, readFile, mkdir, writeFile } from 'node:fs/promises';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { convertLibrary } from './convert.mjs';
+import { downloadPhotos } from './images.mjs';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const repoRoot = resolve(here, '..', '..', '..');
@@ -101,6 +102,21 @@ if (command === 'convert') {
   const entries = Array.isArray(fetched?.recipes) ? fetched.recipes : [];
   const { document, report } = convertLibrary(entries);
 
+  // The photos, so the library does not read as a spreadsheet. --no-photos
+  // skips it.
+  let photos = null;
+  if (!process.argv.includes('--no-photos')) {
+    console.log(`Downloading ${document.recipes.length} photos. This takes a couple of minutes.`);
+    photos = await downloadPhotos(document.recipes, {
+      outDir: dirname(outFile),
+      onProgress: (done, total, counts) => {
+        if (done % 20 === 0 || done === total) {
+          console.log(`  ${done}/${total}  kept ${counts.downloaded}  failed ${counts.failed}  none published ${counts.missing}`);
+        }
+      },
+    });
+  }
+
   await mkdir(dirname(outFile), { recursive: true });
   await writeFile(outFile, `${JSON.stringify(document, null, 2)}\n`, 'utf8');
 
@@ -112,6 +128,11 @@ if (command === 'convert') {
   for (const { where, why } of report.skipped) console.log(`  skipped ${where}: ${why}`);
   if (Array.isArray(fetched.failures) && fetched.failures.length) {
     console.log(`\n${fetched.failures.length} pages failed in the browser. __nyt.retryFailures() retries just those.`);
+  }
+
+  if (photos) {
+    const mb = (photos.bytes / 1024 / 1024).toFixed(1);
+    console.log(`Photos: ${photos.downloaded} downloaded (${mb} MB), ${photos.failed} failed, ${photos.missing} published none`);
   }
 
   console.log(`\nWrote ${outFile}`);

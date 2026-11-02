@@ -891,7 +891,12 @@ sessionStorage, and told the owner it had 163 recipes while downloading 96. A
 count shown to a person has to be read from the place the deliverable is
 written from.
 
-Images are recorded as urls and never downloaded. The photos are the Times's.
+Photos are downloaded, into the same folder beside the import file that the
+Mealime ones use. The first version did not, on the reasoning that the pictures
+belong to the Times. That was the wrong line: showing a photo next to a recipe
+you saved, in your own app, is what the recipe page does and what every recipe
+app does, and Mealime did it with these exact pictures for years. Republishing
+them would be different, and nothing here republishes anything.
 
 ## Imported recipe ids come out of the url, not the title
 

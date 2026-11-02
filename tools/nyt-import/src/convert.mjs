@@ -132,6 +132,9 @@ export function convertRecipe(entry) {
 
   return {
     externalID: String(external),
+    /// Filled in by the download step: the photo's name in the images folder
+    /// beside the import file.
+    imageFile: null,
     title,
     summary: stripTags(ld.description),
     sourceURL: url,

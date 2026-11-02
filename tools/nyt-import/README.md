@@ -73,4 +73,21 @@ cook time, so prep plus cook equals what NYT said rather than double it.
 Recipe ids come out of the url, so reimporting updates rather than duplicating
 even if a recipe is retitled.
 
-Images are recorded as urls and not downloaded. NYT's images are theirs.
+## Photos
+
+Downloaded during `convert`, into `data/mise/images/` beside the import file,
+and read from there by the app. NYT serves them from a public image CDN with no
+sign in, which is how the recipe page loads them in the first place.
+
+It takes the largest size published, because a `thumbStandard` is a 75 pixel
+square and would look like a mistake on a phone. A photo that will not download
+is not an error: the recipe is worth having without it.
+
+`--no-photos` skips the download.
+
+**Both the JSON and the `images` folder have to reach the app:**
+
+```sh
+APP=$(xcrun simctl get_app_container booted com.benkleiman.mise data)
+cp -R ~/mise/data/mise/nyt_import.json ~/mise/data/mise/images "$APP/Documents/"
+```

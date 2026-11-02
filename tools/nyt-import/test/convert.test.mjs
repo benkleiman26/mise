@@ -1,6 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { convertRecipe, convertLibrary, minutesFromDuration, servingsFrom, stepsFrom, stripTags } from '../src/convert.mjs';
+import { isAllowed, pickImageURL } from '../src/images.mjs';
 
 const ld = (extra = {}) => ({
   '@type': 'Recipe',
@@ -94,4 +95,39 @@ test('the library comes out sorted, deduplicated and reported on', () => {
   assert.equal(report.converted, 2);
   assert.equal(report.skipped.length, 2, 'one duplicate id, one unreadable page');
   assert.equal(report.cooked, 1);
+});
+
+// Photos.
+
+test('only NYT image hosts over https are fetched', () => {
+  assert.equal(isAllowed('https://static01.nyt.com/images/a.jpg'), true);
+  assert.equal(isAllowed('https://cooking.nytimes.com/a.jpg'), true);
+  assert.equal(isAllowed('http://static01.nyt.com/images/a.jpg'), false, 'plain http is refused');
+  assert.equal(isAllowed('https://example.com/a.jpg'), false);
+  assert.equal(isAllowed('not a url'), false);
+  assert.equal(isAllowed(undefined), false);
+});
+
+test('the big size wins over the thumbnail', () => {
+  assert.equal(
+    pickImageURL([
+      'https://static01.nyt.com/images/a-thumbStandard.jpg',
+      'https://static01.nyt.com/images/a-superJumbo.jpg',
+      'https://static01.nyt.com/images/a-articleLarge.jpg',
+    ]),
+    'https://static01.nyt.com/images/a-superJumbo.jpg'
+  );
+});
+
+test('with nothing in the names, the first wins, because JSON-LD leads with the primary image', () => {
+  assert.equal(
+    pickImageURL(['https://static01.nyt.com/images/one.jpg', 'https://static01.nyt.com/images/two.jpg']),
+    'https://static01.nyt.com/images/one.jpg'
+  );
+});
+
+test('a recipe with no usable image url downloads nothing rather than guessing', () => {
+  assert.equal(pickImageURL([]), null);
+  assert.equal(pickImageURL(['https://example.com/a.jpg']), null);
+  assert.equal(pickImageURL(undefined), null);
 });

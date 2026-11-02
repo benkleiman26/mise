@@ -28,5 +28,8 @@ npm-debug.log*
 /data/**
 !/data/README.md
 
-# Supabase project url and anon key. The repository is public.
+# The Supabase project url and publishable key. The repository is public, and
+# while the publishable key is meant to be public, the project it points at is
+# nobody else's business. See supabase/supabase.example.json.
+Mise/Resources/supabase.json
 Secrets.xcconfig

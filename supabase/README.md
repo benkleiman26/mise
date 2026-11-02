@@ -19,15 +19,22 @@ level security means neither app can read the other's rows.
    already being used.
 3. **Project Settings → API**. You need the **Project URL** and the
    **anon public** key.
-4. Put them in `Secrets.xcconfig` at the repository root, which git ignores:
+4. Click the copy button next to the **publishable** key, then run this. It
+   writes the file without the key passing through anyone's hands but yours:
 
-   ```
-   SUPABASE_URL = https:/$()/abcdefgh.supabase.co
-   SUPABASE_ANON_KEY = eyJhbGciOi...
+   ```sh
+   cd ~/mise && mkdir -p Mise/Resources
+   printf '{\n  "url": "https://YOUR-PROJECT-REF.supabase.co",\n  "anonKey": "%s"\n}\n' "$(pbpaste)" \
+     > Mise/Resources/supabase.json
    ```
 
-   The `/$()/` is not a typo. Xcode config files treat `//` as a comment, and
-   that is the standard way to write a url in one.
+   `Mise/Resources/supabase.json` is git ignored. The publishable key is
+   designed to be public and the row level security in `schema.sql` is what
+   actually protects the data, but the project it points at is still nobody
+   else's business.
+
+   Never put the **secret** key in there. It bypasses every policy. The app
+   refuses to start sync if it finds one.
 
 ## Why the schema looks like this
 

@@ -1151,3 +1151,19 @@ security means neither application can read the other's rows even by accident.
 
 The alternative, a project per app, is cleaner and costs either money or
 another signup. This costs a prefix.
+
+## The Supabase config is a bundled file that is allowed to be missing
+
+`Mise/Resources/supabase.json` is git ignored and read at runtime. Absent is a
+normal state rather than an error: a fresh clone of this repository has no
+sync, everything else works, and nothing fails to build because a server has
+not been set up.
+
+The alternative, an xcconfig feeding Info.plist, is the more usual approach and
+would have meant editing the project file and a build failure for anyone
+without the file. Reading a resource costs one optional.
+
+The loader refuses a key beginning `sb_secret_`. Putting the secret key where
+the publishable one goes would be a serious mistake and an easy one to make at
+the end of a long setup, and it would hand every reader of the app bundle the
+ability to bypass every row level security policy in the schema.

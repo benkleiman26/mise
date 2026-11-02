@@ -128,4 +128,80 @@ final class RecipeWebImporterTests: XCTestCase {
             }
         }
     }
+
+    // MARK: - Photos
+
+    func testAPhotoIsOnlyEverFetchedOverHttps() async {
+        for address in [
+            nil,
+            "",
+            "http://example.com/a.jpg",
+            "ftp://example.com/a.jpg",
+            "not a url",
+            "data:image/png;base64,iVBORw0KGgo=",
+        ] as [String?] {
+            let data = await RecipeWebImporter.photo(at: address)
+            XCTAssertNil(data, "\(address ?? "nil") should not have been fetched")
+        }
+    }
+
+    /// A page can claim anything about what it is serving, and this writes into
+    /// the device's database.
+    func testAPhotoThatIsNotAnImageIsRefused() async {
+        let html = Data("<html>not a picture</html>".utf8)
+        let session = StubSession.returning(html, type: "text/html")
+        let data = await RecipeWebImporter.photo(at: "https://example.com/a.jpg", using: session)
+        XCTAssertNil(data)
+    }
+
+    func testAnImageThatIsTooBigIsRefused() async {
+        let huge = Data(repeating: 0xFF, count: 6 * 1024 * 1024)
+        let session = StubSession.returning(huge, type: "image/jpeg")
+        let data = await RecipeWebImporter.photo(at: "https://example.com/a.jpg", using: session)
+        XCTAssertNil(data, "six megabytes is not a recipe photo")
+    }
+
+    func testAnOrdinaryImageComesBack() async {
+        let bytes = Data([0xFF, 0xD8, 0xFF, 0xE0, 0x00, 0x10])
+        let session = StubSession.returning(bytes, type: "image/jpeg")
+        let data = await RecipeWebImporter.photo(at: "https://example.com/a.jpg", using: session)
+        XCTAssertEqual(data, bytes)
+    }
+}
+
+/// A URLSession that answers from memory, so the guards above are tested
+/// without a network and without a live site.
+private enum StubSession {
+    static func returning(_ data: Data, type: String, status: Int = 200) -> URLSession {
+        StubProtocol.body = data
+        StubProtocol.contentType = type
+        StubProtocol.status = status
+
+        let configuration = URLSessionConfiguration.ephemeral
+        configuration.protocolClasses = [StubProtocol.self]
+        return URLSession(configuration: configuration)
+    }
+}
+
+private final class StubProtocol: URLProtocol {
+    nonisolated(unsafe) static var body = Data()
+    nonisolated(unsafe) static var contentType = "image/jpeg"
+    nonisolated(unsafe) static var status = 200
+
+    override class func canInit(with request: URLRequest) -> Bool { true }
+    override class func canonicalRequest(for request: URLRequest) -> URLRequest { request }
+
+    override func startLoading() {
+        let response = HTTPURLResponse(
+            url: request.url!,
+            statusCode: Self.status,
+            httpVersion: nil,
+            headerFields: ["Content-Type": Self.contentType]
+        )!
+        client?.urlProtocol(self, didReceive: response, cacheStoragePolicy: .notAllowed)
+        client?.urlProtocol(self, didLoad: Self.body)
+        client?.urlProtocolDidFinishLoading(self)
+    }
+
+    override func stopLoading() {}
 }

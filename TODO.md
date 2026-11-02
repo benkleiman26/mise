@@ -253,9 +253,11 @@ green on the Mac: 70 tests, no failures, up from 61 before `ListGenerator`.
 - [ ] Still to come in Phase 1: writing a recipe down by hand, editing an
       imported one beyond its serving count, and smart lists that save a set
       of filters under a name.
-- [ ] A link import does not keep the photo. The url is read and recorded but
-      nothing downloads it, so a pasted recipe has no picture. The file
-      importers do download, so the machinery exists.
+- [x] A link import downloads the photo, checks it is actually an image,
+      caps it at five megabytes and shrinks it to 1200px before storing.
+- [ ] The Mealime and NYT file imports do not shrink their photos, so those
+      go into the store at whatever size they came at. The same helper would
+      do it; it lives in the link import for now.
 - [ ] A site that renders its recipe client side, or hides it behind a sign
       in, cannot be read. That is most newspaper sites. There is no fallback
       and deliberately so, but the error should probably suggest the Share

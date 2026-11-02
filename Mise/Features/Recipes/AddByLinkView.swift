@@ -71,9 +71,16 @@ struct AddByLinkView: View {
                 ToolbarItem(placement: .confirmationAction) {
                     if case .found(let recipe) = state {
                         Button("Save") {
-                            store?.save(recipe)
-                            dismiss()
+                            // The photo is fetched as part of saving, so the
+                            // sheet waits rather than closing on a half done
+                            // job.
+                            state = .loading
+                            Task {
+                                await store?.save(recipe)
+                                dismiss()
+                            }
                         }
+                        .disabled(state == .loading)
                     }
                 }
             }

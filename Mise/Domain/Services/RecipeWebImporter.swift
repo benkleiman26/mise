@@ -76,6 +76,33 @@ enum RecipeWebImporter {
         return recipe
     }
 
+    /// The recipe's photo, or nil.
+    ///
+    /// Never an error: a recipe without its picture is worth having, and
+    /// failing a save over an image would be a bad trade. Https only, has to
+    /// answer as an image, and capped, because this writes into the device's
+    /// database and a page can claim anything about what it is serving.
+    static func photo(at address: String?, using session: URLSession = .shared) async -> Data? {
+        guard let address, let url = URL(string: address), url.scheme == "https" else { return nil }
+
+        var request = URLRequest(url: url)
+        request.httpMethod = "GET"
+        request.timeoutInterval = 15
+
+        guard let (data, response) = try? await session.data(for: request) else { return nil }
+
+        if let http = response as? HTTPURLResponse {
+            guard (200..<300).contains(http.statusCode) else { return nil }
+            let kind = http.value(forHTTPHeaderField: "Content-Type")?.lowercased() ?? ""
+            guard kind.hasPrefix("image/") else { return nil }
+        }
+
+        // Five megabytes is far more than a recipe photo and far less than
+        // something that should go into a phone's database by surprise.
+        guard !data.isEmpty, data.count <= 5 * 1024 * 1024 else { return nil }
+        return data
+    }
+
     // MARK: - Parsing
 
     /// The recipe in a page, or nil. Pure, so the awkward cases are tests

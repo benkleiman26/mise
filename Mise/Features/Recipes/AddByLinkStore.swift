@@ -1,4 +1,5 @@
 import Foundation
+import UIKit
 
 /// Saves a recipe read off a web page.
 ///
@@ -25,7 +26,14 @@ final class AddByLinkStore {
         self.households = households
     }
 
-    func save(_ imported: RecipeImporter.ImportedRecipe) {
+    func save(_ imported: RecipeImporter.ImportedRecipe) async {
+        // The photo first, because it is the only slow part and the rest of
+        // the save should not be interleaved with a network wait.
+        // A reference to `shrink` would not do: it has a defaulted second
+        // parameter, so its type is not the one flatMap wants.
+        let photo = await RecipeWebImporter.photo(at: imported.imageURLs?.first)
+            .flatMap { Self.shrink($0) }
+
         do {
             guard let household = try households.all().first else {
                 throw RecipeImporter.ImportError.noHousehold
@@ -48,11 +56,37 @@ final class AddByLinkStore {
             }
 
             var report = RecipeImporter.Report()
-            recipes.insert(importer.build(imported, source: "link", into: &report))
+            let recipe = importer.build(imported, source: "link", into: &report)
+            recipe.imageData = photo
+            recipes.insert(recipe)
             try recipes.save()
             problem = nil
         } catch {
             problem = (error as? LocalizedError)?.errorDescription ?? "That could not be saved. \(error)"
         }
+    }
+
+    /// A recipe photo at a sensible size for a phone.
+    ///
+    /// Sites serve pictures sized for a desktop hero image, two thousand pixels
+    /// and several megabytes. The library shows them at 56 points and the
+    /// recipe screen at 200, so most of that is weight in the database and
+    /// nothing on screen. Anything already small enough is left alone, because
+    /// re-encoding a small image only loses quality.
+    nonisolated static func shrink(_ data: Data, longestSide: CGFloat = 1200) -> Data? {
+        guard let image = UIImage(data: data) else { return nil }
+
+        let side = max(image.size.width, image.size.height)
+        guard side > longestSide else { return data }
+
+        let scale = longestSide / side
+        let size = CGSize(width: image.size.width * scale, height: image.size.height * scale)
+
+        let format = UIGraphicsImageRendererFormat.default()
+        format.scale = 1
+        let smaller = UIGraphicsImageRenderer(size: size, format: format).image { _ in
+            image.draw(in: CGRect(origin: .zero, size: size))
+        }
+        return smaller.jpegData(compressionQuality: 0.8) ?? data
     }
 }

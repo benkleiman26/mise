@@ -1073,3 +1073,23 @@ second set of answers to the same questions.
 
 Keyed on the url, so pasting the same link twice updates rather than
 duplicates.
+
+## A downloaded photo is checked, capped and shrunk before it is stored
+
+A link import now keeps the picture, which was the obvious gap in it.
+
+Three guards, because this writes bytes from an arbitrary page into the
+device's database. Https only. The response has to answer as an image, since a
+page can put anything behind a url that ends in .jpg. And five megabytes is the
+ceiling: far more than a recipe photo and far less than something that should
+arrive by surprise.
+
+Failing any of those is not an error. The recipe saves without its picture,
+because a recipe is worth having without one and losing the save over an image
+would be the wrong trade.
+
+Sites serve photos sized for a desktop hero image, two thousand pixels and
+several megabytes. The library shows them at 56 points and the recipe screen at
+200, so most of that is weight in the database and nothing on screen. Anything
+over 1200 on its longest side is redrawn at 1200; anything already smaller is
+left exactly as it came, because re-encoding a small image only loses quality.

@@ -7,6 +7,7 @@ struct GroceryListView: View {
     @State private var store: GroceryListStore?
     @State private var isAddingItem = false
     @State private var newItem = ""
+    @State private var showing: GroceryItem?
 
     var body: some View {
         NavigationStack {
@@ -44,6 +45,11 @@ struct GroceryListView: View {
                 Button("Cancel", role: .cancel) { newItem = "" }
             } message: {
                 Text("Anything you add by hand stays on the list when you make it again.")
+            }
+            .sheet(item: $showing) { item in
+                if let store {
+                    sources(for: item, in: store)
+                }
             }
         }
         .task {
@@ -89,7 +95,7 @@ struct GroceryListView: View {
                     Label("Make the list again", systemImage: "arrow.clockwise")
                 }
             } footer: {
-                Text(footerText(store))
+                Text("\(footerText(store)) Press and hold an item to see which meals need it.")
             }
         }
     }
@@ -129,6 +135,61 @@ struct GroceryListView: View {
         .onTapGesture {
             store.toggle(item)
         }
+        // Ticking off is the thing a shopper does fifty times in a shop, so it
+        // keeps the tap. Asking what a row is for is rarer and gets the longer
+        // press.
+        .onLongPressGesture(minimumDuration: 0.35) {
+            showing = item
+        }
+    }
+
+    /// What a row is for. Section 5.3 asks for this, and a shopper standing in
+    /// front of the parsley needs it to decide whether to bother.
+    @ViewBuilder
+    private func sources(for item: GroceryItem, in store: GroceryListStore) -> some View {
+        let meals = store.meals(for: item)
+
+        NavigationStack {
+            List {
+                Section {
+                    LabeledContent("Item", value: item.displayName)
+                    if let detail = amount(item) {
+                        LabeledContent("Amount", value: detail)
+                    }
+                    LabeledContent("Aisle", value: item.aisle.displayName)
+                }
+
+                Section("Needed for") {
+                    if meals.isEmpty {
+                        Text(item.isManual
+                             ? "You added this one yourself."
+                             : "Nothing in this week's plan, so this came from an earlier list.")
+                            .foregroundStyle(.secondary)
+                    } else {
+                        ForEach(meals, id: \.self) { meal in
+                            Text(meal)
+                        }
+                    }
+                }
+
+                Section {
+                    Button(role: .destructive) {
+                        store.delete(item)
+                        showing = nil
+                    } label: {
+                        Text("Remove from the list")
+                    }
+                }
+            }
+            .navigationTitle(item.displayName)
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .confirmationAction) {
+                    Button("Done") { showing = nil }
+                }
+            }
+        }
+        .presentationDetents([.medium])
     }
 
     private func amount(_ item: GroceryItem) -> String? {

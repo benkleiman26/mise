@@ -43,6 +43,17 @@ final class GroceryListStore {
 
     var isEmpty: Bool { sections.isEmpty }
 
+    /// The meals a row came from, by title. Section 5.3: tap an item and see
+    /// which meals need it, which is how a shopper decides whether to skip it.
+    func meals(for item: GroceryItem) -> [String] {
+        guard !item.sourceRecipeIDs.isEmpty else { return [] }
+        let wanted = Set(item.sourceRecipeIDs)
+        let titles = (try? recipes.all())?
+            .filter { wanted.contains($0.id) }
+            .map(\.title) ?? []
+        return titles.sorted { $0.localizedCaseInsensitiveCompare($1) == .orderedAscending }
+    }
+
     var remainingCount: Int {
         sections.flatMap(\.items).filter { !$0.isChecked }.count
     }

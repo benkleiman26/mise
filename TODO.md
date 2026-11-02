@@ -229,18 +229,16 @@ green on the Mac: 70 tests, no failures, up from 61 before `ListGenerator`.
 - [ ] The import's match rate should be measurable without a simulator. A
       command in `tools/resource-lint` that runs the table over an import file
       would make the next pass a loop rather than a round trip.
-- [ ] Tapping a grocery row does not show which meals need it, although
-      `sourceRecipeIDs` is on every row. Asked for on 2026-11-01, for later.
+- [x] Press and hold a grocery row to see which meals need it.
 - [ ] Making a list with no meals planned still creates an empty `GroceryList`
       record. It shows as the empty state, so it is invisible, but it is junk.
-- [ ] Nothing shows which meals an item came from, although
-      `sourceRecipeIDs` is stored for it. Section 5.3 asks for that tap.
+- [ ] The pantry cannot be edited from the grocery list, so "we already have
+      this" means leaving the shop screen to go and say so.
 - [ ] The pantry seeding rule changed after the first real list. An install
       from before 2026-11-01 keeps its old all `have` entries, because seeding
       is idempotent. Delete the app and run again to pick up the new defaults.
-- [ ] Nothing in the app can change a pantry status yet, so a staple seeded as
-      `low` can only be hidden by editing the store. The Pantry tab is read
-      only until section 5.4 lands.
+- [x] The pantry is editable: have, low, out, or not tracked, with the search
+      reaching the whole grocery table so anything can be found and tracked.
 - [x] Facet chips, collections, sort orders and favouriting, with the search
       reaching titles, summaries, tags and ingredients. Written 2026-11-02.
 - [ ] Still to come in Phase 1: manual recipe entry, editing an imported

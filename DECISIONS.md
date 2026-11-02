@@ -979,3 +979,29 @@ The answer is stored on the recipe rather than computed, because filtering
 reruns on every keystroke, and the backfill runs at launch over anything that
 has none. 427 recipes were already imported before the classifier existed and
 reimporting them to pick it up would have been a poor trade.
+
+## The pantry has four states, and untracked is not the same as out
+
+Staples not being editable was an omission, not a decision, and the owner was
+right to ask. A status set once at install and never changeable means the list
+leaves out eggs forever whether or not there are any, which is exactly the
+failure section 1a complains about in Mealime, arrived at from the other side.
+
+Each item is now `have`, `low`, `out`, or not tracked at all. The fourth is a
+real state rather than a gap: section 4 excludes `have` and includes `low` and
+`out`, and an item nobody has ever said anything about must not be treated as
+one deliberately marked out, or every list would carry all 395 of them.
+
+The screen shows only what the household tracks, because 395 rows would bury
+the twenty that matter, and the search reaches the whole table so anything can
+be found and then tracked.
+
+## Ticking off keeps the tap, asking what a row is for gets the long press
+
+A shopper ticks items off fifty times in a shop and asks what a row is for
+perhaps twice. The frequent action keeps the cheapest gesture.
+
+The sheet answers from `sourceRecipeIDs`, which has been stored on every row
+since the generator was written and until now was never shown. It also says
+when a row came from the user's own hand, and when it came from a plan that no
+longer exists, because both are real and a blank list would look like a bug.

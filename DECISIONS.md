@@ -901,3 +901,24 @@ retitled recipe a second copy on the next import, and NYT does retitle.
 
 The Mealime side keys on its own id for the same reason and falls back to the
 title only when there is no id at all.
+
+## A recipe's photo travels beside the import file
+
+The app can only read what sits next to the file the user picks, and the CDN
+the Mealime photos came from went away with Mealime, so a url would be a dead
+link. The converter copies one photo per recipe into an `images` folder beside
+the import file, and the importer reads it from there.
+
+One photo, not the four sizes Mealime served. A library screen needs one good
+picture, and 424 of them at every size is a lot to carry into a phone's
+database.
+
+The importer refuses an `imageFile` that starts with a slash or contains `..`.
+An import file is a document from outside the app, and a document does not get
+to name an arbitrary path on the device to read. A missing or unreadable photo
+is not an error either way: the recipe is worth importing without the picture,
+and failing an import over one would be a bad trade.
+
+The empty state is a coloured tile with the recipe's initial, steady per title
+rather than random. The built in recipes have no photos and the NYT ones never
+will, so no picture is the common case and it should not look like a failure.

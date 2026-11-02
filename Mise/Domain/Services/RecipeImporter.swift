@@ -37,6 +37,10 @@ struct RecipeImporter {
         let ingredientLines: [String]
         let steps: [String]
         let imageURLs: [String]?
+        /// A photo next to the import file, as a relative path. The rescued
+        /// Mealime photos are only on disk, and the CDN they came from is gone,
+        /// so a url would be a dead link.
+        let imageFile: String?
         let notes: String?
         let isFavorite: Bool?
         let timesCooked: Int?
@@ -57,6 +61,10 @@ struct RecipeImporter {
         /// Ingredient and step rows left behind by an earlier import, cleared
         /// out. Anything above zero here means something leaked.
         var orphansSwept = 0
+        /// Photos found beside the import file and stored with the recipe.
+        var photosRead = 0
+        /// Paths that tried to point outside the import file's folder.
+        var photosRefused = 0
 
         var total: Int { recipesInserted + recipesUpdated }
     }
@@ -80,6 +88,8 @@ struct RecipeImporter {
 
     let householdID: UUID
     let matcher: CanonicalMatcher
+    /// Where the import file is, so a photo beside it can be found.
+    let alongside: URL?
 
     static func decode(_ data: Data) throws -> Document {
         let document: Document
@@ -104,6 +114,27 @@ struct RecipeImporter {
 
     /// Builds a recipe and everything hanging off it. The caller decides
     /// whether this is an insert or a replacement.
+    /// The photo for a recipe, read from beside the import file.
+    ///
+    /// A missing or unreadable photo is not an error. The recipe is worth
+    /// importing without it, and a failed import over a picture would be a bad
+    /// trade.
+    private func photo(for imported: ImportedRecipe, into report: inout Report) -> Data? {
+        guard let relative = imported.imageFile, !relative.isEmpty, let alongside else { return nil }
+
+        // Only ever beside the file the user picked. A path that climbs out of
+        // that folder is not something an import gets to ask for.
+        guard !relative.hasPrefix("/"), !relative.contains("..") else {
+            report.photosRefused += 1
+            return nil
+        }
+
+        let url = alongside.appendingPathComponent(relative)
+        guard let data = try? Data(contentsOf: url) else { return nil }
+        report.photosRead += 1
+        return data
+    }
+
     func build(_ imported: ImportedRecipe, source: String, into report: inout Report) -> Recipe {
         let seedKey = "import:\(source):\(imported.externalID ?? "title:\(imported.title.lowercased())")"
 
@@ -120,6 +151,7 @@ struct RecipeImporter {
             tags: imported.tags ?? [],
             cookware: imported.cookware ?? [],
             imageURL: imported.imageURLs?.compactMap(URL.init(string:)).first,
+            imageData: photo(for: imported, into: &report),
             isFavorite: imported.isFavorite ?? false,
             timesCooked: max(0, imported.timesCooked ?? 0),
             notes: imported.notes ?? "",

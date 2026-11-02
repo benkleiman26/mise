@@ -13,6 +13,17 @@ struct RecipeDetailView: View {
 
     var body: some View {
         List {
+            if let data = recipe.imageData, let image = UIImage(data: data) {
+                Section {
+                    Image(uiImage: image)
+                        .resizable()
+                        .scaledToFill()
+                        .frame(height: 200)
+                        .clipped()
+                        .listRowInsets(EdgeInsets())
+                }
+            }
+
             Section {
                 if !recipe.summary.isEmpty {
                     Text(recipe.summary)

@@ -59,7 +59,25 @@ The run prints what it skipped and why.
 Servings fall back to four. Cooking time stays zero, which the app reads as
 "not recorded" rather than inventing a number for a screen that says "26 min".
 
-Images are not handled yet. The rescued photos are in `data/mealime/images/`.
+## Photos
+
+The run copies one photo per recipe into `data/mise/images/`, beside the import
+file, and records its name in the recipe. The app reads it from there, because
+it can only see what sits next to the file you pick, and because the CDN those
+photos came from went away with Mealime.
+
+One photo, not four sizes of the same one: `presentation_<id>.jpg` where
+Mealime named them by role, otherwise the largest file in the folder.
+
+`--no-photos` skips it. `--images <folder>` points somewhere else.
+
+**Both the JSON and the `images` folder have to reach the app.** Copy the
+folder as well as the file:
+
+```sh
+APP=$(xcrun simctl get_app_container booted com.benkleiman.mise data)
+cp -R ~/mise/data/mise/mealime_import.json ~/mise/data/mise/images "$APP/Documents/"
+```
 
 ## Importing twice
 

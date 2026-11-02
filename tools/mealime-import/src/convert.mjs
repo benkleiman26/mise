@@ -129,6 +129,9 @@ export function convertRecipe(source, { defaultServings = 4 } = {}) {
 
   return {
     externalID: text(source.mealime_id) || text(source.id) || null,
+    /// Set by the CLI when a rescued photo for this recipe is on disk, as a
+    /// path relative to the import file. The app reads it from alongside.
+    imageFile: null,
     title,
     summary: text(source.description) || text(source.summary),
     sourceURL: text(source.source_url) || text(source.url) || text(source.web_url) || null,

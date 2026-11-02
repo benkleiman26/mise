@@ -88,6 +88,14 @@ struct RecipesView: View {
     }
 
     private func row(_ recipe: Recipe) -> some View {
+        HStack(alignment: .top, spacing: 12) {
+            RecipeThumbnail(recipe: recipe)
+            details(recipe)
+        }
+        .padding(.vertical, 2)
+    }
+
+    private func details(_ recipe: Recipe) -> some View {
         VStack(alignment: .leading, spacing: 4) {
             Text(recipe.title)
                 .font(.headline)
@@ -101,7 +109,6 @@ struct RecipesView: View {
                 .font(.caption)
                 .foregroundStyle(.secondary)
         }
-        .padding(.vertical, 2)
     }
 
     @MainActor

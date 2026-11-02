@@ -1,6 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { convertRecipe, convertLibrary, ingredientLine, isJunk, stepText } from '../src/convert.mjs';
+import { pickPhoto } from '../src/images.mjs';
 
 // The two shapes in the real export: a recipe the owner imported, where the
 // whole line sits in ingredient_name, and one Mealime published, where the
@@ -174,4 +175,31 @@ test('the junk a conversion dropped is counted', () => {
   ]);
   assert.deepEqual(document.recipes[0].ingredientLines, ['1 onion']);
   assert.equal(report.junkDropped, 2);
+});
+
+// Photos: one per recipe, the big one rather than the thumbnail.
+
+test('the presentation photo wins over the thumbnail', () => {
+  const chosen = pickPhoto([
+    { name: 'thumbnail_abc.jpg', size: 9000 },
+    { name: 'presentation_abc.jpg', size: 4000 },
+  ]);
+  assert.equal(chosen.name, 'presentation_abc.jpg', 'even though it is the smaller file');
+});
+
+test('with nothing in the names, the biggest file wins', () => {
+  const chosen = pickPhoto([
+    { name: 'a.jpg', size: 1000 },
+    { name: 'b.jpg', size: 9000 },
+  ]);
+  assert.equal(chosen.name, 'b.jpg');
+});
+
+test('files that are not pictures are never chosen', () => {
+  assert.equal(pickPhoto([{ name: 'notes.txt', size: 99999 }]), null);
+  assert.equal(pickPhoto([]), null);
+  assert.equal(
+    pickPhoto([{ name: 'notes.txt', size: 99999 }, { name: 'a.png', size: 10 }]).name,
+    'a.png'
+  );
 });

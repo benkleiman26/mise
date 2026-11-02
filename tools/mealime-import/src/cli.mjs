@@ -11,6 +11,7 @@ import { readdir, readFile, mkdir, writeFile } from 'node:fs/promises';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { convertLibrary } from './convert.mjs';
+import { attachPhotos } from './images.mjs';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const repoRoot = resolve(here, '..', '..', '..');
@@ -51,6 +52,14 @@ for (const name of names) {
 
 const { document, report } = convertLibrary(sources, { defaultServings: servings });
 
+// The rescued photos, one per recipe, copied next to the import file so the
+// app can read them from alongside it. --no-photos skips the whole thing.
+let photos = null;
+if (!process.argv.includes('--no-photos')) {
+  const imagesDir = resolve(option('--images', join(repoRoot, 'data', 'mealime', 'images')));
+  photos = await attachPhotos(document.recipes, { imagesDir, outDir: dirname(outFile) });
+}
+
 await mkdir(dirname(outFile), { recursive: true });
 await writeFile(outFile, `${JSON.stringify(document, null, 2)}\n`, 'utf8');
 
@@ -63,6 +72,11 @@ if (report.junkDropped) console.log(`  ${report.junkDropped} page furniture line
 
 for (const { file, why } of [...unreadable, ...report.skipped]) {
   console.log(`  skipped ${file}: ${why}`);
+}
+
+if (photos) {
+  const mb = (photos.bytes / 1024 / 1024).toFixed(1);
+  console.log(`Photos: ${photos.copied} copied (${mb} MB), ${photos.missing} recipes have none`);
 }
 
 console.log(`\nWrote ${outFile}`);

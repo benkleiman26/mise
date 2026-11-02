@@ -199,8 +199,15 @@ green on the Mac: 70 tests, no failures, up from 61 before `ListGenerator`.
 - [x] **NYT import** is built: `tools/nyt-export/browser/fetch-recipes.js`
       fetches the pages in the owner's browser, `tools/nyt-import` reshapes
       what it downloads. 10 tests. Not yet run against the real 169.
-- [ ] Imported recipes have no photos. 424 are in `data/mealime/images/`,
-      named by recipe id, and `Recipe.imageData` is ready for them.
+- [x] Imported Mealime recipes carry their rescued photo, copied next to the
+      import file and stored on the recipe. Written 2026-11-02, not yet run
+      against the real 424.
+- [ ] NYT recipes have no photos and will not get them: the pictures are the
+      Times's and the importer records their urls without downloading them.
+      The placeholder covers it.
+- [ ] Photos go into the store at whatever size Mealime served, under
+      `.externalStorage`. If the database gets uncomfortable, downscaling to
+      something like 800px on the long edge during conversion is the fix.
 - [x] An imported recipe with no cooking time no longer shows "0 min". 159 of
       the owner's 213 have none, because Mealime leaves it null on a recipe you
       typed in yourself. The library and plan rows leave the time out and the

@@ -102,7 +102,7 @@ final class ImportStore {
             let needsScope = url.startAccessingSecurityScopedResource()
             defer { if needsScope { url.stopAccessingSecurityScopedResource() } }
 
-            report = try run(on: try Data(contentsOf: url))
+            report = try run(on: try Data(contentsOf: url), alongside: url.deletingLastPathComponent())
             problem = nil
         } catch {
             report = nil
@@ -112,7 +112,7 @@ final class ImportStore {
 
     // MARK: - Private
 
-    private func run(on data: Data) throws -> RecipeImporter.Report {
+    private func run(on data: Data, alongside: URL) throws -> RecipeImporter.Report {
         guard let household = try households.all().first else {
             throw RecipeImporter.ImportError.noHousehold
         }
@@ -122,7 +122,8 @@ final class ImportStore {
 
         let importer = RecipeImporter(
             householdID: household.id,
-            matcher: CanonicalMatcher(items: try canonicalItems.all().map(CanonicalCandidate.init))
+            matcher: CanonicalMatcher(items: try canonicalItems.all().map(CanonicalCandidate.init)),
+            alongside: alongside
         )
 
         var report = RecipeImporter.Report()

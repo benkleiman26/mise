@@ -14,7 +14,7 @@ final class RecipeImporterTests: XCTestCase {
     ]
 
     private var importer: RecipeImporter {
-        RecipeImporter(householdID: UUID(), matcher: CanonicalMatcher(items: Self.candidates))
+        RecipeImporter(householdID: UUID(), matcher: CanonicalMatcher(items: Self.candidates), alongside: nil)
     }
 
     private func document(_ recipes: String) -> Data {
@@ -179,5 +179,73 @@ final class RecipeImporterTests: XCTestCase {
 
         XCTAssertEqual(recipe.baseServings, 1, "dividing by zero servings would take the list with it")
         XCTAssertEqual(recipe.timesCooked, 0)
+    }
+
+    // MARK: - Photos
+
+    func testAPhotoBesideTheFileIsStoredWithTheRecipe() throws {
+        let folder = FileManager.default.temporaryDirectory
+            .appendingPathComponent(UUID().uuidString, isDirectory: true)
+        try FileManager.default.createDirectory(at: folder.appendingPathComponent("images"), withIntermediateDirectories: true)
+        defer { try? FileManager.default.removeItem(at: folder) }
+
+        let bytes = Data([0xFF, 0xD8, 0xFF, 0xE0, 0x00, 0x10])
+        try bytes.write(to: folder.appendingPathComponent("images/abc.jpg"))
+
+        let data = document("""
+        { "externalID": "abc", "title": "With a photo", "imageFile": "images/abc.jpg",
+          "ingredientLines": ["1 cucumber"], "steps": [] }
+        """)
+        let parsed = try RecipeImporter.decode(data)
+        var report = RecipeImporter.Report()
+        let importer = RecipeImporter(
+            householdID: UUID(),
+            matcher: CanonicalMatcher(items: Self.candidates),
+            alongside: folder
+        )
+
+        let recipe = importer.build(parsed.recipes[0], source: "mealime", into: &report)
+        XCTAssertEqual(recipe.imageData, bytes)
+        XCTAssertEqual(report.photosRead, 1)
+    }
+
+    func testAMissingPhotoImportsTheRecipeAnyway() throws {
+        let data = document("""
+        { "externalID": "abc", "title": "No photo on disk", "imageFile": "images/gone.jpg",
+          "ingredientLines": ["1 cucumber"], "steps": [] }
+        """)
+        let parsed = try RecipeImporter.decode(data)
+        var report = RecipeImporter.Report()
+        let importer = RecipeImporter(
+            householdID: UUID(),
+            matcher: CanonicalMatcher(items: Self.candidates),
+            alongside: FileManager.default.temporaryDirectory
+        )
+
+        let recipe = importer.build(parsed.recipes[0], source: "mealime", into: &report)
+        XCTAssertEqual(recipe.title, "No photo on disk", "the recipe is worth having without the picture")
+        XCTAssertNil(recipe.imageData)
+        XCTAssertEqual(report.photosRead, 0)
+    }
+
+    /// An import file is not allowed to read whatever it likes off the disk.
+    func testAPhotoPathThatClimbsOutOfTheFolderIsRefused() throws {
+        for path in ["../secrets.jpg", "/etc/passwd", "images/../../x.jpg"] {
+            let data = document("""
+            { "externalID": "abc", "title": "Nosy", "imageFile": "\(path)",
+              "ingredientLines": ["1 cucumber"], "steps": [] }
+            """)
+            let parsed = try RecipeImporter.decode(data)
+            var report = RecipeImporter.Report()
+            let importer = RecipeImporter(
+                householdID: UUID(),
+                matcher: CanonicalMatcher(items: Self.candidates),
+                alongside: FileManager.default.temporaryDirectory
+            )
+
+            let recipe = importer.build(parsed.recipes[0], source: "mealime", into: &report)
+            XCTAssertNil(recipe.imageData, "\(path) should have been refused")
+            XCTAssertEqual(report.photosRefused, 1)
+        }
     }
 }

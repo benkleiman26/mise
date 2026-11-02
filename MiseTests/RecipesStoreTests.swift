@@ -194,4 +194,66 @@ final class RecipesStoreTests: XCTestCase {
         store.toggleFavourite(recipe)
         XCTAssertFalse(try XCTUnwrap(repository.find(id: recipe.id)).isFavorite)
     }
+
+    // MARK: - Correcting what a recipe makes
+
+    /// Mealime leaves the serving count empty on a recipe you typed in, and
+    /// 159 of the owner's 213 arrived that way and were given four. Everything
+    /// downstream scales off that number, so a wrong one scales the error.
+    func testCorrectingTheServingCountLeavesTheAmountsAlone() throws {
+        let recipe = add("Soup for two, labelled four")
+        let ingredient = Ingredient(householdID: householdID, position: 0, name: "stock", quantity: 2, unit: .cup)
+        ingredient.recipe = recipe
+        recipe.ingredients.append(ingredient)
+        try repository.save()
+
+        let detail = RecipeDetailStore(recipes: repository)
+        detail.setBaseServings(2, on: recipe)
+
+        let saved = try XCTUnwrap(repository.find(id: recipe.id))
+        XCTAssertEqual(saved.baseServings, 2)
+        XCTAssertEqual(saved.orderedIngredients.first?.quantity, 2,
+                       "the recipe still says two cups; only what that feeds has changed")
+    }
+
+    func testANonsenseServingCountIsRefused() throws {
+        let recipe = add("A")
+        let detail = RecipeDetailStore(recipes: repository)
+
+        detail.setBaseServings(0, on: recipe)
+        XCTAssertEqual(try XCTUnwrap(repository.find(id: recipe.id)).baseServings, 4,
+                       "dividing by zero servings would take the grocery list with it")
+
+        detail.setBaseServings(-3, on: recipe)
+        XCTAssertEqual(try XCTUnwrap(repository.find(id: recipe.id)).baseServings, 4)
+    }
+
+    /// The whole point of correcting it: the plan scales from this number, and
+    /// the grocery list scales from the plan.
+    func testCorrectingTheBaseChangesWhatTheListAsksFor() throws {
+        let recipe = add("Stew")
+        let ingredient = Ingredient(householdID: householdID, position: 0, name: "beef", quantity: 2, unit: .lb)
+        ingredient.recipe = recipe
+        recipe.ingredients.append(ingredient)
+        try repository.save()
+
+        func poundsFor(_ servings: Int) -> Double {
+            let input = RecipeInput(
+                id: recipe.id,
+                title: recipe.title,
+                baseServings: recipe.baseServings,
+                ingredients: [IngredientInput(name: "beef", quantity: 2, unit: Mise.Unit.lb)]
+            )
+            let generated = ListGenerator(matcher: CanonicalMatcher(items: []))
+                .generate(plan: [PlannedMealInput(recipe: input, servings: servings)])
+            return generated.items.first?.quantities.first?.quantity ?? 0
+        }
+
+        // Labelled four, cooking for four: as written.
+        XCTAssertEqual(poundsFor(4), 2, accuracy: 0.001)
+
+        // It actually only feeds two, so cooking for four needs double.
+        RecipeDetailStore(recipes: repository).setBaseServings(2, on: recipe)
+        XCTAssertEqual(poundsFor(4), 4, accuracy: 0.001)
+    }
 }

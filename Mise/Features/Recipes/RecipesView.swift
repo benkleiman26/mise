@@ -72,7 +72,7 @@ struct RecipesView: View {
 
                 ForEach(shown, id: \.id) { recipe in
                     NavigationLink {
-                        RecipeDetailView(recipe: recipe, onAdd: { add(recipe) })
+                        RecipeDetailView(recipe: recipe, onAdd: { add(recipe, servings: $0) })
                     } label: {
                         row(recipe)
                     }
@@ -287,8 +287,8 @@ struct RecipesView: View {
     }
 
     @MainActor
-    private func add(_ recipe: Recipe) {
-        plan?.add(recipe)
+    private func add(_ recipe: Recipe, servings: Int? = nil) {
+        plan?.add(recipe, servings: servings)
         justAdded = recipe.title
 
         let title = recipe.title

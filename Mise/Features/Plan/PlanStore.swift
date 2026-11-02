@@ -53,7 +53,10 @@ final class PlanStore {
         }
     }
 
-    func add(_ recipe: Recipe) {
+    /// `servings` is what the cook asked for on the recipe screen. Without one
+    /// the household default is used, which is what the plus button on the
+    /// library row means.
+    func add(_ recipe: Recipe, servings: Int? = nil) {
         do {
             let plan = try currentPlan()
             // Adding the same dinner twice is a real thing people do, so this
@@ -62,7 +65,7 @@ final class PlanStore {
                 householdID: plan.householdID,
                 position: (plan.entries.map(\.position).max() ?? -1) + 1,
                 recipeID: recipe.id,
-                servings: try defaultServings()
+                servings: servings ?? (try defaultServings())
             )
             meal.plan = plan
             plan.entries.append(meal)

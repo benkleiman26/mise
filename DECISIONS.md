@@ -1005,3 +1005,32 @@ The sheet answers from `sourceRecipeIDs`, which has been stored on every row
 since the generator was written and until now was never shown. It also says
 when a row came from the user's own hand, and when it came from a plan that no
 longer exists, because both are real and a blank list would look like a bug.
+
+## A recipe says how many it feeds, and that is correctable without rewriting it
+
+Mealime leaves the serving count empty on a recipe you typed in yourself, and
+159 of the owner's 213 arrived that way and were given four. Four is a
+reasonable guess, and everything downstream scales off it: the plan scales the
+recipe, and the grocery list scales the plan. A wrong base does not just mislead
+on one screen, it scales the error into the shop.
+
+So the recipe screen does two separate things, and keeping them separate is the
+point.
+
+**Cooking for N** scales what is on screen. It is a view, and it carries
+through to the plan when the recipe is added, so "add this for two" works from
+one control.
+
+**"The amounts are not for four"** corrects the recipe's own number and leaves
+every quantity exactly as written. It is a correction, not a conversion: the
+text still says two cups of stock, and what has changed is how many people two
+cups of stock feeds.
+
+Rewriting the ingredients to match a new serving count would be the other
+option and it is worse. The imported text is the one thing in a rescued recipe
+that is known to be right, and normalising it would quietly replace what the
+author wrote with arithmetic.
+
+The footer says which of the two is in play, including that the method still
+describes the original number, because a scaled ingredient list next to an
+unscaled method is a real trap and the screen should admit it.

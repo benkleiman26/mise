@@ -211,8 +211,15 @@ green on the Mac: 70 tests, no failures, up from 61 before `ListGenerator`.
       the owner's 213 have none, because Mealime leaves it null on a recipe you
       typed in yourself. The library and plan rows leave the time out and the
       detail screen says it was not recorded.
-- [ ] Nothing can edit a recipe, so a missing cooking time cannot be filled in.
-      Manual entry and editing are the rest of Phase 1.
+- [x] A recipe's serving count is correctable, and the recipe screen scales to
+      however many are eating.
+- [ ] Nothing else about a recipe can be edited: no fixing a missing cooking
+      time, a wrong title, or an ingredient the parser read badly. Manual entry
+      and full editing are the rest of Phase 1.
+- [ ] Scaling does not touch the method, so step 3 still says "add two cups"
+      when the ingredient list says four. The footer admits it. Rewriting
+      numbers inside prose is its own problem and probably wants the amounts
+      marked up at import rather than found by regex later.
 - [x] The user can categorise an unmatched ingredient, and it applies to every
       recipe already waiting on that name. Section 5.3 rule 2.
 - [x] Web page furniture the Mealime "import from a link" captured is dropped

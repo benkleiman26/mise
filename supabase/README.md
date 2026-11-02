@@ -1,14 +1,22 @@
 # The sync server
 
-One Supabase project holds one household's records. Free tier is ample: this is
-two phones and a few thousand small rows.
+One Supabase project holds one household's records. This is two phones and a
+few thousand small rows, so the free tier is ample.
+
+Every table, index and function is prefixed `mise_`, so it does **not** need a
+project of its own. Free plans allow two projects per organisation, and sharing
+a database with an unrelated app is fine here: the names cannot collide and row
+level security means neither app can read the other's rows.
 
 ## Setting it up
 
-1. <https://supabase.com/dashboard> → **New project**. Name it `mise`, pick a
-   region near you, and save the database password somewhere.
+1. Use a project you already have, or make a new one at
+   <https://supabase.com/dashboard>. If you are out of free projects, either
+   reuse one, or create a second **organisation**, which gets its own free
+   allowance.
 2. **SQL Editor → New query**, paste the whole of [`schema.sql`](schema.sql),
-   **Run**. It is safe to run again later.
+   **Run**. It is safe to run again later, and safe to run in a project that is
+   already being used.
 3. **Project Settings → API**. You need the **Project URL** and the
    **anon public** key.
 4. Put them in `Secrets.xcconfig` at the repository root, which git ignores:

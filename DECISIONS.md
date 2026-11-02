@@ -1136,3 +1136,18 @@ is acceptable here because the records are small and separate. Two people
 ticking different items off a list never collide, and losing the earlier of two
 edits made to the same recipe seconds apart is a fair trade against the
 machinery that would avoid it.
+
+## The sync tables are prefixed, so Mise does not need a project of its own
+
+The owner was out of free Supabase projects, which are limited per
+organisation. Rather than ask him to pay, delete something, or sign up again,
+every table, index and function is named `mise_*`.
+
+Sharing a Postgres database between two unrelated applications is usually a bad
+idea, because the blast radius of a migration grows and the names drift towards
+collision. Here it is fine and the reasons are specific: there are three tables
+with one prefix, nothing else in the database is touched, and row level
+security means neither application can read the other's rows even by accident.
+
+The alternative, a project per app, is cleaner and costs either money or
+another signup. This costs a prefix.

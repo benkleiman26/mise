@@ -3,6 +3,12 @@
 -- Run this once in the Supabase SQL editor:
 --   Dashboard -> SQL Editor -> New query -> paste -> Run
 --
+-- Every table, index and function here is prefixed `mise_`, so this can live
+-- inside a Supabase project that is already being used for something else.
+-- Free plans allow two projects per organisation and the owner was out of
+-- them; sharing a database with an unrelated app is fine when the names cannot
+-- collide and row level security is on, which it is.
+--
 -- The shape is deliberately boring. Every table is the same four columns plus
 -- a JSON blob, because the two phones in a household will not be running the
 -- same version of the app: one updates on Tuesday and the other on Friday. A
@@ -20,17 +26,17 @@
 create extension if not exists "pgcrypto";
 
 -- Who is in which household. A person is in exactly one, in this version.
-create table if not exists household_members (
+create table if not exists mise_household_members (
   household_id  uuid        not null,
   user_id       uuid        not null references auth.users(id) on delete cascade,
   joined_at     timestamptz not null default now(),
   primary key (household_id, user_id)
 );
 
-create index if not exists household_members_user on household_members(user_id);
+create index if not exists mise_household_members_user on mise_household_members(user_id);
 
 -- Every synced record, whatever table it came from.
-create table if not exists records (
+create table if not exists mise_records (
   household_id  uuid        not null,
   entity        text        not null,
   id            uuid        not null,
@@ -44,10 +50,10 @@ create table if not exists records (
   primary key (household_id, entity, id)
 );
 
-create index if not exists records_cursor on records(household_id, server_at);
+create index if not exists mise_records_cursor on mise_records(household_id, server_at);
 
 -- Deletions, because the absence of a row is not information.
-create table if not exists deletions (
+create table if not exists mise_deletions (
   household_id  uuid        not null,
   entity        text        not null,
   record_id     uuid        not null,
@@ -57,16 +63,16 @@ create table if not exists deletions (
   primary key (household_id, entity, record_id)
 );
 
-create index if not exists deletions_cursor on deletions(household_id, server_at);
+create index if not exists mise_deletions_cursor on mise_deletions(household_id, server_at);
 
 -- Row level security. Without this every signed in user of every Supabase
 -- project could read this household's data, and the anon key is published in
 -- the app.
-alter table household_members enable row level security;
-alter table records           enable row level security;
-alter table deletions         enable row level security;
+alter table mise_household_members enable row level security;
+alter table mise_records           enable row level security;
+alter table mise_deletions         enable row level security;
 
-create or replace function is_member_of(target uuid)
+create or replace function mise_is_member_of(target uuid)
 returns boolean
 language sql
 security definer
@@ -74,49 +80,49 @@ set search_path = public
 stable
 as $$
   select exists (
-    select 1 from household_members
+    select 1 from mise_household_members
     where household_id = target and user_id = auth.uid()
   );
 $$;
 
-drop policy if exists "members read their household" on household_members;
-create policy "members read their household" on household_members
-  for select using (is_member_of(household_id));
+drop policy if exists "members read their household" on mise_household_members;
+create policy "members read their household" on mise_household_members
+  for select using (mise_is_member_of(household_id));
 
-drop policy if exists "a person joins a household" on household_members;
-create policy "a person joins a household" on household_members
+drop policy if exists "a person joins a household" on mise_household_members;
+create policy "a person joins a household" on mise_household_members
   for insert with check (user_id = auth.uid());
 
-drop policy if exists "members read records" on records;
-create policy "members read records" on records
-  for select using (is_member_of(household_id));
+drop policy if exists "members read records" on mise_records;
+create policy "members read records" on mise_records
+  for select using (mise_is_member_of(household_id));
 
-drop policy if exists "members write records" on records;
-create policy "members write records" on records
-  for insert with check (is_member_of(household_id));
+drop policy if exists "members write records" on mise_records;
+create policy "members write records" on mise_records
+  for insert with check (mise_is_member_of(household_id));
 
-drop policy if exists "members update records" on records;
-create policy "members update records" on records
-  for update using (is_member_of(household_id)) with check (is_member_of(household_id));
+drop policy if exists "members update records" on mise_records;
+create policy "members update records" on mise_records
+  for update using (mise_is_member_of(household_id)) with check (mise_is_member_of(household_id));
 
-drop policy if exists "members read deletions" on deletions;
-create policy "members read deletions" on deletions
-  for select using (is_member_of(household_id));
+drop policy if exists "members read deletions" on mise_deletions;
+create policy "members read deletions" on mise_deletions
+  for select using (mise_is_member_of(household_id));
 
-drop policy if exists "members write deletions" on deletions;
-create policy "members write deletions" on deletions
-  for insert with check (is_member_of(household_id));
+drop policy if exists "members write deletions" on mise_deletions;
+create policy "members write deletions" on mise_deletions
+  for insert with check (mise_is_member_of(household_id));
 
-drop policy if exists "members update deletions" on deletions;
-create policy "members update deletions" on deletions
-  for update using (is_member_of(household_id)) with check (is_member_of(household_id));
+drop policy if exists "members update deletions" on mise_deletions;
+create policy "members update deletions" on mise_deletions
+  for update using (mise_is_member_of(household_id)) with check (mise_is_member_of(household_id));
 
 -- Upsert that refuses to go backwards.
 --
 -- Two phones pushing the same record out of order must not leave the older
 -- copy on top, and a retry of a push that already succeeded must not undo a
 -- newer edit. The where clause is what makes a push safe to repeat.
-create or replace function push_records(payload jsonb)
+create or replace function mise_push_records(payload jsonb)
 returns timestamptz
 language plpgsql
 security invoker
@@ -124,7 +130,7 @@ as $$
 declare
   now_at timestamptz := now();
 begin
-  insert into records (household_id, entity, id, fields, updated_at, server_at, device_id)
+  insert into mise_records (household_id, entity, id, fields, updated_at, server_at, device_id)
   select
     (r->>'household_id')::uuid,
     r->>'entity',
@@ -139,13 +145,13 @@ begin
         updated_at = excluded.updated_at,
         server_at  = excluded.server_at,
         device_id  = excluded.device_id
-    where records.updated_at < excluded.updated_at;
+    where mise_records.updated_at < excluded.updated_at;
 
   return now_at;
 end;
 $$;
 
-create or replace function push_deletions(payload jsonb)
+create or replace function mise_push_deletions(payload jsonb)
 returns timestamptz
 language plpgsql
 security invoker
@@ -153,7 +159,7 @@ as $$
 declare
   now_at timestamptz := now();
 begin
-  insert into deletions (household_id, entity, record_id, deleted_at, server_at, device_id)
+  insert into mise_deletions (household_id, entity, record_id, deleted_at, server_at, device_id)
   select
     (d->>'household_id')::uuid,
     d->>'entity',
@@ -165,10 +171,10 @@ begin
   on conflict (household_id, entity, record_id) do update
     set deleted_at = excluded.deleted_at,
         server_at  = excluded.server_at
-    where deletions.deleted_at < excluded.deleted_at;
+    where mise_deletions.deleted_at < excluded.deleted_at;
 
   -- A record that has been deleted does not need keeping.
-  delete from records r
+  delete from mise_records r
   using jsonb_array_elements(payload) as d
   where r.household_id = (d->>'household_id')::uuid
     and r.entity       = d->>'entity'

@@ -1046,3 +1046,30 @@ a missing setting.
 It also means `xcodebuild archive` works from the command line without Xcode
 being open, which is what makes a TestFlight upload a command rather than a
 sequence of clicks to remember.
+
+## Paste a link reads the published recipe, and never scrapes the page
+
+Asked for on 2026-11-02: the thing Mealime did and the owner used most.
+
+Almost every recipe site publishes schema.org Recipe as JSON-LD inside the
+page, because Google requires it for the rich result. That is the contract
+this leans on, and it is the same one the NYT importer uses.
+
+Scraping the rendered page as a fallback is deliberately not attempted. It
+would always produce something, and what it produces looks like a recipe and
+is full of navigation text. The owner's Mealime library carries twenty lines
+of exactly that, scraped by Mealime's own link importer, and the junk filter
+in `tools/mealime-import` exists because of it. "No recipe on that page" is a
+better answer than a plausible wrong one.
+
+The screen shows what it found before saving: title, servings, every ingredient
+line, every step. A bad read is obvious there and invisible once it is in the
+library.
+
+Saving goes through `RecipeImporter`, the same path the Mealime and NYT files
+take, so a pasted recipe is parsed, matched to grocery items and categorised
+exactly like every other recipe. A second route into the store would be a
+second set of answers to the same questions.
+
+Keyed on the url, so pasting the same link twice updates rather than
+duplicates.

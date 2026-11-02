@@ -7,6 +7,7 @@ struct RecipesView: View {
     @State private var plan: PlanStore?
     @State private var justAdded: String?
     @State private var isPickingTags = false
+    @State private var isAddingByLink = false
 
     var body: some View {
         NavigationStack {
@@ -23,11 +24,21 @@ struct RecipesView: View {
             }
             .navigationTitle("Recipes")
             .toolbar {
+                ToolbarItem(placement: .topBarLeading) {
+                    Button {
+                        isAddingByLink = true
+                    } label: {
+                        Label("Add from a link", systemImage: "plus")
+                    }
+                }
                 if let store {
                     ToolbarItem(placement: .topBarTrailing) {
                         sortMenu(store)
                     }
                 }
+            }
+            .sheet(isPresented: $isAddingByLink, onDismiss: { store?.load() }) {
+                AddByLinkView()
             }
         }
         .task {

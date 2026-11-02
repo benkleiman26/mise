@@ -248,9 +248,18 @@ green on the Mac: 70 tests, no failures, up from 61 before `ListGenerator`.
       reaching the whole grocery table so anything can be found and tracked.
 - [x] Facet chips, collections, sort orders and favouriting, with the search
       reaching titles, summaries, tags and ingredients. Written 2026-11-02.
-- [ ] Still to come in Phase 1: manual recipe entry, editing an imported
-      recipe, the paste a link flow, and smart lists that save a set of
-      filters under a name.
+- [x] Paste a link, reading the recipe the site publishes rather than scraping
+      the page.
+- [ ] Still to come in Phase 1: writing a recipe down by hand, editing an
+      imported one beyond its serving count, and smart lists that save a set
+      of filters under a name.
+- [ ] A link import does not keep the photo. The url is read and recorded but
+      nothing downloads it, so a pasted recipe has no picture. The file
+      importers do download, so the machinery exists.
+- [ ] A site that renders its recipe client side, or hides it behind a sign
+      in, cannot be read. That is most newspaper sites. There is no fallback
+      and deliberately so, but the error should probably suggest the Share
+      Extension once Phase 4 builds one.
 - [ ] Dish types cannot be corrected by hand. When the classifier gets one
       wrong the only fix is a rule change and a relaunch. Editing a recipe
       should let the cook set them, and that edit has to survive the backfill,

@@ -15,6 +15,15 @@ final class ImportStore {
     private(set) var isWorking = false
     private(set) var report: RecipeImporter.Report?
     private(set) var problem: String?
+    /// Import files sitting in the app's own Documents folder, newest first.
+    private(set) var waiting: [WaitingFile] = []
+
+    struct WaitingFile: Identifiable, Equatable {
+        let url: URL
+        let name: String
+        let sizeText: String
+        var id: URL { url }
+    }
 
     init(
         recipes: any RecipeRepository,
@@ -26,12 +35,69 @@ final class ImportStore {
         self.households = households
     }
 
-    /// `url` comes from a file picker, so it is security scoped and has to be
-    /// opened before it can be read.
-    func importRecipes(from url: URL) {
-        isWorking = true
-        defer { isWorking = false }
+    /// The app's own Documents folder, which is where a file copied in with
+    /// `xcrun simctl get_app_container` lands, and where a file dropped into
+    /// Mise's folder from a Mac lands on a real phone.
+    ///
+    /// Looking here is not a shortcut around the file picker. Files would not
+    /// show the folder at all on 2026-11-02, and a working import is worth more
+    /// than a tidy one. The picker stays for everything outside this folder.
+    static var documentsDirectory: URL? {
+        try? FileManager.default.url(
+            for: .documentDirectory,
+            in: .userDomainMask,
+            appropriateFor: nil,
+            create: true
+        )
+    }
 
+    func findWaitingFiles() {
+        guard let directory = Self.documentsDirectory else {
+            waiting = []
+            return
+        }
+        let contents = (try? FileManager.default.contentsOfDirectory(
+            at: directory,
+            includingPropertiesForKeys: [.fileSizeKey, .contentModificationDateKey]
+        )) ?? []
+
+        waiting = contents
+            .filter { $0.pathExtension.lowercased() == "json" }
+            .sorted { left, right in
+                let a = (try? left.resourceValues(forKeys: [.contentModificationDateKey]).contentModificationDate) ?? .distantPast
+                let b = (try? right.resourceValues(forKeys: [.contentModificationDateKey]).contentModificationDate) ?? .distantPast
+                return a > b
+            }
+            .map { url in
+                let bytes = (try? url.resourceValues(forKeys: [.fileSizeKey]).fileSize) ?? 0
+                return WaitingFile(
+                    url: url,
+                    name: url.lastPathComponent,
+                    sizeText: ByteCountFormatter.string(fromByteCount: Int64(bytes), countStyle: .file)
+                )
+            }
+    }
+
+    /// `url` may come from a file picker, in which case it is security scoped
+    /// and has to be opened before it can be read. A file in our own Documents
+    /// folder is not, and `startAccessingSecurityScopedResource` says so by
+    /// returning false, which is why the result is checked rather than assumed.
+    func importRecipes(from url: URL) {
+        guard !isWorking else { return }
+        isWorking = true
+
+        // 2436 ingredient lines through the parser and the matcher takes a few
+        // seconds, and it has to run on the main actor because the store does.
+        // Yielding once first lets the row redraw as "Importing" rather than
+        // the app looking frozen with no explanation.
+        Task {
+            await Task.yield()
+            work(on: url)
+            isWorking = false
+        }
+    }
+
+    private func work(on url: URL) {
         do {
             let needsScope = url.startAccessingSecurityScopedResource()
             defer { if needsScope { url.stopAccessingSecurityScopedResource() } }

@@ -82,6 +82,15 @@ struct SettingsView: View {
                     households: container.households
                 )
             }
+            importer?.findWaitingFiles()
+            store?.load()
+        }
+        .refreshable {
+            importer?.findWaitingFiles()
+        }
+        // The import runs asynchronously, so the library counts are reloaded
+        // when its report lands rather than right after the button is pressed.
+        .onChange(of: importer?.report) { _, _ in
             store?.load()
         }
         .fileImporter(
@@ -93,7 +102,6 @@ struct SettingsView: View {
             case .success(let urls):
                 guard let url = urls.first else { return }
                 importer?.importRecipes(from: url)
-                store?.load()
             case .failure(let error):
                 // The picker itself failed, which is not the same as the file
                 // being wrong, so it is worth saying separately.
@@ -108,13 +116,29 @@ struct SettingsView: View {
     @ViewBuilder
     private var importSection: some View {
         Section {
+            // Anything sitting in Mise's own folder, offered by name. One tap,
+            // no picker. On a phone that folder is reachable from Finder, Mail
+            // or Messages; on a simulator it is one copy command away.
+            ForEach(importer?.waiting ?? []) { file in
+                Button {
+                    importer?.importRecipes(from: file.url)
+                } label: {
+                    LabeledContent {
+                        Text(file.sizeText)
+                    } label: {
+                        Label(file.name, systemImage: "tray.and.arrow.down")
+                    }
+                }
+                .disabled(importer?.isWorking == true)
+            }
+
             Button {
                 isPickingFile = true
             } label: {
                 if importer?.isWorking == true {
                     Label("Importing", systemImage: "hourglass")
                 } else {
-                    Label("Import recipes from a file", systemImage: "square.and.arrow.down")
+                    Label("Find a file somewhere else", systemImage: "folder")
                 }
             }
             .disabled(importer?.isWorking == true)
@@ -143,8 +167,16 @@ struct SettingsView: View {
         } header: {
             Text("Import")
         } footer: {
-            Text("Pick a Mise recipe import file. Importing the same file again replaces those recipes rather than adding a second copy of them.")
+            Text(importFooter)
         }
+    }
+
+    private var importFooter: String {
+        let waiting = importer?.waiting.count ?? 0
+        if waiting == 0 {
+            return "Put a Mise recipe import file in Mise's folder and it will be offered here. Importing the same file again replaces those recipes rather than adding a second copy."
+        }
+        return "Importing the same file again replaces those recipes rather than adding a second copy of them."
     }
 
     private func unmatchedList(_ names: [String]) -> some View {

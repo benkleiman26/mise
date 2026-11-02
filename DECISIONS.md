@@ -1034,3 +1034,15 @@ author wrote with arithmetic.
 The footer says which of the two is in play, including that the method still
 describes the original number, because a scaled ingredient list next to an
 unscaled method is a real trap and the screen should admit it.
+
+## Signing is in the project file, not in each person's Xcode
+
+Team `NDM99C66D7` and automatic signing are committed. The alternative, picking
+the team in Xcode's UI, works on one machine and is invisible: nothing in the
+repository records what a build is supposed to be signed as, and the first
+build from a different machine fails in a way that looks like a bug rather than
+a missing setting.
+
+It also means `xcodebuild archive` works from the command line without Xcode
+being open, which is what makes a TestFlight upload a command rather than a
+sequence of clicks to remember.

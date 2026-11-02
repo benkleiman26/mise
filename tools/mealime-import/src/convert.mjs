@@ -21,6 +21,40 @@ const positiveInt = (value) => {
 };
 
 /**
+ * Lines that are page furniture rather than food.
+ *
+ * Mealime's "import from a link" captured whatever the page had where the
+ * ingredients were, so the owner's library contains "Recent Posts",
+ * "^ Back to Top", "Pinch of Yum logo", "5 (from 113 ratings)" and a raw
+ * anchor tag. Twenty or so lines out of 2436.
+ *
+ * Every rule here is narrow on purpose. A junk line that gets through costs
+ * one odd row in the Other aisle. A real ingredient that gets dropped means
+ * standing in the kitchen without it, so the bar for dropping is high.
+ */
+const JUNK = [
+  /^<[a-z/!]/i,                               // a raw html tag
+  /^\^?\s*back to top/i,
+  /^recent posts?$/i,
+  /\blogo$/i,
+  /^mobile search/i,
+  /^\d+\s*\(from [\d,]+ ratings?\)$/i,        // a star rating widget
+  /^(toppings?|remaining ingredients|baked goods|travel|pack for lunch)\s*:?\s*$/i,
+  /^ingredients?\d/i,                         // "Ingredients2 1/2 cups ..."
+  /^ingredients .*\b1x2x3x/i,                 // a recipe card's scaling control
+  /▢/,                                        // a recipe card checkbox glyph
+  /^(february|january|march|april|may|june|july|august|september|october|november|december)\s+\d+$/i,
+];
+
+export function isJunk(line) {
+  const text = String(line ?? '').trim();
+  if (!text) return true;
+  // Nothing to shop for without a letter in it.
+  if (!/[a-z]/i.test(text)) return true;
+  return JUNK.some((pattern) => pattern.test(text));
+}
+
+/**
  * One ingredient line, as written.
  *
  * Most of this library was imported by the owner rather than published by
@@ -70,7 +104,7 @@ export function convertRecipe(source, { defaultServings = 4 } = {}) {
   const ingredientLines = (Array.isArray(source.line_items) ? source.line_items : [])
     .map(ingredientLine)
     .map((line) => line.trim())
-    .filter(Boolean);
+    .filter((line) => line && !isJunk(line));
 
   const steps = (Array.isArray(source.instructions) ? source.instructions : [])
     .slice()
@@ -121,9 +155,14 @@ export function convertLibrary(sources, options = {}) {
   const recipes = [];
   const skipped = [];
   const seen = new Set();
+  let junkDropped = 0;
 
   for (const { file, recipe } of sources) {
+    const before = (Array.isArray(recipe?.line_items) ? recipe.line_items : [])
+      .map(ingredientLine)
+      .filter((line) => line.trim()).length;
     const converted = convertRecipe(recipe, options);
+    if (converted) junkDropped += before - converted.ingredientLines.length;
     if (!converted) {
       skipped.push({ file, why: 'no title, or no ingredients and no steps' });
       continue;
@@ -154,6 +193,7 @@ export function convertLibrary(sources, options = {}) {
       withoutCookTime: recipes.filter((r) => r.cookMinutes === 0).length,
       withoutSteps: recipes.filter((r) => r.steps.length === 0).length,
       withoutIngredients: recipes.filter((r) => r.ingredientLines.length === 0).length,
+    junkDropped,
       ingredientLines: recipes.reduce((n, r) => n + r.ingredientLines.length, 0),
     },
   };

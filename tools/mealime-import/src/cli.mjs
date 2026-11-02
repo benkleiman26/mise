@@ -59,6 +59,7 @@ console.log(`Converted ${report.converted} recipes, ${report.ingredientLines} in
 if (report.withoutCookTime) console.log(`  ${report.withoutCookTime} have no cooking time recorded`);
 if (report.withoutSteps) console.log(`  ${report.withoutSteps} have no steps`);
 if (report.withoutIngredients) console.log(`  ${report.withoutIngredients} have no ingredients`);
+if (report.junkDropped) console.log(`  ${report.junkDropped} page furniture lines dropped`);
 
 for (const { file, why } of [...unreadable, ...report.skipped]) {
   console.log(`  skipped ${file}: ${why}`);

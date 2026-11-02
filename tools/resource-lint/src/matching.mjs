@@ -16,11 +16,23 @@ const REASONS = ['exactName', 'alias', 'normalized', 'contained', 'none'];
 const CONFIDENCE = ['high', 'medium', 'low'];
 
 /// Words that describe a thing without changing which thing it is.
-const DESCRIPTORS = new Set([
-  'large', 'medium', 'small', 'extra', 'jumbo', 'mini', 'baby',
-  'fresh', 'freshly', 'ripe', 'good', 'quality', 'organic', 'raw',
-  // State, not identity. Cooked rice is still rice to buy.
-  'cooked', 'uncooked', 'leftover',
+///
+/// Copied from `CanonicalMatcher.descriptors` in the app, and kept in step by
+/// `npm run sync-descriptors`. The duplication is deliberate: this linter has
+/// to validate the fixtures without a Swift toolchain, which the cloud
+/// environment does not have. The check below fails if the two lists diverge.
+export const DESCRIPTORS = new Set([
+  'large', 'medium', 'small', 'extra', 'jumbo', 'mini', 'baby', 'fresh', 'freshly', 'ripe',
+  'good', 'quality', 'organic', 'raw', 'cooked', 'uncooked', 'leftover', 'finely', 'roughly',
+  'coarsely', 'thinly', 'thickly', 'lightly', 'chopped', 'minced', 'diced', 'sliced', 'grated',
+  'shredded', 'crushed', 'torn', 'peeled', 'trimmed', 'julienned', 'cubed', 'halved',
+  'quartered', 'drained', 'rinsed', 'defrosted', 'thawed', 'packed', 'tightly', 'loosely',
+  'firmly', 'handful', 'handfuls', 'pinch', 'plus', 'more', 'needed', 'serving', 'about',
+  'approximately', 'boneless', 'skinless', 'skin', 'bone', 'boned', 'leaf', 'leaves', 'stem',
+  'stems', 'sprig', 'sprigs', 'tender', 'store', 'bought', 'homemade', 'jarred',
+  'refrigerated', 'shelf', 'stable', 'frozen', 'dried', 'whole', 'ground', 'low', 'sodium',
+  'full', 'fat', 'reduced', 'nonfat', 'unsweetened', 'sweetened', 'salted', 'unsalted',
+  'seasoned', 'mild', 'hot', 'spicy', 'light', 'dark', 'and', 'of'
 ]);
 
 export function normalize(text) {
@@ -43,6 +55,29 @@ export function variants(word) {
   out.add(`${word}s`);
   out.add(`${word}es`);
   return [...out];
+}
+
+/**
+ * The readings of a name written as a choice, best first.
+ * Mirrors `CanonicalMatcher.alternatives(in:)` in the app.
+ *
+ * "A or B C" is usually one product written two ways, and the noun can belong
+ * to either half, so every reading is offered and the table decides.
+ */
+export function alternatives(name) {
+  const text = String(name ?? '');
+  const at = text.toLowerCase().indexOf(' or ');
+  if (at < 0) return [];
+
+  const head = text.slice(0, at).trim();
+  const tail = text.slice(at + 4).trim();
+  if (!head || !tail) return [];
+
+  const readings = [];
+  const tailWords = tail.split(/\s+/);
+  if (tailWords.length > 1) readings.push([head, ...tailWords.slice(1)].join(' '));
+  readings.push(head, tail, ...alternatives(tail));
+  return readings;
 }
 
 /** Every spelling of a phrase we are willing to treat as the same phrase. */
@@ -161,8 +196,16 @@ export function lintMatchingFixtures(doc, canonical) {
         break;
       case 'normalized': {
         const stripped = withoutDescriptors(entry.input);
-        const reachable = nameKeys.has(stripped) || aliasKeys.has(stripped) || nameKeys.has(normalizedInput);
-        if (!reachable) fail(`${where}: claims normalized, but dropping descriptors gives "${stripped}", which matches nothing on "${item.name}"`);
+        const hits = (phrase) => {
+          const key = normalize(phrase);
+          return nameKeys.has(key) || aliasKeys.has(key)
+            || nameKeys.has(withoutDescriptors(phrase)) || aliasKeys.has(withoutDescriptors(phrase));
+        };
+        // Either the descriptors came off, or the phrase was a choice and one
+        // of its readings resolved. Both count as having rewritten the name.
+        const reachable = nameKeys.has(stripped) || aliasKeys.has(stripped)
+          || nameKeys.has(normalizedInput) || alternatives(entry.input).some(hits);
+        if (!reachable) fail(`${where}: claims normalized, but neither dropping descriptors ("${stripped}") nor reading it as a choice matches "${item.name}"`);
         if (aliasKeys.has(normalizedInput) || normalizedInput === normalize(item.name)) {
           fail(`${where}: claims normalized, but it already matches exactly, so the reason is wrong`);
         }

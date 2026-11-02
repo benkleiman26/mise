@@ -482,16 +482,16 @@
       "input": "2 tablespoons safflower or canola oil",
       "quantity": 2,
       "unit": "tbsp",
-      "name": "safflower",
-      "confidence": "medium",
-      "why": "one bottle to buy, and the writer led with the first. Taking both would put two oils on the list."
+      "name": "safflower or canola oil",
+      "confidence": "high",
+      "why": "the name is left whole. Choosing between the alternatives needs the canonical table, so CanonicalMatcher does it: cutting here turned “chicken or vegetable broth” into “chicken”."
     },
     {
       "input": "1 cup Parmesan or Pecorino Romano",
       "quantity": 1,
       "unit": "cup",
-      "name": "Parmesan",
-      "confidence": "medium"
+      "name": "Parmesan or Pecorino Romano",
+      "confidence": "high"
     },
     {
       "input": "2 cups flour",
@@ -507,6 +507,14 @@
       "unit": "bunch",
       "name": "kale",
       "confidence": "high"
+    },
+    {
+      "input": "4 cups chicken or vegetable broth",
+      "quantity": 4,
+      "unit": "cup",
+      "name": "chicken or vegetable broth",
+      "confidence": "high",
+      "why": "the noun belongs to both alternatives and only the matcher can tell"
     }
   ]
 }

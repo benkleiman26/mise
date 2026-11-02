@@ -205,10 +205,13 @@ green on the Mac: 70 tests, no failures, up from 61 before `ListGenerator`.
 - [ ] Nothing in the app lets the user categorise an unmatched ingredient, so
       the import's "not yet categorised" list is read only. Section 5.3 rule 2
       wants that tap to teach the alias table.
-- [ ] About 20 of the unmatched lines are web page furniture the Mealime "import
-      from a link" captured: "5 (from 113 ratings)", "Recent Posts", "^ Back to
-      Top", "Pinch of Yum logo". The converter should drop them, carefully, since
-      dropping a real ingredient is worse than keeping a junk one.
+- [x] Web page furniture the Mealime "import from a link" captured is dropped
+      by the converter, and the run reports how many lines went.
+- [ ] Deleting a recipe may not be taking its ingredients with it. After the
+      second import, several unmatched names kept the exact counts they had
+      before the aliases for them were added, which is what orphaned rows
+      would look like. Check with
+      `SELECT COUNT(*) FROM ZINGREDIENT WHERE ZRECIPE IS NULL`.
 - [ ] "Salt and pepper" is one line asking for two things, and there are 11 of
       them. Splitting on "and" is only safe for a short list of known pairs.
 - [ ] The import's match rate should be measurable without a simulator. A

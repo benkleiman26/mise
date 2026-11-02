@@ -761,3 +761,35 @@ The lesson is that 45 seed recipes written in one house style cannot find
 parser bugs. 213 recipes from dozens of authors found four in an afternoon.
 Any future importer should expect the same, and the first import of a new
 source is worth reading line by line rather than trusting the totals.
+
+## A choice between ingredients is read by the matcher, not the parser
+
+The first attempt cut "safflower or canola oil" at the "or" and kept the first
+half. It turned "chicken or vegetable broth" into "chicken" and cost about
+forty five lines their noun, which was worse than the problem it fixed.
+
+The noun can belong to either half. "chicken or vegetable broth" keeps it at
+the end, "Parmesan or Pecorino Romano" at the front, and "safflower or canola
+oil" shares it. No rule decides that from the text alone, because the answer
+depends on which readings are real products.
+
+So the parser leaves the name whole and `CanonicalMatcher` offers every
+reading to the table: the first half carrying the trailing words back, the
+first half alone, the second half, and so on down a chain of "or"s. Whichever
+resolves wins, at medium confidence because a choice was made on the cook's
+behalf.
+
+The general shape is worth keeping: when a decision needs a fact the parser
+does not have, the parser should preserve the ambiguity rather than guess, and
+the component that holds the fact should resolve it.
+
+## The descriptor list is duplicated on purpose, and checked
+
+`CanonicalMatcher.descriptors` grew from 20 words to 95 off the back of the
+real import. The linter has its own copy because it validates the fixtures
+without a Swift toolchain, which the cloud environment does not have.
+
+Duplication that nothing checks is how two implementations quietly disagree,
+which is the exact failure the import pipeline was designed to avoid. So
+`npm test` in `tools/resource-lint` now reads the word list out of the Swift
+file and fails if the two have drifted.

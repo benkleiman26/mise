@@ -141,6 +141,53 @@ struct CanonicalMatcher: Sendable {
     }
 
     func match(_ ingredientName: String) -> CanonicalMatch {
+        let direct = resolve(ingredientName)
+        if direct.item != nil { return direct }
+
+        // 5: "chicken or vegetable broth" is one thing to buy, written as a
+        // choice. Which half to keep cannot be decided without the table: the
+        // noun may belong to the second half ("chicken or vegetable broth"),
+        // to the first ("Parmesan or Pecorino Romano"), or to both
+        // ("safflower or canola oil"). So every reading is tried and the one
+        // that resolves wins.
+        for alternative in Self.alternatives(in: ingredientName) {
+            if let item = resolve(alternative).item {
+                // The phrase had to be rewritten to get here, which is what
+                // `normalized` means, whichever rung the rewrite then hit.
+                return CanonicalMatch(item: item, reason: .normalized, confidence: .medium)
+            }
+        }
+
+        return direct
+    }
+
+    /// The readings of a name written as a choice, best first.
+    ///
+    /// "A or B C" is usually one product: the writer named two kinds of the
+    /// same thing. Carrying the trailing words back onto the first half is
+    /// what turns "chicken or vegetable broth" into "chicken broth" rather
+    /// than into "chicken".
+    static func alternatives(in name: String) -> [String] {
+        guard let choice = name.range(of: " or ", options: .caseInsensitive) else { return [] }
+
+        let head = String(name[name.startIndex..<choice.lowerBound]).trimmingCharacters(in: .whitespaces)
+        let tail = String(name[choice.upperBound...]).trimmingCharacters(in: .whitespaces)
+        guard !head.isEmpty, !tail.isEmpty else { return [] }
+
+        var readings: [String] = []
+        let tailWords = tail.split(separator: " ").map(String.init)
+        if tailWords.count > 1 {
+            readings.append(([head] + tailWords.dropFirst()).joined(separator: " "))
+        }
+        readings.append(head)
+        readings.append(tail)
+
+        // "a or b or c" keeps going.
+        readings.append(contentsOf: alternatives(in: tail))
+        return readings
+    }
+
+    private func resolve(_ ingredientName: String) -> CanonicalMatch {
         let normalized = Self.normalize(ingredientName)
         guard !normalized.isEmpty else {
             return CanonicalMatch(item: nil, reason: .none, confidence: .low)
@@ -219,12 +266,44 @@ struct CanonicalMatcher: Sendable {
 
     /// Words that describe a thing without changing which thing it is. A large
     /// lemon is a lemon.
+    /// Words that describe an ingredient without changing what you buy.
+    ///
+    /// Only the third rung uses these, after an exact name and an alias have
+    /// both failed, so a phrase that is genuinely its own product keeps its
+    /// identity: "ground beef" and "frozen peas" match outright and never
+    /// reach the stripping.
+    ///
+    /// The list grew a lot on 2026-11-02, from the owner's 213 imported
+    /// recipes. Every entry below past the first three lines is a word that
+    /// stopped a real ingredient from matching: "tightly packed basil leaves",
+    /// "freshly grated Parmigiano-Reggiano cheese", "boneless, skinless
+    /// chicken thighs", "thinly sliced store-bought pizza dough".
     static let descriptors: Set<String> = [
         "large", "medium", "small", "extra", "jumbo", "mini", "baby",
         "fresh", "freshly", "ripe", "good", "quality", "organic", "raw",
         // State, not identity. A recipe calling for cooked rice still sends
         // you to the shelf for rice.
         "cooked", "uncooked", "leftover",
+        // How it arrives at the board.
+        "finely", "roughly", "coarsely", "thinly", "thickly", "lightly",
+        "chopped", "minced", "diced", "sliced", "grated", "shredded",
+        "crushed", "torn", "peeled", "trimmed", "julienned", "cubed",
+        "halved", "quartered", "drained", "rinsed", "defrosted", "thawed",
+        // How much of it, when we could not turn that into a quantity.
+        "packed", "tightly", "loosely", "firmly", "handful", "handfuls",
+        "pinch", "plus", "more", "needed", "serving", "about", "approximately",
+        // Cuts and forms.
+        "boneless", "skinless", "skin", "bone", "boned",
+        "leaf", "leaves", "stem", "stems", "sprig", "sprigs", "tender",
+        // Where it came from.
+        "store", "bought", "homemade", "jarred", "refrigerated",
+        "shelf", "stable", "frozen", "dried", "whole", "ground",
+        // Which version on the shelf.
+        "low", "sodium", "full", "fat", "reduced", "nonfat",
+        "unsweetened", "sweetened", "salted", "unsalted", "seasoned",
+        "mild", "hot", "spicy", "light", "dark",
+        // Joining words left behind once the above are gone.
+        "and", "of",
     ]
 
     static func normalize(_ text: String) -> String {

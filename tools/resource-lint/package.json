@@ -5,5 +5,5 @@
   "type": "module",
   "description": "Validates Mise/Resources JSON, which nothing else can check without Xcode.",
   "engines": { "node": ">=20" },
-  "scripts": { "lint": "node src/cli.mjs", "test": "node --test" }
+  "scripts": { "lint": "node src/cli.mjs", "test": "node --test && node src/sync-descriptors.mjs" }
 }

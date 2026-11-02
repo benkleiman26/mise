@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { convertRecipe, convertLibrary, ingredientLine, stepText } from '../src/convert.mjs';
+import { convertRecipe, convertLibrary, ingredientLine, isJunk, stepText } from '../src/convert.mjs';
 
 // The two shapes in the real export: a recipe the owner imported, where the
 // whole line sits in ingredient_name, and one Mealime published, where the
@@ -124,4 +124,54 @@ test('a recipe with no id is deduplicated by title instead', () => {
   ]);
   assert.equal(document.recipes.length, 1);
   assert.equal(report.skipped.length, 1);
+});
+
+// Mealime's "import from a link" captured whatever the page had where the
+// ingredients were. Twenty or so of the owner's 2436 lines are page furniture.
+
+test('page furniture is dropped', () => {
+  for (const line of [
+    '^ Back to Top',
+    'Recent Posts',
+    'Pinch of Yum logo',
+    'Mobile Search Trigger',
+    '5 (from 113 ratings)',
+    'February 9',
+    'Toppings',
+    'Remaining Ingredients',
+    '<a href="https://cooking.nytimes.com/recipes/1015987"><span>Marinara</span></a>',
+    'Ingredients2 1/2 cups vegetable broth1/2 cup uncooked quinoa',
+    '▢ 2 large cucumbers ▢ 1 cup sushi rice',
+    '   ',
+    '1/2',
+  ]) {
+    assert.equal(isJunk(line), true, `${line} should be dropped`);
+  }
+});
+
+test('real ingredients are never dropped, including the odd looking ones', () => {
+  for (const line of [
+    '2 scallions, trimmed',
+    'Salt and pepper',
+    'Ice',
+    'Oil',
+    '1 (15-ounce) can of black beans',
+    'Toppings : toasted nuts or seeds',
+    'Lemon wedges for serving',
+    'Nước chấm or peanut sauce',
+    "dozen Hershey's Kisses",
+    '2 tablespoons extra-virgin olive oil',
+  ]) {
+    assert.equal(isJunk(line), false, `${line} should be kept`);
+  }
+});
+
+test('the junk a conversion dropped is counted', () => {
+  const { document, report } = convertLibrary([
+    { file: 'a.json', recipe: { mealime_id: 'a', name: 'Soup', line_items: [
+      { raw: '1 onion' }, { raw: 'Recent Posts' }, { raw: '^ Back to Top' },
+    ] } },
+  ]);
+  assert.deepEqual(document.recipes[0].ingredientLines, ['1 onion']);
+  assert.equal(report.junkDropped, 2);
 });

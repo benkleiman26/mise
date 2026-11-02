@@ -442,12 +442,11 @@ enum IngredientParser {
             changed = true
         }
 
-        // "safflower or canola oil" is one bottle to buy. The first option is
-        // the one the writer led with.
-        if let choice = working.range(of: " or ", options: .caseInsensitive) {
-            working = String(working[working.startIndex..<choice.lowerBound])
-            changed = true
-        }
+        // "safflower or canola oil" is one bottle to buy, but cutting at the
+        // "or" here was wrong: "chicken or vegetable broth" became "chicken",
+        // and about forty five lines of the owner's library lost their noun
+        // that way. Deciding between the alternatives needs the canonical
+        // table, so CanonicalMatcher does it and the name is left whole.
 
         var tokens = working.split(separator: " ").map(String.init)
         func key(_ token: String) -> String {

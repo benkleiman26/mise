@@ -63,7 +63,8 @@
         "rolls",
         "whole grain bun",
         "whole grain buns",
-        "brioche buns"
+        "brioche buns",
+        "brioche"
       ],
       "defaultUnit": "package"
     },
@@ -163,7 +164,10 @@
       "aisle": "bakery",
       "aliases": [
         "sourdough",
-        "crusty bread"
+        "crusty bread",
+        "crusty loaf",
+        "country loaf",
+        "small loaf crusty bread"
       ],
       "defaultUnit": "count"
     },
@@ -303,7 +307,8 @@
       "aliases": [
         "mild chile powder",
         "kashmiri chile powder",
-        "chile powder"
+        "chile powder",
+        "mild chile flakes"
       ]
     },
     {
@@ -354,7 +359,8 @@
       "aisle": "bakingAndSpices",
       "aliases": [
         "corn starch",
-        "cornflour"
+        "cornflour",
+        "arrowroot powder"
       ],
       "defaultUnit": "oz",
       "isStaple": true
@@ -386,7 +392,9 @@
       "name": "dried oregano",
       "aisle": "bakingAndSpices",
       "aliases": [
-        "oregano"
+        "oregano",
+        "fresh oregano",
+        "chopped fresh oregano"
       ],
       "defaultUnit": "oz",
       "isStaple": true
@@ -476,7 +484,12 @@
       "aliases": [
         "salt",
         "sea salt",
-        "table salt"
+        "table salt",
+        "fine sea salt",
+        "coarse sea salt",
+        "flaky sea salt",
+        "flaky salt",
+        "maldon salt"
       ],
       "defaultUnit": "lb",
       "isStaple": true
@@ -598,6 +611,15 @@
       "isStaple": true
     },
     {
+      "name": "smoked paprika sweet",
+      "aisle": "bakingAndSpices",
+      "aliases": [
+        "dulce pimentón",
+        "pimenton dulce"
+      ],
+      "isStaple": true
+    },
+    {
       "name": "superfine sugar",
       "aisle": "bakingAndSpices",
       "aliases": [
@@ -615,7 +637,8 @@
       "aisle": "bakingAndSpices",
       "aliases": [
         "raw sugar",
-        "demerara sugar"
+        "demerara sugar",
+        "turbinado"
       ]
     },
     {
@@ -781,7 +804,8 @@
       "aliases": [
         "cannellini beans",
         "white beans",
-        "great northern beans"
+        "great northern beans",
+        "cannellini (white kidney) beans"
       ],
       "defaultUnit": "can",
       "isStaple": true
@@ -816,7 +840,8 @@
       "name": "canned diced tomatoes",
       "aisle": "cannedAndJarred",
       "aliases": [
-        "diced tomatoes"
+        "diced tomatoes",
+        "canned diced tomatoes with their liquid"
       ],
       "defaultUnit": "can",
       "isStaple": true
@@ -856,7 +881,8 @@
       "aliases": [
         "whole peeled tomatoes",
         "whole plum tomatoes",
-        "plum tomatoes"
+        "plum tomatoes",
+        "whole plum tomatoes with their juices"
       ],
       "defaultUnit": "can",
       "isStaple": true
@@ -874,7 +900,8 @@
         "chicken stock",
         "low-sodium chicken broth",
         "broth",
-        "stock"
+        "stock",
+        "low-sodium chicken stock"
       ],
       "defaultUnit": "l",
       "isStaple": true
@@ -920,7 +947,9 @@
       "name": "pickles",
       "aisle": "cannedAndJarred",
       "aliases": [
-        "dill pickles"
+        "dill pickles",
+        "dill pickle brine",
+        "pickle brine"
       ],
       "defaultUnit": "oz"
     },
@@ -948,13 +977,18 @@
       "name": "tomato paste",
       "aisle": "cannedAndJarred",
       "defaultUnit": "oz",
-      "isStaple": true
+      "isStaple": true,
+      "aliases": [
+        "tube tomato paste"
+      ]
     },
     {
       "name": "vegetable broth",
       "aisle": "cannedAndJarred",
       "aliases": [
-        "vegetable stock"
+        "vegetable stock",
+        "low-sodium vegetable broth",
+        "low-sodium vegetable stock"
       ],
       "defaultUnit": "l",
       "isStaple": true
@@ -1230,7 +1264,9 @@
         "parmesan cheese",
         "grated parmesan",
         "parmigiano-reggiano",
-        "parmesan shavings"
+        "parmesan shavings",
+        "grated parmesan cheese",
+        "freshly grated parmigiano-reggiano cheese"
       ],
       "defaultUnit": "oz",
       "isStaple": true
@@ -1426,7 +1462,8 @@
         "chili oil",
         "chile crisp",
         "chile-crisp condiment",
-        "chili crisp condiment"
+        "chili crisp condiment",
+        "chile oil"
       ],
       "defaultUnit": "oz"
     },
@@ -1461,6 +1498,14 @@
       "defaultUnit": "oz"
     },
     {
+      "name": "guajillo chiles",
+      "aisle": "international",
+      "aliases": [
+        "dried guajillo chile peppers",
+        "guajillo"
+      ]
+    },
+    {
       "name": "harissa",
       "aisle": "international",
       "defaultUnit": "oz"
@@ -1476,7 +1521,10 @@
     {
       "name": "kimchi",
       "aisle": "international",
-      "defaultUnit": "oz"
+      "defaultUnit": "oz",
+      "aliases": [
+        "kimchi juice"
+      ]
     },
     {
       "name": "mirin",
@@ -1501,6 +1549,13 @@
         "seaweed sheets"
       ],
       "defaultUnit": "package"
+    },
+    {
+      "name": "nuoc cham",
+      "aisle": "international",
+      "aliases": [
+        "nước chấm"
+      ]
     },
     {
       "name": "oyster sauce",
@@ -1561,6 +1616,13 @@
       "name": "tamari",
       "aisle": "international",
       "defaultUnit": "floz"
+    },
+    {
+      "name": "teriyaki sauce",
+      "aisle": "international",
+      "aliases": [
+        "teriyaki"
+      ]
     },
     {
       "name": "udon noodles",
@@ -1960,7 +2022,11 @@
       "aisle": "oilsAndCondiments",
       "aliases": [
         "canola oil",
-        "neutral oil"
+        "neutral oil",
+        "safflower oil",
+        "safflower",
+        "neutral-flavored oil",
+        "cooking oil"
       ],
       "defaultUnit": "floz",
       "isStaple": true
@@ -2244,7 +2310,9 @@
       "name": "broccoli",
       "aisle": "produce",
       "aliases": [
-        "broccoli florets"
+        "broccoli florets",
+        "broccoli crowns",
+        "broccoli slaw"
       ],
       "defaultUnit": "bunch"
     },
@@ -2327,7 +2395,9 @@
       "name": "cherry tomatoes",
       "aisle": "produce",
       "aliases": [
-        "grape tomatoes"
+        "grape tomatoes",
+        "cherry tomato",
+        "pint cherry tomatoes"
       ],
       "defaultUnit": "package"
     },
@@ -2372,7 +2442,9 @@
       "aisle": "produce",
       "aliases": [
         "cucumbers",
-        "english cucumber"
+        "english cucumber",
+        "persian cucumbers",
+        "persian cucumber"
       ],
       "defaultUnit": "count"
     },
@@ -2406,7 +2478,8 @@
       "aliases": [
         "garlic cloves",
         "clove of garlic",
-        "garlic clove"
+        "garlic clove",
+        "garlic paste"
       ],
       "defaultUnit": "clove",
       "isStaple": true
@@ -2418,14 +2491,18 @@
         "fresh ginger",
         "ginger root",
         "piece ginger",
-        "knob of ginger"
+        "knob of ginger",
+        "ginger paste"
       ],
       "defaultUnit": "oz"
     },
     {
       "name": "grapefruit",
       "aisle": "produce",
-      "aliases": [],
+      "aliases": [
+        "grapefruit zest",
+        "fresh grapefruit zest"
+      ],
       "defaultUnit": "count"
     },
     {
@@ -2449,7 +2526,9 @@
         "jalapeno pepper",
         "jalapeño",
         "jalapeños",
-        "jalapeno peppers"
+        "jalapeno peppers",
+        "jalapeño chiles",
+        "jalapeno chiles"
       ],
       "defaultUnit": "count"
     },
@@ -2460,7 +2539,8 @@
         "lacinato kale",
         "curly kale",
         "tuscan kale",
-        "baby kale"
+        "baby kale",
+        "cavolo nero"
       ],
       "defaultUnit": "bunch"
     },
@@ -2650,7 +2730,9 @@
       "aisle": "produce",
       "aliases": [
         "green onions",
-        "spring onions"
+        "spring onions",
+        "green onion",
+        "bunch green onions"
       ],
       "defaultUnit": "bunch",
       "isStaple": true
@@ -2662,7 +2744,8 @@
         "serrano",
         "serrano pepper",
         "serranos",
-        "serrano peppers"
+        "serrano peppers",
+        "serrano chiles"
       ],
       "defaultUnit": "count"
     },
@@ -2789,6 +2872,12 @@
       "defaultUnit": "count"
     },
     {
+      "name": "watercress",
+      "aisle": "produce",
+      "aliases": [],
+      "defaultUnit": "bunch"
+    },
+    {
       "name": "yellow onion",
       "aisle": "produce",
       "aliases": [
@@ -2871,7 +2960,9 @@
       "aliases": [
         "lentils",
         "red lentils",
-        "green lentils"
+        "green lentils",
+        "cooked lentils",
+        "french lentils"
       ],
       "defaultUnit": "lb"
     },
@@ -2954,7 +3045,8 @@
       "aisle": "riceGrainsBeans",
       "aliases": [
         "long grain rice",
-        "rice"
+        "rice",
+        "steamed rice"
       ],
       "defaultUnit": "lb",
       "isStaple": true
@@ -2988,6 +3080,14 @@
         "lump crab meat"
       ],
       "defaultUnit": "oz"
+    },
+    {
+      "name": "fish fillets",
+      "aisle": "seafood",
+      "aliases": [
+        "white fish fillets"
+      ],
+      "defaultUnit": "lb"
     },
     {
       "name": "halibut",

@@ -241,8 +241,13 @@ green on the Mac: 70 tests, no failures, up from 61 before `ListGenerator`.
 - [ ] Nothing in the app can change a pantry status yet, so a staple seeded as
       `low` can only be hidden by editing the store. The Pantry tab is read
       only until section 5.4 lands.
-- [ ] The rest of Phase 1 is untouched: collections, tags, smart lists, facet
-      chips, sort orders, manual recipe entry and the paste a link flow.
+- [x] Facet chips, collections, sort orders and favouriting, with the search
+      reaching titles, summaries, tags and ingredients. Written 2026-11-02.
+- [ ] Still to come in Phase 1: manual recipe entry, editing an imported
+      recipe, the paste a link flow, and smart lists that save a set of
+      filters under a name.
+- [ ] Nothing marks a meal as cooked, so "Cooked" only ever shows what the NYT
+      import brought in. Cook mode is Phase 3 and owns that.
 
 ## Environment
 

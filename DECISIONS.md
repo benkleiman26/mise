@@ -927,3 +927,22 @@ and failing an import over one would be a bad trade.
 The empty state is a coloured tile with the recipe's initial, steady per title
 rather than random. The built in recipes have no photos and the NYT ones never
 will, so no picture is the common case and it should not look like a failure.
+
+## The library screen is mostly about narrowing down
+
+427 recipes in one alphabetical list is worse than a shorter list, because the
+answer to "what are we eating Thursday" is in there and cannot be reached. So
+section 5.1's facets came before anything else in Phase 1.
+
+The facets are the ones a weeknight actually uses: favourites, already cooked,
+under twenty, thirty or forty five minutes, and the collections. Two
+collections narrow rather than widen, because a second tap means "and also".
+
+The collections are not a new idea imposed on the library. They are the NYT
+folders and the Mealime collections, which came across with the imports and are
+already how the household thinks about its recipes.
+
+A time filter leaves out a recipe with no time recorded. 159 of the owner's 213
+Mealime recipes have none, and sweeping them into "under 30 minutes" would make
+the filter a claim it cannot support. For the same reason "quickest first" puts
+them last: zero minutes means not recorded, not instant.

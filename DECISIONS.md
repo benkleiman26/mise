@@ -712,3 +712,19 @@ even if it names one.
 The replace is a delete and an insert, committed in that order. Doing both
 inside one transaction asks a unique constraint to hold two rows with the same
 id at once.
+
+## Mise's Documents folder is visible in Files
+
+Dragging a file onto the simulator window is the documented way to get one in,
+and on 2026-11-02 it silently did nothing. Rather than hunt for why, the app
+now sets `UIFileSharingEnabled` and `LSSupportsOpeningDocumentsInPlace`, so its
+Documents folder appears in the Files app under "On My iPhone".
+
+That makes a file reachable by copying it into the app container, which on a
+simulator is one shell command, and on a real phone means dropping a file into
+Mise's folder from a Mac over Finder, or saving one there from Mail or
+Messages. It is also the thing that makes an export worth having later: a
+folder the user can see is a folder they can get a backup out of.
+
+The alternative, reading a path baked into the app, would have worked today in
+the simulator and nowhere else.

@@ -306,10 +306,13 @@ green on the Mac: 70 tests, no failures, up from 61 before `ListGenerator`.
       validated by `tools/resource-lint`.
 - [x] `seed_recipes.json` holds 45 recipes, within the 40 to 60 section 5.1
       asks for. Validated by `tools/resource-lint`.
-- [x] An app icon exists, generated rather than designed: a list on a plate.
-      The first attempt was three bowls on a board and read as a face. Worth
-      replacing with something drawn by a person before this goes further than
-      friends.
+- [x] The app icon is a board, parsley, a tomato and a knife over the word
+      Mise, supplied by the owner. The two generated attempts before it read
+      as a face and as a generic to-do app respectively.
+- [ ] The icon carries the word "Mise", which iOS also prints underneath it.
+      Harmless, slightly redundant, and the lettering will not be readable at
+      home screen size. The board mark carries it on its own, so a version
+      without the word is worth trying.
 - [ ] No recipe images for the seed set. The 45 built in recipes show the
       coloured initial tile, which is the placeholder, so this is no longer
       urgent.

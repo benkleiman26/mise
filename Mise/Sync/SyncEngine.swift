@@ -61,24 +61,37 @@ final class SyncEngine {
         status = .working
 
         do {
-            guard let householdID = try households.all().first?.id else { throw SyncError.noHousehold }
+            // Two different ids, and conflating them was the first thing to
+            // fail against the real server.
+            //
+            // `group` is what the server partitions by and what the row level
+            // security policies check membership of. `local` is this
+            // database's own household id, which comes from a constant string
+            // and is therefore the same on every install of Mise. Pushing
+            // under `local` was rejected, correctly: nobody is a member of a
+            // household whose id everyone has.
+            guard let group = SyncGroup.current else { throw SyncError.notSharing }
+            guard let local = try households.all().first?.id else { throw SyncError.noHousehold }
 
             // Out.
             let outgoing = SyncBatch(
                 records: try mapper.records(changedSince: cursor),
-                deletions: try pendingDeletions(householdID: householdID)
+                deletions: try pendingDeletions(householdID: local)
             )
             if !outgoing.records.isEmpty || !outgoing.deletions.isEmpty {
-                _ = try await client.push(outgoing, householdID: householdID, deviceID: deviceID)
+                _ = try await client.push(outgoing, householdID: group, deviceID: deviceID)
                 try clearSentDeletions(outgoing.deletions)
             }
             lastSent = outgoing.records.count + outgoing.deletions.count
 
             // In.
-            let incoming = try await client.pull(householdID: householdID, since: cursor, deviceID: deviceID)
+            let incoming = try await client.pull(householdID: group, since: cursor, deviceID: deviceID)
             // Deletions last: a record that arrives and is then deleted in the
             // same round should end up deleted, not resurrected.
-            let taken = try mapper.apply(incoming.records)
+            // Records arrive stamped with the group id. They are stored under
+            // this database's own household id, so everything local agrees
+            // about which household it belongs to.
+            let taken = try mapper.apply(incoming.records, as: local)
             let removed = try mapper.apply(incoming.deletions)
             lastReceived = taken + removed
 

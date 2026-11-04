@@ -1295,3 +1295,26 @@ while the store is being built. A screen that is waiting should say so.
 The second attempt at this then nested sections inside that section, which
 does not render either. Every branch now returns rows, and the sections are
 assembled once at the top, which is the shape that cannot go wrong twice.
+
+## The sharing group's id and the household's id are different, and the first sync proved it
+
+The first real attempt against Supabase failed with
+`new row violates row-level security policy for table "mise_records"`, which
+was the policy doing exactly its job.
+
+The sharing group got its own random id precisely because the local household
+id is derived from a constant string and is therefore identical on every
+install. That part was right. What was missed is that the engine still pushed
+under the local household id, and nobody is a member of a household whose id
+everyone has, so the insert was refused.
+
+Now the wire uses the group id and local records keep their own. Records
+arriving from the other phone are stamped with this database's household id
+rather than the group's, so everything local agrees about which household it
+belongs to and the group id stays what it is: a key to a partition on a
+server, not a fact about the data.
+
+Worth noting that the failure was loud, immediate and named the exact table.
+Had the policy been left off, this would have worked, both households would
+have written into the same rows, and the first symptom would have been someone
+else's groceries on the list.

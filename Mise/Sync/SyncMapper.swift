@@ -47,14 +47,17 @@ struct SyncMapper {
         return out
     }
 
-    private func record(_ entity: SyncEntity, _ record: any HouseholdRecord, _ fields: [String: SyncValue]) -> SyncRecord {
+    /// `householdID` here is the record's own, which the client replaces with
+    /// the sharing group's id on the wire. The two are different and keeping
+    /// them apart is what the first real sync got wrong.
+    private func record(_ entity: SyncEntity, _ model: any HouseholdRecord, _ fields: [String: SyncValue]) -> SyncRecord {
         var all = fields
-        all["createdAt"] = .date(record.createdAt)
+        all["createdAt"] = .date(model.createdAt)
         return SyncRecord(
             entity: entity,
-            id: record.id,
-            householdID: record.householdID,
-            updatedAt: record.updatedAt,
+            id: model.id,
+            householdID: model.householdID,
+            updatedAt: model.updatedAt,
             fields: all
         )
     }
@@ -160,7 +163,7 @@ extension SyncMapper {
     /// Returns how many were actually taken, which is not the same as how many
     /// arrived, and is what the user sees.
     @discardableResult
-    func apply(_ records: [SyncRecord]) throws -> Int {
+    func apply(_ records: [SyncRecord], as householdID: UUID) throws -> Int {
         var taken = 0
 
         // Parents before children: a planned meal arriving before its plan has
@@ -168,7 +171,7 @@ extension SyncMapper {
         // order so this cannot be got wrong by accident.
         for entity in SyncEntity.allCases {
             for record in records where record.entity == entity {
-                if try applyOne(record) { taken += 1 }
+                if try applyOne(record, as: householdID) { taken += 1 }
             }
         }
 
@@ -176,12 +179,12 @@ extension SyncMapper {
         return taken
     }
 
-    private func applyOne(_ record: SyncRecord) throws -> Bool {
+    private func applyOne(_ record: SyncRecord, as householdID: UUID) throws -> Bool {
         switch record.entity {
         case .household:
             guard let existing = try households.find(id: record.id) else {
                 let household = Household(id: record.id, name: record.string("name") ?? "Our kitchen")
-                household.householdID = record.householdID
+                household.householdID = householdID
                 household.updatedAt = record.updatedAt
                 households.insert(household)
                 return true
@@ -192,11 +195,11 @@ extension SyncMapper {
             return true
 
         case .householdPreferences:
-            let household = try households.find(id: record.householdID)
+            let household = try households.find(id: householdID)
             let existing = household?.preferences
             if let existing, record.updatedAt <= existing.updatedAt { return false }
 
-            let preferences = existing ?? HouseholdPreferences(id: record.id, householdID: record.householdID)
+            let preferences = existing ?? HouseholdPreferences(id: record.id, householdID: householdID)
             preferences.menuType = record.enumeration("menuType") ?? preferences.menuType
             preferences.restrictions = record.enumerations("restrictions") ?? preferences.restrictions
             preferences.dislikedIngredients = record.strings("dislikedIngredients") ?? preferences.dislikedIngredients
@@ -218,7 +221,7 @@ extension SyncMapper {
             }
             let user = User(
                 id: record.id,
-                householdID: record.householdID,
+                householdID: householdID,
                 displayName: record.string("displayName") ?? "Someone"
             )
             user.updatedAt = record.updatedAt
@@ -237,7 +240,7 @@ extension SyncMapper {
                 existing.updatedAt = record.updatedAt
                 return true
             }
-            let entry = PantryEntry(id: record.id, householdID: record.householdID, canonicalItemID: itemID, status: status)
+            let entry = PantryEntry(id: record.id, householdID: householdID, canonicalItemID: itemID, status: status)
             entry.updatedAt = record.updatedAt
             pantry.insert(entry)
             return true
@@ -250,7 +253,7 @@ extension SyncMapper {
                 existing.updatedAt = record.updatedAt
                 return true
             }
-            let plan = MealPlan(id: record.id, householdID: record.householdID, weekStartDate: week)
+            let plan = MealPlan(id: record.id, householdID: householdID, weekStartDate: week)
             plan.updatedAt = record.updatedAt
             plans.insert(plan)
             return true
@@ -278,7 +281,7 @@ extension SyncMapper {
             guard let plan else { return false }
             let meal = PlannedMeal(
                 id: record.id,
-                householdID: record.householdID,
+                householdID: householdID,
                 position: record.integer("position") ?? 0,
                 date: record.date("date"),
                 slot: record.enumeration("slot") ?? .dinner,
@@ -302,7 +305,7 @@ extension SyncMapper {
             }
             let list = GroceryList(
                 id: record.id,
-                householdID: record.householdID,
+                householdID: householdID,
                 mealPlanID: record.uuid("mealPlanID"),
                 generatedAt: generated
             )
@@ -333,7 +336,7 @@ extension SyncMapper {
             guard let listID = record.uuid("listID"), let list = try lists.find(id: listID) else { return false }
             let item = GroceryItem(
                 id: record.id,
-                householdID: record.householdID,
+                householdID: householdID,
                 position: record.integer("position") ?? 0,
                 canonicalItemID: record.uuid("canonicalItemID"),
                 displayName: record.string("displayName") ?? "",

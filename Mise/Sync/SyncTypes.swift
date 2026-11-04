@@ -91,12 +91,14 @@ protocol SyncClient: Sendable {
 
 enum SyncError: LocalizedError {
     case notSignedIn
+    case notSharing
     case noHousehold
     case server(String)
 
     var errorDescription: String? {
         switch self {
         case .notSignedIn: "Sign in to share this household."
+        case .notSharing: "Start sharing, or join with an invite code, before syncing."
         case .noHousehold: "Mise has not finished setting up. Close the app and open it again."
         case .server(let detail): "Mise could not reach the server. \(detail)"
         }

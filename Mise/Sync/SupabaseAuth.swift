@@ -22,7 +22,7 @@ actor SupabaseAuth {
     private let session: URLSession
     private var current: Session?
 
-    private static let storageKey = "supabase.session"
+    fileprivate static let storageKey = "supabase.session"
 
     init(config: SupabaseConfig, session: URLSession = .shared) {
         self.config = config
@@ -32,6 +32,14 @@ actor SupabaseAuth {
 
     var signedInUserID: UUID? { current?.userID }
     var isSignedIn: Bool { current != nil }
+
+    /// When the stored token runs out, for the Details panel. A policy
+    /// failure with an expired token here means the refresh is at fault
+    /// rather than the policy.
+    nonisolated var storedExpiry: Date? {
+        guard let text = Keychain.get(Self.storageKey), let data = text.data(using: .utf8) else { return nil }
+        return (try? JSONDecoder().decode(Session.self, from: data))?.expiresAt
+    }
 
     // MARK: - The three calls
 

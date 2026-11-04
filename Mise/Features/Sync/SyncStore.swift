@@ -25,6 +25,11 @@ final class SyncStore {
     private(set) var problem: String?
     private(set) var busy = false
     private(set) var signedInEmail: String?
+    /// The account id the server will see as `auth.uid()`. Shown in Details
+    /// because a policy failure on `user_id = auth.uid()` is either this not
+    /// matching the stored row, or the token not being accepted at all, and
+    /// those look identical from outside.
+    private(set) var signedInUserID: String?
 
     /// What the last round did, for a line the user can read.
     private(set) var lastSummary: String?
@@ -75,6 +80,7 @@ final class SyncStore {
             step = .notConfigured
             return
         }
+        signedInUserID = await auth.signedInUserID?.uuidString
         step = await auth.isSignedIn ? .ready : .signedOut
     }
 
@@ -83,16 +89,19 @@ final class SyncStore {
     func signIn(email: String, password: String) async {
         await attempt { try await $0.signIn(email: email, password: password) }
         signedInEmail = step == .ready ? email : nil
+        signedInUserID = await auth?.signedInUserID?.uuidString
     }
 
     func signUp(email: String, password: String) async {
         await attempt { try await $0.signUp(email: email, password: password) }
         signedInEmail = step == .ready ? email : nil
+        signedInUserID = await auth?.signedInUserID?.uuidString
     }
 
     func signOut() async {
         await auth?.signOut()
         signedInEmail = nil
+        signedInUserID = nil
         step = .signedOut
         // The sharing group stays. Signing back in should not mean setting
         // sharing up again.
@@ -230,12 +239,26 @@ final class SyncStore {
         out.append(("Step", "\(step)"))
         out.append(("Household", SyncGroup.current?.uuidString.prefix(8).description ?? "none"))
         out.append(("Device", DeviceIdentity.current.uuidString.prefix(8).description))
+        out.append(("Account", signedInUserID ?? "not signed in"))
+        out.append(("Token", tokenState))
         out.append(("Engine status", engine.map { "\($0.status)" } ?? "none"))
         out.append(("Seen up to", engine?.cursorDescription ?? "nothing yet"))
         out.append(("Last sent", "\(engine?.lastSent ?? 0)"))
         out.append(("Last received", "\(engine?.lastReceived ?? 0)"))
         out.append(("Changes waiting", "\(pendingCount)"))
         return out
+    }
+
+    /// Whether the saved session still looks usable, without calling out.
+    /// "Expired" here with a policy failure means the refresh is the problem,
+    /// not the policy.
+    private var tokenState: String {
+        guard let auth else { return "none" }
+        return auth.storedExpiry.map { expiry in
+            expiry.timeIntervalSinceNow > 60
+                ? "good for \(Int(expiry.timeIntervalSinceNow / 60)) min"
+                : "expired"
+        } ?? "none"
     }
 
     /// How many local records sync would send right now. Zero here with an

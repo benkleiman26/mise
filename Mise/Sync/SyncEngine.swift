@@ -104,6 +104,15 @@ final class SyncEngine {
         }
     }
 
+    var cursorDescription: String {
+        cursor.map { $0.formatted(date: .abbreviated, time: .standard) } ?? "nothing yet"
+    }
+
+    /// What a sync would send right now, without sending it.
+    func pendingCount() throws -> Int {
+        try mapper.records(changedSince: cursor).count
+    }
+
     /// Starts this device over: everything is sent and everything is taken.
     /// For after a restore, or when the two phones have plainly drifted.
     func resetCursor() {

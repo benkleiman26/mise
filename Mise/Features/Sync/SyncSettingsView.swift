@@ -93,6 +93,19 @@ struct SyncSettingsView: View {
             }
         }
 
+        if let store, store.step != .notConfigured {
+            Section {
+                DisclosureGroup("Details") {
+                    ForEach(store.details, id: \.0) { label, value in
+                        LabeledContent(label, value: value)
+                            .font(.footnote)
+                    }
+                }
+            } footer: {
+                Text("For working out why sync did or did not do something.")
+            }
+        }
+
         if let store, let problem = store.problem {
             Section {
                 Text(problem)

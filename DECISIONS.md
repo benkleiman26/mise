@@ -1340,3 +1340,24 @@ costs one request per sync.
 The general shape: local state that claims a server agreed to something has to
 be written after the server agrees, and anything derived from that agreement
 should be re-asserted rather than assumed.
+
+## "Not synced yet" was the least useful thing the app could have said
+
+Three wrong guesses came out of that one line. It is what the status shows when
+nothing has happened, and nothing happening has at least four causes: no
+config, not signed in, no household, or a sync that returned at a guard. The
+line was identical for all of them.
+
+Every guard in `sync()` now sets a message saying which one it was. A silent
+early return in code that talks to a server is a decision to debug it later
+with less information.
+
+There is also a Details panel: server, whether the engine was built, the step,
+the household, the device, the engine's own status, how far it has read, and
+how many local changes are waiting to go. The last of those is the whole answer
+to "why did nothing happen" when it reads zero against an empty server.
+
+A debug panel in a shipping app is usually a smell. Here it is two people, one
+of whom is reading the status over a chat window to someone who cannot attach a
+debugger, and in that situation it is the difference between one message and
+four.

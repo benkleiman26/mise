@@ -181,7 +181,19 @@ final class SyncStore {
     // MARK: - Syncing
 
     func sync() async {
-        guard let engine, step == .ready, let group = SyncGroup.current else { return }
+        guard let engine else {
+            problem = "Sharing is not set up on this phone: supabase.json is missing from the app bundle."
+            return
+        }
+        guard step == .ready else {
+            problem = "Not signed in yet."
+            return
+        }
+        guard let group = SyncGroup.current else {
+            problem = "This phone is not in a household yet. Start sharing, or join with an invite code."
+            return
+        }
+
         busy = true
         defer { busy = false }
 
@@ -205,6 +217,31 @@ final class SyncStore {
             problem = nil
             lastSummary = Self.summary(sent: engine.lastSent, received: engine.lastReceived)
         }
+    }
+
+    /// Plain facts about what sync thinks is true, for when the status line is
+    /// not enough. Written because three wrong guesses were made from
+    /// "Not synced yet", which is the least informative thing the app could
+    /// have said.
+    var details: [(String, String)] {
+        var out: [(String, String)] = []
+        out.append(("Server", config?.url.host() ?? "not configured"))
+        out.append(("Engine", engine == nil ? "not built" : "ready"))
+        out.append(("Step", "\(step)"))
+        out.append(("Household", SyncGroup.current?.uuidString.prefix(8).description ?? "none"))
+        out.append(("Device", DeviceIdentity.current.uuidString.prefix(8).description))
+        out.append(("Engine status", engine.map { "\($0.status)" } ?? "none"))
+        out.append(("Seen up to", engine?.cursorDescription ?? "nothing yet"))
+        out.append(("Last sent", "\(engine?.lastSent ?? 0)"))
+        out.append(("Last received", "\(engine?.lastReceived ?? 0)"))
+        out.append(("Changes waiting", "\(pendingCount)"))
+        return out
+    }
+
+    /// How many local records sync would send right now. Zero here with an
+    /// empty server is the whole answer to "why did nothing happen".
+    private var pendingCount: Int {
+        (try? engine?.pendingCount()) ?? 0
     }
 
     private static func summary(sent: Int, received: Int) -> String {

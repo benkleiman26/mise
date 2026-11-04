@@ -76,8 +76,11 @@ struct SyncMapper {
         ])
     }
 
+    /// The name only. `appleUserID` identifies a person to Apple, it is not
+    /// needed to show who ticked something off, and the less of it that
+    /// travels the better.
     private func encode(_ user: User) -> SyncRecord {
-        record(.user, user, ["name": .string(user.name)])
+        record(.user, user, ["displayName": .string(user.displayName)])
     }
 
     private func encode(_ entry: PantryEntry) -> SyncRecord {
@@ -209,11 +212,15 @@ extension SyncMapper {
         case .user:
             if let existing = try users.find(id: record.id) {
                 guard record.updatedAt > existing.updatedAt else { return false }
-                existing.name = record.string("name") ?? existing.name
+                existing.displayName = record.string("displayName") ?? existing.displayName
                 existing.updatedAt = record.updatedAt
                 return true
             }
-            let user = User(id: record.id, householdID: record.householdID, name: record.string("name") ?? "Someone")
+            let user = User(
+                id: record.id,
+                householdID: record.householdID,
+                displayName: record.string("displayName") ?? "Someone"
+            )
             user.updatedAt = record.updatedAt
             users.insert(user)
             return true

@@ -33,6 +33,10 @@ final class SyncStore {
 
     /// What the last round did, for a line the user can read.
     private(set) var lastSummary: String?
+    /// What the server says about who is calling. The one fact that separates
+    /// "this account is not a member" from "the server does not think anyone
+    /// is calling at all".
+    private(set) var serverSays: String?
 
     init(container: AppContainer) {
         self.config = SupabaseConfig.load()
@@ -154,6 +158,49 @@ final class SyncStore {
             await sync()
         } catch {
             problem = (error as? LocalizedError)?.errorDescription ?? "\(error)"
+        }
+    }
+
+    /// Asks the server who it thinks is calling.
+    ///
+    /// A policy failure on `user_id = auth.uid()` while the app believes it is
+    /// signed in means either the stored row belongs to another account or the
+    /// token is not being accepted. This says which, in one tap, instead of
+    /// another round of reasoning from a status line.
+    func checkConnection() async {
+        guard let config, let auth else {
+            serverSays = "No server configured."
+            return
+        }
+        busy = true
+        defer { busy = false }
+
+        do {
+            var request = URLRequest(url: config.url.appending(path: "/rest/v1/rpc/mise_whoami"))
+            request.httpMethod = "POST"
+            request.setValue(config.anonKey, forHTTPHeaderField: "apikey")
+            request.setValue("Bearer \(try await auth.accessToken())", forHTTPHeaderField: "Authorization")
+            request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+            request.httpBody = Data("{}".utf8)
+
+            let (data, response) = try await URLSession.shared.data(for: request)
+            let status = (response as? HTTPURLResponse)?.statusCode ?? 0
+            let body = String(data: data, encoding: .utf8)?
+                .trimmingCharacters(in: CharacterSet(charactersIn: "\"\n ")) ?? ""
+
+            if status == 404 {
+                serverSays = "The mise_whoami function is missing. Run supabase/schema.sql again."
+            } else if !(200..<300).contains(status) {
+                serverSays = "HTTP \(status): \(body)"
+            } else if body.isEmpty || body == "null" {
+                serverSays = "The server sees nobody signed in. The token is being ignored, which is why every policy refuses the write."
+            } else if body.lowercased() == signedInUserID?.lowercased() {
+                serverSays = "The server sees you, and it is the right account."
+            } else {
+                serverSays = "The server sees a different account: \(body)"
+            }
+        } catch {
+            serverSays = (error as? LocalizedError)?.errorDescription ?? "\(error)"
         }
     }
 

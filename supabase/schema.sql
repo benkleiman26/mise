@@ -194,3 +194,24 @@ begin
   return now_at;
 end;
 $$;
+
+-- Who does the server think is calling?
+--
+-- Added after a run where every insert was refused by a policy of the form
+-- `user_id = auth.uid()` while the app was, as far as it knew, signed in.
+-- That has two causes which look identical from the client: the row belongs
+-- to another account, or the token is not being accepted and auth.uid() is
+-- null. This answers it directly.
+--
+-- Safe to keep. It returns the caller their own id and nothing else, and an
+-- unauthenticated caller gets null, which is exactly what they already know.
+create or replace function mise_whoami()
+returns uuid
+language sql
+security invoker
+stable
+as $$
+  select auth.uid();
+$$;
+
+grant execute on function mise_whoami() to anon, authenticated;

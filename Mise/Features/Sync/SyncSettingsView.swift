@@ -100,6 +100,15 @@ struct SyncSettingsView: View {
                         LabeledContent(label, value: value)
                             .font(.footnote)
                     }
+                    Button("Ask the server who I am") {
+                        Task { await store.checkConnection() }
+                    }
+                    .font(.footnote)
+                    if let says = store.serverSays {
+                        Text(says)
+                            .font(.footnote)
+                            .foregroundStyle(.secondary)
+                    }
                 }
             } footer: {
                 Text("For working out why sync did or did not do something.")

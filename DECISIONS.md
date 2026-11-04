@@ -1247,3 +1247,26 @@ The upload uses an API key rather than Xcode's Organizer so nothing has to be
 clicked and no password is typed into a prompt. The `.p8` is a credential that
 can upload builds under the owner's name, so it lives outside the repository,
 and `appstore.env` beside it is git ignored.
+
+## Two of the Info.plist keys needed a real file, because Xcode drops the rest silently
+
+`INFOPLIST_KEY_UIFileSharingEnabled = YES` sat in the project doing nothing.
+Xcode's `INFOPLIST_KEY_*` mechanism only carries a fixed set of keys Apple
+supports, and an unsupported one is dropped with no warning and no error. The
+Mise folder never appeared in Finder and the build looked completely fine.
+
+What made it hard to see was that the companion key,
+`LSSupportsOpeningDocumentsInPlace`, **is** on the list and did work. Half the
+feature arrived, so the symptom was "the folder is missing" rather than "file
+sharing is off", and the obvious explanations were all about Finder.
+
+`Config/Info.plist` now holds the two keys. Xcode merges the generated keys
+into it, so this is an addition rather than a move: everything else still comes
+from build settings. The file sits outside `Mise/`, which is a synchronized
+group that would otherwise try to copy it into the bundle as a resource.
+
+The general lesson is that a build setting accepting a value is not evidence it
+does anything. The check that would have caught this in a minute is reading the
+key back out of the built app:
+
+    plutil -extract UIFileSharingEnabled raw <built>.app/Info.plist

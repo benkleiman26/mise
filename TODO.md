@@ -293,6 +293,10 @@ green on the Mac: 70 tests, no failures, up from 61 before `ListGenerator`.
       every device that will ever need it. The server keeps its own copy, so
       this is right, but it has not been proven.
 
+- [ ] Nothing verifies the built app's Info.plist. One silently dropped build
+      setting cost an evening. `scripts/release.sh` could read the keys back
+      out of the archive and fail loudly if one is missing.
+
 ## Environment
 
 - [ ] No Swift toolchain or Xcode in the cloud environment, so no Swift code can

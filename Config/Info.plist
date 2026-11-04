@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<!--
+	  Everything else in this app's Info.plist is generated from build
+	  settings, which is tidier and keeps one list rather than two. This file
+	  exists for the keys that mechanism cannot carry.
+
+	  INFOPLIST_KEY_* only works for a fixed set of keys Apple supports, and an
+	  unsupported one is dropped without a warning. UIFileSharingEnabled is not
+	  on that list, so `INFOPLIST_KEY_UIFileSharingEnabled = YES` sat in the
+	  project doing nothing, and the Mise folder never appeared in Finder.
+	  LSSupportsOpeningDocumentsInPlace is on the list and did work, which is
+	  what made it confusing: half the feature arrived.
+
+	  Xcode merges the generated keys into this file, so adding it does not
+	  mean moving the rest of the settings here.
+	-->
+
+	<!-- Puts the app's Documents folder in Finder's Files tab, and in the
+	     Files app, so import files can be dropped in from a Mac. -->
+	<key>UIFileSharingEnabled</key>
+	<true/>
+
+	<!-- The companion key: lets Files open what is in there in place rather
+	     than copying it somewhere else first. -->
+	<key>LSSupportsOpeningDocumentsInPlace</key>
+	<true/>
+</dict>
+</plist>

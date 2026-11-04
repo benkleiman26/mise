@@ -89,9 +89,19 @@ drop policy if exists "members read their household" on mise_household_members;
 create policy "members read their household" on mise_household_members
   for select using (mise_is_member_of(household_id));
 
+-- A person may add only themselves, and only to a household whose id they
+-- already know. The id is a random v4 uuid handed over as an invite code, so
+-- knowing it is what grants access, the same way a share link works. Guessing
+-- one is not a realistic attack; publishing one is, which is why the app
+-- keeps it in the Keychain and never derives it from anything predictable.
 drop policy if exists "a person joins a household" on mise_household_members;
 create policy "a person joins a household" on mise_household_members
   for insert with check (user_id = auth.uid());
+
+-- Leaving is allowed; removing someone else is not.
+drop policy if exists "a person leaves a household" on mise_household_members;
+create policy "a person leaves a household" on mise_household_members
+  for delete using (user_id = auth.uid());
 
 drop policy if exists "members read records" on mise_records;
 create policy "members read records" on mise_records

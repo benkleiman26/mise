@@ -25,6 +25,12 @@ final class AppContainer {
     let mealPlans: any MealPlanRepository
     let groceryLists: any GroceryListRepository
 
+    /// The same context the repositories share, for the one table that has no
+    /// repository of its own: the deletion tombstones sync reads. Exposed
+    /// rather than given a repository because nothing but sync will ever
+    /// touch it, and a seventh protocol for one fetch would be ceremony.
+    let syncContext: ModelContext
+
     /// What the last seed run did. Nil until it has run.
     private(set) var seedReport: SeedReport?
 
@@ -40,6 +46,7 @@ final class AppContainer {
         modelContainer = store.container
 
         let context = ModelContext(store.container)
+        syncContext = context
         households = SwiftDataHouseholdRepository(context: context)
         users = SwiftDataUserRepository(context: context)
         recipes = SwiftDataRecipeRepository(context: context)

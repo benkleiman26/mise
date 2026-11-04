@@ -272,6 +272,27 @@ green on the Mac: 70 tests, no failures, up from 61 before `ListGenerator`.
 - [ ] Nothing marks a meal as cooked, so "Cooked" only ever shows what the NYT
       import brought in. Cook mode is Phase 3 and owns that.
 
+## Sync
+
+- [x] Deletion tombstones, the wire format, the Supabase schema with row level
+      security, auth in the Keychain, the client, the engine and the Settings
+      screen. Written 2026-11-04.
+- [ ] **Never run against the real server.** Every line of this is untested
+      against Supabase. The first run is the test.
+- [ ] Sync is manual: a button in Settings. It should run on launch, when the
+      app comes back to the foreground, and after a change settles.
+- [ ] No tests. The engine should be tested against an in-memory `SyncClient`:
+      two devices, offline edits on both, a delete racing an edit. That is the
+      part where being wrong is silent.
+- [ ] The recipe library does not sync by design, so both phones must import
+      the same files. If one person adds a recipe from a link, the other does
+      not get it, and a planned meal referring to it shows nothing.
+- [ ] Nothing resolves a conflict visibly. Last writer wins and the loser is
+      never told.
+- [ ] Tombstones are deleted once pushed, which assumes the push succeeded for
+      every device that will ever need it. The server keeps its own copy, so
+      this is right, but it has not been proven.
+
 ## Environment
 
 - [ ] No Swift toolchain or Xcode in the cloud environment, so no Swift code can

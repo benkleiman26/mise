@@ -1167,3 +1167,35 @@ The loader refuses a key beginning `sb_secret_`. Putting the secret key where
 the publishable one goes would be a serious mistake and an easy one to make at
 the end of a long setup, and it would hand every reader of the app bundle the
 ability to bypass every row level security policy in the schema.
+
+## The sharing group has its own random id, not the household's
+
+`StableID.household()` is derived from a constant string, so every install of
+Mise has the same local household id. Locally that is harmless and useful. As
+the partition key on a shared server it is a hole: the join policy lets any
+signed in person add themselves to a household, and an id that everyone can
+work out is not a secret.
+
+So sharing uses a separate random v4 uuid, made once by whoever sets it up and
+handed to the other person as an invite code. Knowing the code is what grants
+access, the same way a share link works, and the code lives in the Keychain
+because it is the single piece of information that decides whose groceries
+this device can read.
+
+The alternative, re-stamping every local record with a new household id, would
+have been invasive and would have had to be got exactly right on a database
+already holding 427 recipes. This needs nothing rewritten.
+
+## Signed in and sharing are two separate states, shown separately
+
+Signing out leaves the sharing group in place, because signing back in should
+not mean setting sharing up again. Leaving the group resets the engine's
+cursor, because what it has already seen says nothing about a different
+household.
+
+Keeping them apart on screen costs a section and avoids the failure where
+someone is signed in, syncing nothing, and cannot see why.
+
+The invite code screen says plainly that anyone holding it can read and change
+the list, and to send it to one person rather than a group chat. A share link
+with no warning next to it is how these get pasted somewhere public.

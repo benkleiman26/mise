@@ -70,6 +70,8 @@ struct SettingsView: View {
                     Text("Ingredients that match no grocery item sit in the Other aisle and never merge. Telling Mise what one is teaches it for good.")
                 }
 
+                SyncSettingsView()
+
                 Section("About") {
                     LabeledContent("Version", value: store?.appVersion ?? "0")
                 }

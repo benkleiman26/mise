@@ -68,6 +68,12 @@ So the order that actually works is: you use it for a week and find what is
 wrong, sync gets built, and then she installs. Putting it on her phone before
 sync gets her a demo and a disappointment.
 
+## Giving it to someone outside the household
+
+See [TESTERS.md](TESTERS.md). External TestFlight needs Apple's beta review and
+an honest answer to the privacy questions, and the other household's data lands
+in your Supabase project, which they should be told before they sign up.
+
 ## Known gaps before anyone relies on it
 
 - No sync, so one household means one device.

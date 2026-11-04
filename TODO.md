@@ -306,8 +306,13 @@ green on the Mac: 70 tests, no failures, up from 61 before `ListGenerator`.
       validated by `tools/resource-lint`.
 - [x] `seed_recipes.json` holds 45 recipes, within the 40 to 60 section 5.1
       asks for. Validated by `tools/resource-lint`.
-- [ ] No recipe images for the seed set. The app needs a sensible placeholder,
-      or the recipe cards look broken on first launch.
+- [x] An app icon exists, generated rather than designed: a list on a plate.
+      The first attempt was three bowls on a board and read as a face. Worth
+      replacing with something drawn by a person before this goes further than
+      friends.
+- [ ] No recipe images for the seed set. The 45 built in recipes show the
+      coloured initial tile, which is the placeholder, so this is no longer
+      urgent.
 - [ ] Aisle order in `canonical_items.json` is the spec's default, not the
       owner's store. Section 12 asks him for his usual store's order in Phase 2.
 

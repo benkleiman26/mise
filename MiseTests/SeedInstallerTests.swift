@@ -42,13 +42,21 @@ final class SeedInstallerTests: XCTestCase {
         super.tearDown()
     }
 
+    /// Its own, so one test never finds another's answers already recorded.
+    private func freshDefaults() -> UserDefaults {
+        let name = "mise.tests.\(UUID().uuidString)"
+        UserDefaults.standard.removePersistentDomain(forName: name)
+        return UserDefaults(suiteName: name) ?? .standard
+    }
+
     private func makeInstaller() -> SeedInstaller {
         SeedInstaller(
             households: households,
             users: users,
             canonicalItems: canonicalItems,
             recipes: recipes,
-            pantry: pantry
+            pantry: pantry,
+            defaults: freshDefaults()
         )
     }
 
@@ -254,7 +262,8 @@ final class SeedInstallerTests: XCTestCase {
             users: SwiftDataUserRepository(context: otherContext),
             canonicalItems: SwiftDataCanonicalItemRepository(context: otherContext),
             recipes: SwiftDataRecipeRepository(context: otherContext),
-            pantry: SwiftDataPantryRepository(context: otherContext)
+            pantry: SwiftDataPantryRepository(context: otherContext),
+            defaults: freshDefaults()
         )
         try other.install(catalog)
 
@@ -316,5 +325,77 @@ final class SeedInstallerTests: XCTestCase {
         let refreshed = try XCTUnwrap(canonicalItems.find(id: id))
         XCTAssertEqual(refreshed.aliases, catalog.canonicalItems[0].aliases, "the shipped spellings come back")
         XCTAssertEqual(refreshed.learnedAliases, ["whatever he calls it"], "what he taught stays")
+    }
+
+    // MARK: - What seeding claims, and what it stops claiming
+
+    /// Sync settles a conflict by taking the newer `updatedAt`. A record
+    /// stamped with the moment it was seeded asserts somebody edited it just
+    /// then, and a phone joining an established household seeds minutes before
+    /// its first sync.
+    func testSeededRecordsMakeTheWeakestClaimTheyCan() throws {
+        try makeInstaller().install(catalog)
+
+        let item = try XCTUnwrap(canonicalItems.all().first)
+        XCTAssertEqual(item.updatedAt, SeedInstaller.seededAt)
+
+        let entry = try XCTUnwrap(pantry.all().first)
+        XCTAssertEqual(entry.updatedAt, SeedInstaller.seededAt,
+                       "otherwise the joining phone overwrites the pantry with its own defaults")
+    }
+
+    /// The old test was whether the entry is here, and an untracked item is
+    /// precisely one that is not, so seeding put it back on every launch and
+    /// the user could never win.
+    func testAStapleTakenOutOfThePantryStaysOut() throws {
+        let shared = freshDefaults()
+        func installer() -> SeedInstaller {
+            SeedInstaller(
+                households: households, users: users, canonicalItems: canonicalItems,
+                recipes: recipes, pantry: pantry, defaults: shared
+            )
+        }
+
+        try installer().install(catalog)
+        let entry = try XCTUnwrap(pantry.all().first)
+        pantry.delete(entry)
+        try pantry.save()
+        let remaining = try pantry.count()
+
+        try installer().install(catalog)
+
+        XCTAssertEqual(try pantry.count(), remaining,
+                       "putting it back every launch is the app arguing with the user")
+    }
+
+    /// Seeding only ever has an opinion about what is in the catalog, so an
+    /// item somebody added by hand is left alone however it is marked.
+    func testSeedingHasNoOpinionAboutAnItemAddedByHand() throws {
+        let shared = freshDefaults()
+        func installer() -> SeedInstaller {
+            SeedInstaller(
+                households: households, users: users, canonicalItems: canonicalItems,
+                recipes: recipes, pantry: pantry, defaults: shared
+            )
+        }
+
+        try installer().install(catalog)
+        let before = try pantry.count()
+
+        // Nothing recorded for this one, so it is new to this device.
+        let newcomer = CanonicalItem(
+            id: StableID.canonicalItem(name: "gochujang"),
+            householdID: StableID.household(),
+            name: "gochujang",
+            aisle: .international,
+            isStaple: true
+        )
+        canonicalItems.insert(newcomer)
+        try canonicalItems.save()
+
+        try installer().install(catalog)
+
+        XCTAssertEqual(try pantry.count(), before,
+                       "it is not in the catalog, so seeding has no opinion about it")
     }
 }

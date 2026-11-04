@@ -14,6 +14,7 @@ import Foundation
 struct SyncMapper {
     let households: any HouseholdRepository
     let users: any UserRepository
+    let canonicalItems: any CanonicalItemRepository
     let pantry: any PantryRepository
     let plans: any MealPlanRepository
     let lists: any GroceryListRepository
@@ -24,14 +25,21 @@ struct SyncMapper {
         var out: [SyncRecord] = []
         let after = cursor ?? .distantPast
 
-        for household in try households.all() where household.updatedAt > after {
-            out.append(encode(household))
+        for household in try households.all() {
+            if household.updatedAt > after { out.append(encode(household)) }
+            // Not nested inside the household's own test. Changing the store
+            // walk order or the default servings touches the preferences and
+            // nothing else, and nesting meant those changes waited for some
+            // unrelated edit to the household before they could travel.
             if let preferences = household.preferences, preferences.updatedAt > after {
                 out.append(encode(preferences))
             }
         }
         for user in try users.all() where user.updatedAt > after {
             out.append(encode(user))
+        }
+        for item in try canonicalItems.all() where item.updatedAt > after {
+            out.append(encode(item))
         }
         for entry in try pantry.all() where entry.updatedAt > after {
             out.append(encode(entry))
@@ -84,6 +92,22 @@ struct SyncMapper {
     /// travels the better.
     private func encode(_ user: User) -> SyncRecord {
         record(.user, user, ["displayName": .string(user.displayName)])
+    }
+
+    /// `learnedAliases` travels, `aliases` does not need to: the shipped ones
+    /// come from the bundle and both phones have the same bundle sooner or
+    /// later. They are sent anyway, because an item added by hand has none and
+    /// the field has to mean the same thing on both sides of the wire.
+    private func encode(_ item: CanonicalItem) -> SyncRecord {
+        var fields: [String: SyncValue] = [
+            "name": .string(item.name),
+            "aliases": .strings(item.aliases),
+            "learnedAliases": .strings(item.learnedAliases),
+            "aisle": .string(item.aisle.rawValue),
+            "isStaple": .boolean(item.isStaple),
+        ]
+        if let unit = item.defaultUnit { fields["defaultUnit"] = .string(unit.rawValue) }
+        return record(.canonicalItem, item, fields)
     }
 
     private func encode(_ entry: PantryEntry) -> SyncRecord {
@@ -353,7 +377,42 @@ extension SyncMapper {
             list.items.append(item)
             return true
 
-        case .canonicalItem, .recipe, .ingredient, .recipeStep:
+        case .canonicalItem:
+            guard let name = record.string("name"),
+                  let aisle: Aisle = record.enumeration("aisle")
+            else { return false }
+
+            let aliases = record.strings("aliases") ?? []
+            let learned = record.strings("learnedAliases") ?? []
+            let isStaple = record.boolean("isStaple") ?? false
+            let unit: Unit? = record.enumeration("defaultUnit")
+
+            if let existing = try canonicalItems.find(id: record.id) {
+                guard record.updatedAt > existing.updatedAt else { return false }
+                existing.name = name
+                existing.aliases = aliases
+                existing.learnedAliases = learned
+                existing.aisle = aisle
+                existing.isStaple = isStaple
+                existing.defaultUnit = unit
+                existing.updatedAt = record.updatedAt
+                return true
+            }
+            let item = CanonicalItem(
+                id: record.id,
+                householdID: householdID,
+                name: name,
+                aliases: aliases,
+                learnedAliases: learned,
+                aisle: aisle,
+                isStaple: isStaple,
+                defaultUnit: unit
+            )
+            item.updatedAt = record.updatedAt
+            canonicalItems.insert(item)
+            return true
+
+        case .recipe, .ingredient, .recipeStep:
             // Not shared. See SyncEntity.isShared.
             return false
         }
@@ -407,7 +466,13 @@ extension SyncMapper {
                 // Deleting the household out from under the other phone is not
                 // something sync should do on its own.
                 continue
-            case .canonicalItem, .recipe, .ingredient, .recipeStep:
+            case .canonicalItem:
+                if let item = try canonicalItems.find(id: deletion.recordID),
+                   item.updatedAt <= deletion.deletedAt {
+                    canonicalItems.delete(item)
+                    removed += 1
+                }
+            case .recipe, .ingredient, .recipeStep:
                 continue
             }
         }

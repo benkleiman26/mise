@@ -54,6 +54,7 @@ final class SyncStore {
             mapper: SyncMapper(
                 households: container.households,
                 users: container.users,
+                canonicalItems: container.canonicalItems,
                 pantry: container.pantry,
                 plans: container.mealPlans,
                 lists: container.groceryLists

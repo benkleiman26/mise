@@ -20,6 +20,14 @@ struct SeedInstaller {
     let recipes: any RecipeRepository
     let pantry: any PantryRepository
 
+    /// Where the record of which staples have already been offered lives.
+    ///
+    /// Injectable so a test gets its own, because this is the one piece of
+    /// seeding that remembers something outside the store, and two tests
+    /// sharing `.standard` would have the second one find the first one's
+    /// answers already there.
+    var defaults: UserDefaults = .standard
+
     static let householdName = "My Kitchen"
     static let firstUserName = "You"
 
@@ -53,6 +61,21 @@ struct SeedInstaller {
         }
     }
 
+    /// What a seeded record claims for `updatedAt`.
+    ///
+    /// Sync settles a conflict by taking the newer `updatedAt`, so a record
+    /// stamped with the moment it was seeded is asserting that somebody edited
+    /// it just then, and nobody did. A phone joining an existing household
+    /// seeds its own defaults minutes before its first sync, and minutes ago
+    /// beats anything the household actually changed last week. The joining
+    /// phone would quietly overwrite the household with its own factory
+    /// settings.
+    ///
+    /// A seeded default has to make the weakest claim there is, so it makes
+    /// the weakest one available. Anything anybody has ever actually done
+    /// beats it.
+    static let seededAt = Date(timeIntervalSince1970: 0)
+
     // MARK: - Household
 
     private func installHousehold(catalog: SeedCatalog, report: inout SeedReport) throws -> Household {
@@ -64,7 +87,10 @@ struct SeedInstaller {
 
         // Section 4 names the first household's settings exactly: pescetarian,
         // no restrictions, dislikes olives, 4 servings, US units.
-        let household = Household(id: householdID, name: Self.householdName)
+        let household = Household(
+            id: householdID, name: Self.householdName,
+            createdAt: Self.seededAt, updatedAt: Self.seededAt
+        )
         let preferences = HouseholdPreferences(
             id: StableID.preferences(householdID: householdID),
             householdID: householdID,
@@ -73,7 +99,9 @@ struct SeedInstaller {
             dislikedIngredients: ["olives"],
             defaultServings: 4,
             units: .us,
-            aisleOrder: catalog.aisleOrder
+            aisleOrder: catalog.aisleOrder,
+            createdAt: Self.seededAt,
+            updatedAt: Self.seededAt
         )
         household.preferences = preferences
 
@@ -86,7 +114,10 @@ struct SeedInstaller {
         let userID = StableID.user(key: "owner")
         let existingUser = try users.find(id: userID)
         if existingUser == nil {
-            let user = User(id: userID, householdID: householdID, displayName: Self.firstUserName)
+            let user = User(
+                id: userID, householdID: householdID, displayName: Self.firstUserName,
+                createdAt: Self.seededAt, updatedAt: Self.seededAt
+            )
             users.insert(user)
             household.memberUserIDs = [userID]
             report.usersInserted += 1
@@ -131,7 +162,11 @@ struct SeedInstaller {
                     item.aisle = seed.aisle
                     item.isStaple = seed.isStaple
                     item.defaultUnit = seed.defaultUnit
-                    item.updatedAt = .now
+                    // Deliberately not restamping `updatedAt`. This is the
+                    // app's own shipped data being brought up to date on this
+                    // device, not anybody editing anything, and claiming
+                    // otherwise would have each phone push its bundle over the
+                    // other's every time the two were on different versions.
                     report.canonicalItemsUpdated += 1
                 }
                 byName[SeedCatalog.key(seed.name)] = item
@@ -145,7 +180,9 @@ struct SeedInstaller {
                 aliases: seed.aliases,
                 aisle: seed.aisle,
                 isStaple: seed.isStaple,
-                defaultUnit: seed.defaultUnit
+                defaultUnit: seed.defaultUnit,
+                createdAt: Self.seededAt,
+                updatedAt: Self.seededAt
             )
             canonicalItems.insert(item)
             byName[SeedCatalog.key(seed.name)] = item
@@ -265,22 +302,46 @@ struct SeedInstaller {
     ) throws {
         let existing = try pantry.existingIDs()
 
+        // Which staples this device has already offered.
+        //
+        // Without it, untracking a staple lasts until the next launch and then
+        // comes back, because the only test was whether the entry is here and
+        // an untracked item is precisely one that is not. Seeding would argue
+        // with the user forever, and they would lose. Recording what was
+        // offered rather than what is present separates "never seeded" from
+        // "seeded and then deliberately removed", which is the distinction the
+        // whole thing turns on.
+        //
+        // Per device, like the rest of seeding. A staple added to the catalog
+        // in a later version is still offered once.
+        let alreadyOffered = Set(defaults.stringArray(forKey: Self.offeredStaplesKey) ?? [])
+        var offered = alreadyOffered
+
         for seed in catalog.canonicalItems where seed.isStaple {
             guard let item = itemsByName[SeedCatalog.key(seed.name)] else { continue }
             let entryID = StableID.pantryEntry(householdID: household.id, canonicalItemID: item.id)
+            offered.insert(entryID.uuidString)
+
             if existing.contains(entryID) { continue }
+            if alreadyOffered.contains(entryID.uuidString) { continue }
 
             pantry.insert(
                 PantryEntry(
                     id: entryID,
                     householdID: household.id,
                     canonicalItemID: item.id,
-                    status: Self.startingStatus(for: item.aisle)
+                    status: Self.startingStatus(for: item.aisle),
+                    createdAt: Self.seededAt,
+                    updatedAt: Self.seededAt
                 )
             )
             report.pantryEntriesInserted += 1
         }
+
+        defaults.set(offered.sorted(), forKey: Self.offeredStaplesKey)
     }
+
+    static let offeredStaplesKey = "mise.seed.offeredStaples"
 
     /// Perishable aisles are the ones whose contents have to be rebought.
     static func startingStatus(for aisle: Aisle) -> PantryStatus {

@@ -81,13 +81,23 @@ enum SyncEntity: String, Codable, CaseIterable, Sendable {
     ///
     /// What has to be shared is what changes daily and has to agree: the week,
     /// the list, the pantry, and the household's settings.
+    ///
+    /// The grocery table is shared too, which the volume argument above never
+    /// applied to: it is 395 small rows that almost never change, and the ids
+    /// are derived from the names, so both phones already agree about every
+    /// item that ships with the app and merging them is a no-op. Leaving it
+    /// out had two costs. An item added on one phone never reached the other,
+    /// so the pantry entry that pointed at it arrived referring to something
+    /// that phone had never heard of and showed nothing at all. And every
+    /// spelling taught by categorising an ingredient stayed on the phone that
+    /// learned it, so the same tedious work waited on the other one.
     var isShared: Bool {
         switch self {
         case .household, .householdPreferences, .user,
-             .pantryEntry, .mealPlan, .plannedMeal,
+             .canonicalItem, .pantryEntry, .mealPlan, .plannedMeal,
              .groceryList, .groceryItem:
             true
-        case .canonicalItem, .recipe, .ingredient, .recipeStep:
+        case .recipe, .ingredient, .recipeStep:
             false
         }
     }

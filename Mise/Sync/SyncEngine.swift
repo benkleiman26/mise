@@ -29,6 +29,7 @@ final class SyncEngine {
     private(set) var lastReceived = 0
 
     private static let cursorKey = "mise.sync.cursor"
+    private static let sentKey = "mise.sync.sentUpTo"
     private static let syncedKey = "mise.sync.lastSyncedAt"
 
     init(
@@ -56,6 +57,19 @@ final class SyncEngine {
         set { UserDefaults.standard.set(newValue, forKey: Self.cursorKey) }
     }
 
+    /// How far this device has got through its own changes, by its own clock.
+    ///
+    /// Separate from `cursor`, and the two must never be confused. `cursor` is
+    /// a server timestamp, and the records waiting to be sent are stamped by
+    /// this phone. Using one to filter the other compares two clocks that
+    /// disagree, sometimes by minutes: a phone running behind the server would
+    /// decide its own fresh edits were older than the last thing it heard
+    /// about and never send them at all, silently, forever.
+    private var sentUpTo: Date? {
+        get { UserDefaults.standard.object(forKey: Self.sentKey) as? Date }
+        set { UserDefaults.standard.set(newValue, forKey: Self.sentKey) }
+    }
+
     func run() async {
         guard status != .working else { return }
         status = .working
@@ -73,29 +87,44 @@ final class SyncEngine {
             guard let group = SyncGroup.current else { throw SyncError.notSharing }
             guard let local = try households.all().first?.id else { throw SyncError.noHousehold }
 
-            // Out.
+            lastSent = 0
+            lastReceived = 0
+
+            // A phone that has never synced pulls first.
+            //
+            // Push before pull is right everywhere else: a record edited here
+            // and there since the last round would otherwise be overwritten
+            // locally and the local edit would never reach the server, so it
+            // would be lost rather than merely losing. None of that applies on
+            // the first round, because this device has never seen the server
+            // and so holds no edit the server also has. What it does hold is a
+            // database full of seeded defaults, and handing those to an
+            // established household before looking at it is how a joining
+            // phone overwrites a year of somebody's pantry with its own
+            // factory settings.
+            if cursor == nil {
+                try await pull(group: group, local: local)
+            }
+
+            // Out. Filtered by this device's own clock, never by the server
+            // cursor, and only advanced once the server has actually taken it.
+            let reachedBy = Date()
             let outgoing = SyncBatch(
-                records: try mapper.records(changedSince: cursor),
+                records: try mapper.records(changedSince: sentUpTo),
                 deletions: try pendingDeletions(householdID: local)
             )
             if !outgoing.records.isEmpty || !outgoing.deletions.isEmpty {
                 _ = try await client.push(outgoing, householdID: group, deviceID: deviceID)
                 try clearSentDeletions(outgoing.deletions)
             }
+            // Stamped from before the batch was gathered, so anything edited
+            // while the push was in flight goes next time rather than never.
+            sentUpTo = reachedBy
             lastSent = outgoing.records.count + outgoing.deletions.count
 
             // In.
-            let incoming = try await client.pull(householdID: group, since: cursor, deviceID: deviceID)
-            // Deletions last: a record that arrives and is then deleted in the
-            // same round should end up deleted, not resurrected.
-            // Records arrive stamped with the group id. They are stored under
-            // this database's own household id, so everything local agrees
-            // about which household it belongs to.
-            let taken = try mapper.apply(incoming.records, as: local)
-            let removed = try mapper.apply(incoming.deletions)
-            lastReceived = taken + removed
+            try await pull(group: group, local: local)
 
-            if let moved = incoming.cursor { cursor = moved }
             lastSyncedAt = Date()
             UserDefaults.standard.set(lastSyncedAt, forKey: Self.syncedKey)
             status = .idle
@@ -104,19 +133,34 @@ final class SyncEngine {
         }
     }
 
+    /// One pull, applied and counted.
+    ///
+    /// Deletions last: a record that arrives and is then deleted in the same
+    /// round should end up deleted, not resurrected. Records arrive stamped
+    /// with the group id and are stored under this database's own household
+    /// id, so everything local agrees about which household it belongs to.
+    private func pull(group: UUID, local: UUID) async throws {
+        let incoming = try await client.pull(householdID: group, since: cursor, deviceID: deviceID)
+        let taken = try mapper.apply(incoming.records, as: local)
+        let removed = try mapper.apply(incoming.deletions)
+        lastReceived += taken + removed
+        if let moved = incoming.cursor { cursor = moved }
+    }
+
     var cursorDescription: String {
         cursor.map { $0.formatted(date: .abbreviated, time: .standard) } ?? "nothing yet"
     }
 
     /// What a sync would send right now, without sending it.
     func pendingCount() throws -> Int {
-        try mapper.records(changedSince: cursor).count
+        try mapper.records(changedSince: sentUpTo).count
     }
 
     /// Starts this device over: everything is sent and everything is taken.
     /// For after a restore, or when the two phones have plainly drifted.
     func resetCursor() {
         cursor = nil
+        sentUpTo = nil
     }
 
     // MARK: - Deletions

@@ -279,6 +279,10 @@ green on the Mac: 70 tests, no failures, up from 61 before `ListGenerator`.
       screen. Written 2026-11-04.
 - [ ] **Never run against the real server.** Every line of this is untested
       against Supabase. The first run is the test.
+- [ ] Nothing catches a SwiftUI view that renders nothing and therefore never
+      appears. The sharing section was invisible for two rounds because its
+      store was built in a `.task` that could never fire. Previews would have
+      caught it; there are none for the feature screens.
 - [ ] Sync is manual: a button in Settings. It should run on launch, when the
       app comes back to the foreground, and after a change settles.
 - [ ] No tests. The engine should be tested against an in-memory `SyncClient`:

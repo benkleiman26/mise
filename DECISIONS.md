@@ -1270,3 +1270,28 @@ does anything. The check that would have caught this in a minute is reading the
 key back out of the built app:
 
     plutil -extract UIFileSharingEnabled raw <built>.app/Info.plist
+
+## A view that renders nothing never appears, so its `.task` never runs
+
+The sharing section was missing from Settings entirely. Not showing an error,
+not showing a spinner: absent, header and all. It read as an old build, and
+two rounds went into checking that it was not.
+
+The cause was this shape:
+
+    Group {
+        if let store { ... }
+    }
+    .task { store = SyncStore(...) }
+
+The store is built in the task, the task runs when the view appears, and a
+view with nothing in it never appears. It could not get past empty, and the
+absence of the header is what made it look like missing code rather than a
+bug in present code.
+
+The fix is that the first section is unconditional, with a spinner inside it
+while the store is being built. A screen that is waiting should say so.
+
+The second attempt at this then nested sections inside that section, which
+does not render either. Every branch now returns rows, and the sections are
+assembled once at the top, which is the shape that cannot go wrong twice.

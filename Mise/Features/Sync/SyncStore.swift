@@ -115,10 +115,10 @@ final class SyncStore {
     // MARK: - The household
 
     /// Starts sharing, or joins what the other phone started.
-    func startSharing() async { await enterGroup(SyncGroup.makeIfNeeded()) }
+    func startSharing() async { await enterGroup(SyncGroup.proposed()) }
 
     func joinSharing(code: String) async {
-        guard let id = SyncGroup.join(code: code) else {
+        guard let id = SyncGroup.proposed(code: code) else {
             problem = "That invite code does not look right. It should be a long string of letters, numbers and dashes."
             return
         }
@@ -134,32 +134,13 @@ final class SyncStore {
     }
 
     private func enterGroup(_ id: UUID) async {
-        guard let config, let auth else { return }
         busy = true
         defer { busy = false }
 
         do {
-            guard let userID = await auth.signedInUserID else { throw SyncError.notSignedIn }
-
-            var request = URLRequest(url: config.url.appending(path: "/rest/v1/mise_household_members"))
-            request.httpMethod = "POST"
-            request.setValue(config.anonKey, forHTTPHeaderField: "apikey")
-            request.setValue("Bearer \(try await auth.accessToken())", forHTTPHeaderField: "Authorization")
-            request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-            // Joining twice is something people do, and it should be quiet.
-            request.setValue("resolution=ignore-duplicates", forHTTPHeaderField: "Prefer")
-            request.httpBody = try JSONSerialization.data(withJSONObject: [
-                "household_id": id.uuidString.lowercased(),
-                "user_id": userID.uuidString.lowercased(),
-            ])
-
-            let (data, response) = try await URLSession.shared.data(for: request)
-            if let http = response as? HTTPURLResponse, !(200..<300).contains(http.statusCode) {
-                let detail = (try? JSONSerialization.jsonObject(with: data) as? [String: Any])
-                    .flatMap { $0?["message"] as? String } ?? "The server answered \(http.statusCode)."
-                throw SyncError.server(detail)
-            }
-
+            try await register(id)
+            // Only now, with the server agreeing this device is a member.
+            SyncGroup.adopt(id)
             problem = nil
             await sync()
         } catch {
@@ -167,12 +148,52 @@ final class SyncStore {
         }
     }
 
+    /// Writes the membership row, quietly, every time.
+    ///
+    /// It is one small idempotent insert, and it is the difference between a
+    /// device that recovers on the next tap and one that is stuck forever
+    /// showing a row level security error it cannot act on. Devices restored
+    /// from a backup arrive in exactly that state: the group is in the
+    /// Keychain and the membership is not on the server.
+    private func register(_ id: UUID) async throws {
+        guard let config, let auth else { throw SyncError.notSignedIn }
+        guard let userID = await auth.signedInUserID else { throw SyncError.notSignedIn }
+
+        var request = URLRequest(url: config.url.appending(path: "/rest/v1/mise_household_members"))
+        request.httpMethod = "POST"
+        request.setValue(config.anonKey, forHTTPHeaderField: "apikey")
+        request.setValue("Bearer \(try await auth.accessToken())", forHTTPHeaderField: "Authorization")
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        request.setValue("resolution=ignore-duplicates", forHTTPHeaderField: "Prefer")
+        request.httpBody = try JSONSerialization.data(withJSONObject: [
+            "household_id": id.uuidString.lowercased(),
+            "user_id": userID.uuidString.lowercased(),
+        ])
+
+        let (data, response) = try await URLSession.shared.data(for: request)
+        if let http = response as? HTTPURLResponse, !(200..<300).contains(http.statusCode) {
+            let detail = (try? JSONSerialization.jsonObject(with: data) as? [String: Any])
+                .flatMap { $0?["message"] as? String } ?? "The server answered \(http.statusCode)."
+            throw SyncError.server(detail)
+        }
+    }
+
     // MARK: - Syncing
 
     func sync() async {
-        guard let engine, step == .ready, isSharing else { return }
+        guard let engine, step == .ready, let group = SyncGroup.current else { return }
         busy = true
         defer { busy = false }
+
+        // Cheap, idempotent, and it rescues a device whose membership never
+        // got written: without it, such a phone shows a row level security
+        // error forever with no way out but reinstalling.
+        do {
+            try await register(group)
+        } catch {
+            problem = (error as? LocalizedError)?.errorDescription ?? "\(error)"
+            return
+        }
 
         await engine.run()
 

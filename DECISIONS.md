@@ -1318,3 +1318,25 @@ Worth noting that the failure was loud, immediate and named the exact table.
 Had the policy been left off, this would have worked, both households would
 have written into the same rows, and the first symptom would have been someone
 else's groceries on the list.
+
+## Nothing is remembered until the server has agreed to it
+
+The second failure against Supabase looked identical to the first and was not.
+The group id was saved to the Keychain before the membership row was written,
+so when that write failed the device was left in a state it could never leave:
+the screen said it was sharing, offered "Sync now", and every sync was refused
+because no membership had ever existed. Nothing in the app could fix it.
+
+Two changes. The group id is only stored once the server has accepted the
+membership. And every sync re-writes that membership first, which is one small
+idempotent insert and is the difference between a device that recovers on the
+next tap and one that needs reinstalling.
+
+The second is worth more than the first. A device restored from a backup
+arrives in exactly the broken state: the Keychain travels, the server's
+membership table does not know about it. Making the client repair that itself
+costs one request per sync.
+
+The general shape: local state that claims a server agreed to something has to
+be written after the server agrees, and anything derived from that agreement
+should be re-asserted rather than assumed.

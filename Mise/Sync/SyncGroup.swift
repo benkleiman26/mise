@@ -23,20 +23,21 @@ enum SyncGroup {
         return UUID(uuidString: saved)
     }
 
-    /// The group this device already belongs to, or a new one.
-    @discardableResult
-    static func makeIfNeeded() -> UUID {
-        if let existing = current { return existing }
-        let fresh = UUID()
-        Keychain.set(fresh.uuidString, for: key)
-        return fresh
-    }
+    /// A group id to try, without committing to it.
+    ///
+    /// Saving before the server has accepted the membership is what made the
+    /// first real attempt unrecoverable: the device looked like it was
+    /// sharing, the screen offered "Sync now", and every sync was refused
+    /// because no membership row had ever been written. Nothing is stored
+    /// until `adopt` is called.
+    static func proposed() -> UUID { current ?? UUID() }
 
-    /// Joins the group behind an invite code.
-    static func join(code: String) -> UUID? {
-        guard let id = UUID(uuidString: Self.tidy(code)) else { return nil }
+    /// An invite code, if it is one.
+    static func proposed(code: String) -> UUID? { UUID(uuidString: tidy(code)) }
+
+    /// Remembers the group, once the server has agreed this device is in it.
+    static func adopt(_ id: UUID) {
         Keychain.set(id.uuidString, for: key)
-        return id
     }
 
     static func leave() {

@@ -113,6 +113,7 @@ final class SyncStore {
 
     private func attempt(_ work: @escaping (SupabaseAuth) async throws -> SupabaseAuth.Session) async {
         guard let auth else { return }
+        problem = nil
         busy = true
         defer { busy = false }
         do {
@@ -147,6 +148,7 @@ final class SyncStore {
     }
 
     private func enterGroup(_ id: UUID) async {
+        problem = nil
         busy = true
         defer { busy = false }
 
@@ -168,6 +170,9 @@ final class SyncStore {
     /// token is not being accepted. This says which, in one tap, instead of
     /// another round of reasoning from a status line.
     func checkConnection() async {
+        serverSays = nil
+        problem = nil
+
         guard let config, let auth else {
             serverSays = "No server configured."
             return
@@ -237,6 +242,9 @@ final class SyncStore {
     // MARK: - Syncing
 
     func sync() async {
+        problem = nil
+        serverSays = nil
+
         guard let engine else {
             problem = "Sharing is not set up on this phone: supabase.json is missing from the app bundle."
             return

@@ -33,3 +33,5 @@ npm-debug.log*
 # nobody else's business. See supabase/supabase.example.json.
 Mise/Resources/supabase.json
 Secrets.xcconfig
+scripts/appstore.env
+build/

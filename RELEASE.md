@@ -30,31 +30,49 @@ something quickly, but it does not get the app to anyone else.
    **App ID**, explicit, with that exact string.
 4. SKU can be anything, `mise` is fine.
 
+### One time: an upload key
+
+So that shipping is a command rather than eight clicks in Xcode's Organizer.
+
+1. <https://appstoreconnect.apple.com> → **Users and Access** →
+   **Integrations** → **App Store Connect API** → **Team Keys** → **+**
+2. Name it `mise-release`, role **App Manager**, Generate
+3. Download the `.p8`. **It downloads once and never again.** Put it
+   somewhere sensible:
+
+   ```sh
+   mkdir -p ~/private_keys
+   mv ~/Downloads/AuthKey_*.p8 ~/private_keys/
+   ```
+
+4. Note the **Key ID** from that row and the **Issuer ID** from the top of the
+   page, then:
+
+   ```sh
+   cd ~/mise
+   cp scripts/appstore.env.example scripts/appstore.env
+   open -e scripts/appstore.env
+   ```
+
+   Fill in the three values. That file is git ignored; the `.p8` is a
+   credential that can upload builds under your name, so it stays out of the
+   repository and out of chat.
+
 ### Every build
 
 ```sh
-cd ~/mise
-xcodebuild -scheme Mise -destination 'generic/platform=iOS' \
-  -archivePath ~/Desktop/Mise.xcarchive archive
+cd ~/mise && ./scripts/release.sh
 ```
 
-Then in Xcode: **Window → Organizer → Archives**, select the newest, click
-**Distribute App → TestFlight & App Store → Upload**.
+It runs the tests, refuses to ship if they fail, raises the build number,
+archives, and uploads. Ten minutes, mostly waiting.
 
-Processing takes ten to twenty minutes. Then in App Store Connect:
-**TestFlight → Internal Testing**, add yourself and your wife by Apple ID
-email. Internal testers need no review and get it within minutes.
-
-**Raise the build number before every upload**, or the upload is rejected for
-reusing one:
-
-```sh
-cd ~/mise
-agvtool next-version -all
-```
+Apple then takes ten to twenty minutes to process it. Internal testers get it
+straight away. An external group's **first** build needs Apple's review,
+usually within a day; after that one, later builds go out without review.
 
 `MARKETING_VERSION` is the version people see, currently `0.1`. Raise it by
-hand in Xcode when it is worth calling something new.
+hand in Xcode when something is worth calling new.
 
 ## What she will and will not get
 

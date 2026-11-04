@@ -1224,3 +1224,26 @@ filling the corners left a seam, and recolouring the corner squares clipped
 the M. What worked was compositing the art onto a solid green square through a
 rounded rectangle mask five pixels inside its own curve, which replaces the
 white and the antialiased edge together.
+
+## Shipping is a script, because the step that gets forgotten is the build number
+
+Asked whether this could be set up from here: it cannot. TestFlight needs an
+App Store Connect account behind two factor authentication and a Mac to build
+the archive on, and the cloud container has neither.
+
+What it can do is make the Mac side one command. `scripts/release.sh` runs the
+tests, refuses to ship if they fail, raises the build number, archives, and
+uploads through an App Store Connect API key.
+
+The build number is the reason this is a script rather than a note. Apple
+rejects an upload that reuses one, and the archive takes several minutes, so
+forgetting it means finding out after the slow part. A script cannot forget.
+
+Running the tests first is the other reason. A build that goes to another
+household should at least have passed the things that are already checked, and
+the moment it is eight manual steps, that one gets skipped.
+
+The upload uses an API key rather than Xcode's Organizer so nothing has to be
+clicked and no password is typed into a prompt. The `.p8` is a credential that
+can upload builds under the owner's name, so it lives outside the repository,
+and `appstore.env` beside it is git ignored.

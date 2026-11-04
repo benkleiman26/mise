@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>method</key>
+    <string>app-store-connect</string>
+
+    <!-- Sends it straight to App Store Connect instead of leaving an ipa on
+         the desk to be dragged into Xcode's Organizer. -->
+    <key>destination</key>
+    <string>upload</string>
+
+    <key>teamID</key>
+    <string>NDM99C66D7</string>
+
+    <key>signingStyle</key>
+    <string>automatic</string>
+
+    <!-- The app has no symbols worth Apple's crash reporter beyond the ones
+         it already gets, and uploading them is slow. -->
+    <key>uploadSymbols</key>
+    <true/>
+
+    <!-- App thinning is for the App Store. TestFlight builds go to two
+         phones, so a universal build is simpler and the size is irrelevant. -->
+    <key>thinning</key>
+    <string>&lt;none&gt;</string>
+</dict>
+</plist>

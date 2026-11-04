@@ -1,5 +1,17 @@
 # Getting Mise onto a phone
 
+## Updating first
+
+```sh
+cd ~/mise && ./scripts/update.sh
+```
+
+Not plain `git pull`. Xcode rewrites `Mise.xcodeproj/project.pbxproj` whenever
+files change on disk, so the next pull is refused for local changes and says so
+in a line that scrolls past in a terminal full of build output. The result is
+rebuilding code that did not change. This parks Xcode's edits, pulls, and
+prints what actually arrived.
+
 Signing is set in the project: team `NDM99C66D7`, bundle id
 `com.benkleiman.mise`, automatic signing. Nothing to pick in Xcode.
 

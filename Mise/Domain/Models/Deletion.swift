@@ -66,8 +66,31 @@ enum SyncEntity: String, Codable, CaseIterable, Sendable {
     case groceryList
     case groceryItem
 
-    /// Photos are big, they never change once imported, and two phones do not
-    /// need the same 600 of them to shop from one list. Section 5.5's sync is
-    /// about the plan and the list.
-    var carriesPhotos: Bool { false }
+    /// Whether this travels between phones.
+    ///
+    /// The recipe library does not, and that is the decision that makes sync
+    /// small enough to trust. 427 recipes with their ingredients and steps is
+    /// around eight thousand rows, most of them never changing, and sending
+    /// them would dominate every sync for no benefit: both phones can hold the
+    /// same library by importing the same files.
+    ///
+    /// That works because an imported recipe's id is derived from its source
+    /// id rather than generated, so the same file produces the same ids on
+    /// both devices. A planned meal made here resolves to the right recipe
+    /// there without the recipe ever crossing the wire.
+    ///
+    /// What has to be shared is what changes daily and has to agree: the week,
+    /// the list, the pantry, and the household's settings.
+    var isShared: Bool {
+        switch self {
+        case .household, .householdPreferences, .user,
+             .pantryEntry, .mealPlan, .plannedMeal,
+             .groceryList, .groceryItem:
+            true
+        case .canonicalItem, .recipe, .ingredient, .recipeStep:
+            false
+        }
+    }
+
+    static var shared: [SyncEntity] { allCases.filter(\.isShared) }
 }

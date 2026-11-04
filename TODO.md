@@ -309,10 +309,8 @@ green on the Mac: 70 tests, no failures, up from 61 before `ListGenerator`.
 - [x] The app icon is a board, parsley, a tomato and a knife over the word
       Mise, supplied by the owner. The two generated attempts before it read
       as a face and as a generic to-do app respectively.
-- [ ] The icon carries the word "Mise", which iOS also prints underneath it.
-      Harmless, slightly redundant, and the lettering will not be readable at
-      home screen size. The board mark carries it on its own, so a version
-      without the word is worth trying.
+- [x] The icon is the board mark on its own, with no lettering. iOS prints the
+      app's name underneath it already.
 - [ ] No recipe images for the seed set. The 45 built in recipes show the
       coloured initial tile, which is the placeholder, so this is no longer
       urgent.

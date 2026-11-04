@@ -103,6 +103,47 @@ drop policy if exists "a person leaves a household" on mise_household_members;
 create policy "a person leaves a household" on mise_household_members
   for delete using (user_id = auth.uid());
 
+-- Joining, done by the server rather than by the client.
+--
+-- The policy above is the whole story in theory: a person may insert a row
+-- that names themselves. In practice the client insert was refused by that
+-- policy for four rounds of debugging while `mise_whoami()` kept answering
+-- with the right account, which is the signature of the insert never being a
+-- plain insert at all. PostgREST turns a POST carrying
+-- `Prefer: resolution=ignore-duplicates` into an upsert, and an upsert is
+-- checked against the update policy too, and there is no update policy here
+-- because nothing about a membership row is editable.
+--
+-- Rather than keep the client guessing at which policy it has to satisfy,
+-- the server does the insert itself. This runs as the owner, so no policy
+-- applies, and it is safe for exactly one reason: the row it writes is built
+-- from `auth.uid()` and not from anything the caller sends. A caller can
+-- name any household, which is the point, since knowing the invite code is
+-- what joining means. A caller cannot name anybody but themselves.
+create or replace function mise_join_household(target uuid)
+returns uuid
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+  caller uuid := auth.uid();
+begin
+  if caller is null then
+    raise exception 'Not signed in.' using errcode = '28000';
+  end if;
+
+  insert into mise_household_members (household_id, user_id)
+  values (target, caller)
+  on conflict (household_id, user_id) do nothing;
+
+  return caller;
+end;
+$$;
+
+revoke all on function mise_join_household(uuid) from public;
+grant execute on function mise_join_household(uuid) to authenticated;
+
 drop policy if exists "members read records" on mise_records;
 create policy "members read records" on mise_records
   for select using (mise_is_member_of(household_id));
@@ -114,6 +155,14 @@ create policy "members write records" on mise_records
 drop policy if exists "members update records" on mise_records;
 create policy "members update records" on mise_records
   for update using (mise_is_member_of(household_id)) with check (mise_is_member_of(household_id));
+
+-- `mise_push_deletions` clears the record a tombstone replaces. Without a
+-- delete policy that clear-out matches no rows and fails silently, because
+-- row level security hides rows from a delete rather than refusing it, so a
+-- deleted item would come back the first time a new phone pulled everything.
+drop policy if exists "members remove records" on mise_records;
+create policy "members remove records" on mise_records
+  for delete using (mise_is_member_of(household_id));
 
 drop policy if exists "members read deletions" on mise_deletions;
 create policy "members read deletions" on mise_deletions

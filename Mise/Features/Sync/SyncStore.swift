@@ -211,32 +211,51 @@ final class SyncStore {
 
     /// Writes the membership row, quietly, every time.
     ///
-    /// It is one small idempotent insert, and it is the difference between a
+    /// It is one small idempotent call, and it is the difference between a
     /// device that recovers on the next tap and one that is stuck forever
     /// showing a row level security error it cannot act on. Devices restored
     /// from a backup arrive in exactly that state: the group is in the
     /// Keychain and the membership is not on the server.
     private func register(_ id: UUID) async throws {
         guard let config, let auth else { throw SyncError.notSignedIn }
-        guard let userID = await auth.signedInUserID else { throw SyncError.notSignedIn }
 
-        var request = URLRequest(url: config.url.appending(path: "/rest/v1/mise_household_members"))
+        var request = URLRequest(url: config.url.appending(path: "/rest/v1/rpc/mise_join_household"))
         request.httpMethod = "POST"
         request.setValue(config.anonKey, forHTTPHeaderField: "apikey")
         request.setValue("Bearer \(try await auth.accessToken())", forHTTPHeaderField: "Authorization")
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-        request.setValue("resolution=ignore-duplicates", forHTTPHeaderField: "Prefer")
         request.httpBody = try JSONSerialization.data(withJSONObject: [
-            "household_id": id.uuidString.lowercased(),
-            "user_id": userID.uuidString.lowercased(),
+            "target": id.uuidString.lowercased(),
         ])
 
         let (data, response) = try await URLSession.shared.data(for: request)
-        if let http = response as? HTTPURLResponse, !(200..<300).contains(http.statusCode) {
-            let detail = (try? JSONSerialization.jsonObject(with: data) as? [String: Any])
-                .flatMap { $0?["message"] as? String } ?? "The server answered \(http.statusCode)."
-            throw SyncError.server(detail)
+        guard let http = response as? HTTPURLResponse else { return }
+        if (200..<300).contains(http.statusCode) { return }
+        if http.statusCode == 404 {
+            throw SyncError.server(
+                "The mise_join_household function is missing. Open supabase/schema.sql and run it again in the Supabase SQL editor."
+            )
         }
+        throw SyncError.server(Self.explain(data, status: http.statusCode))
+    }
+
+    /// Turns a PostgREST error body into something worth reading.
+    ///
+    /// Its errors carry four fields and the useful one moves around: the
+    /// message names the table, the hint names the fix, and the code is the
+    /// only part that is stable enough to look up. Showing one of them and
+    /// dropping the rest cost several rounds here, where "new row violates
+    /// row level security policy" was true, unhelpful, and the whole of what
+    /// the screen said.
+    private static func explain(_ data: Data, status: Int) -> String {
+        guard let body = try? JSONSerialization.jsonObject(with: data) as? [String: Any] else {
+            let text = String(data: data, encoding: .utf8) ?? ""
+            return text.isEmpty ? "The server answered \(status)." : "\(status): \(text)"
+        }
+        let parts = ["message", "details", "hint", "code"]
+            .compactMap { body[$0] as? String }
+            .filter { !$0.isEmpty }
+        return parts.isEmpty ? "The server answered \(status)." : parts.joined(separator: " ")
     }
 
     // MARK: - Syncing

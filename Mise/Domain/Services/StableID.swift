@@ -46,6 +46,46 @@ enum StableID {
         uuid(name: "pantryEntry:\(householdID.uuidString):\(canonicalItemID.uuidString)")
     }
 
+    /// The week's plan.
+    ///
+    /// Derived rather than generated because both phones build their own
+    /// before they ever sync, and a record each phone invents separately is a
+    /// record that never merges: two plans for one week, each phone pushing
+    /// its own and showing whichever the database hands back first.
+    static func mealPlan(householdID: UUID, weekStartDate: Date) -> UUID {
+        uuid(name: "mealPlan:\(householdID.uuidString):\(day(weekStartDate))")
+    }
+
+    /// The household's grocery list. One at a time, per section 1a, so the
+    /// household is the whole key.
+    static func groceryList(householdID: UUID) -> UUID {
+        uuid(name: "groceryList:\(householdID.uuidString)")
+    }
+
+    /// A line on the list.
+    ///
+    /// Keyed by what the line is rather than when it was made, because both
+    /// phones generate the list from the same plan and would otherwise each
+    /// invent their own "2 lemons". The canonical item is the key where there
+    /// is one, since that is exactly what the generator merges on.
+    static func groceryItem(listID: UUID, canonicalItemID: UUID?, displayName: String) -> UUID {
+        let key = canonicalItemID?.uuidString
+            ?? "name:\(displayName.trimmingCharacters(in: .whitespacesAndNewlines).lowercased())"
+        return uuid(name: "groceryItem:\(listID.uuidString):\(key)")
+    }
+
+    /// The calendar day a date falls on, as this phone's own calendar sees it.
+    ///
+    /// Two phones in one household keep the same calendar, so they agree on
+    /// the string without ever talking, which is the whole point. Formatted by
+    /// hand rather than through a DateFormatter because a formatter would
+    /// bring a locale with it, and a locale is exactly the thing that must not
+    /// change the id.
+    static func day(_ date: Date) -> String {
+        let parts = Calendar.current.dateComponents([.year, .month, .day], from: date)
+        return String(format: "%04d-%02d-%02d", parts.year ?? 0, parts.month ?? 0, parts.day ?? 0)
+    }
+
     static func user(key: String) -> UUID {
         uuid(name: "user:\(key)")
     }

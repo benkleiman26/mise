@@ -127,7 +127,12 @@ final class PlanStore {
         if let existing = try plans.all().first(where: { Calendar.current.isDate($0.weekStartDate, inSameDayAs: weekStart) }) {
             return existing
         }
-        let plan = MealPlan(householdID: try householdID(), weekStartDate: weekStart)
+        let household = try householdID()
+        let plan = MealPlan(
+            id: StableID.mealPlan(householdID: household, weekStartDate: weekStart),
+            householdID: household,
+            weekStartDate: weekStart
+        )
         plans.insert(plan)
         try plans.save()
         return plan

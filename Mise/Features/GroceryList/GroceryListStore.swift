@@ -83,29 +83,79 @@ final class GroceryListStore {
 
             let generated = try makeGenerator().generate(plan: try planInputs(), carryingOver: previous)
 
-            let list = existing ?? GroceryList(householdID: householdID)
+            let list = existing ?? GroceryList(
+                id: StableID.groceryList(householdID: householdID),
+                householdID: householdID
+            )
             if existing == nil { lists.insert(list) }
 
-            let doomed = list.items
-            list.items.removeAll()
-            for row in doomed { lists.deleteItem(row) }
+            // Updated in place, keyed by what each line is rather than by when
+            // it was made.
+            //
+            // Clearing the list and building it again was simpler and wrong in
+            // two ways once a second phone exists. It wrote a tombstone per
+            // row, and a tombstone is a decision: the other phone reads it as
+            // "this was taken off the list" and removes its own copy. And the
+            // replacement rows carried new random ids, so both phones ended up
+            // with their own "2 lemons" and the list showed everything twice.
+            var byID: [UUID: GroceryItem] = [:]
+            for row in list.items { byID[row.id] = row }
 
+            var kept: Set<UUID> = []
             for (index, item) in generated.items.enumerated() {
-                let row = GroceryItem(
-                    householdID: householdID,
-                    position: index,
+                // Two lines that key the same would collide. The generator
+                // merges on the canonical item so this should not happen, but
+                // the tie-break has to be deterministic rather than lucky:
+                // both phones must land on the same answer.
+                var id = StableID.groceryItem(
+                    listID: list.id,
                     canonicalItemID: item.canonicalItemID,
-                    displayName: item.displayName,
-                    quantities: item.quantities,
-                    manualQuantities: item.manualQuantities,
-                    aisle: item.aisle,
-                    isChecked: item.isChecked,
-                    sourceRecipeIDs: item.sourceRecipeIDs,
-                    isManual: item.isManual
+                    displayName: item.displayName
                 )
-                row.list = list
-                list.items.append(row)
+                var attempt = 1
+                while kept.contains(id) {
+                    id = StableID.groceryItem(
+                        listID: list.id,
+                        canonicalItemID: item.canonicalItemID,
+                        displayName: "\(item.displayName)#\(attempt)"
+                    )
+                    attempt += 1
+                }
+                kept.insert(id)
+
+                if let row = byID[id] {
+                    row.position = index
+                    row.canonicalItemID = item.canonicalItemID
+                    row.displayName = item.displayName
+                    row.quantities = item.quantities
+                    row.manualQuantities = item.manualQuantities
+                    row.aisle = item.aisle
+                    row.isChecked = item.isChecked
+                    row.sourceRecipeIDs = item.sourceRecipeIDs
+                    row.isManual = item.isManual
+                    row.updatedAt = .now
+                } else {
+                    let row = GroceryItem(
+                        id: id,
+                        householdID: householdID,
+                        position: index,
+                        canonicalItemID: item.canonicalItemID,
+                        displayName: item.displayName,
+                        quantities: item.quantities,
+                        manualQuantities: item.manualQuantities,
+                        aisle: item.aisle,
+                        isChecked: item.isChecked,
+                        sourceRecipeIDs: item.sourceRecipeIDs,
+                        isManual: item.isManual
+                    )
+                    row.list = list
+                    list.items.append(row)
+                }
             }
+
+            let gone = list.items.filter { !kept.contains($0.id) }
+            list.items.removeAll { !kept.contains($0.id) }
+            for row in gone { lists.deleteItem(row) }
             list.generatedAt = .now
             list.updatedAt = .now
             try lists.save()
@@ -139,7 +189,10 @@ final class GroceryListStore {
             if let existing = try currentList() {
                 list = existing
             } else {
-                list = GroceryList(householdID: householdID)
+                list = GroceryList(
+                    id: StableID.groceryList(householdID: householdID),
+                    householdID: householdID
+                )
                 lists.insert(list)
             }
 
@@ -159,7 +212,16 @@ final class GroceryListStore {
                 existing.isChecked = false
                 existing.updatedAt = .now
             } else {
+                // The same key the generator uses, so that regenerating
+                // updates this row rather than deleting it and making a new
+                // one, and so that both phones adding "paper towels" by hand
+                // end up with one line instead of two.
                 let row = GroceryItem(
+                    id: StableID.groceryItem(
+                        listID: list.id,
+                        canonicalItemID: match.item?.id,
+                        displayName: display
+                    ),
                     householdID: householdID,
                     position: (list.items.map(\.position).max() ?? -1) + 1,
                     canonicalItemID: match.item?.id,

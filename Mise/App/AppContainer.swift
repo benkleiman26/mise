@@ -74,6 +74,15 @@ final class AppContainer {
                 pantry: pantry
             )
             seedReport = try installer.install(catalog)
+
+            // After seeding, because a household has to exist before anything
+            // can be keyed to it. Does nothing once there is nothing left to
+            // merge, which is every launch after the first one that runs it.
+            try DuplicateReconciler(
+                households: households,
+                mealPlans: mealPlans,
+                groceryLists: groceryLists
+            ).run()
         } catch {
             startupProblem = "The starter recipes and grocery items could not be loaded. \(error)"
         }

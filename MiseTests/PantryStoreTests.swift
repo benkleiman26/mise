@@ -156,4 +156,121 @@ final class PantryStoreTests: XCTestCase {
         excluded = Set(try pantry.all().filter { $0.status == .have }.map(\.canonicalItemID))
         XCTAssertFalse(excluded.contains(eggs.id), "once they are out, eggs reach the list again")
     }
+
+    // MARK: - Adding
+
+    func testSuggestionsFindAnItemByItsOwnName() {
+        item("green onion")
+        item("dragonfruit")
+
+        XCTAssertEqual(store.suggestions(for: "onion").map(\.name), ["green onion"])
+    }
+
+    func testSuggestionsFindAnItemByASpellingItAlreadyKnows() {
+        let onion = CanonicalItem(
+            householdID: householdID, name: "green onion", aliases: ["scallion"], aisle: .produce
+        )
+        canonicalItems.insert(onion)
+        try? canonicalItems.save()
+
+        let found = store.suggestions(for: "scallion")
+        XCTAssertEqual(found.map(\.name), ["green onion"])
+        XCTAssertEqual(found.first?.matchedOn, "scallion",
+                       "somebody who typed scallion has to understand why they are being offered green onion")
+    }
+
+    func testSuggestionsFindAnItemByASpellingTheUserTaught() {
+        let stock = CanonicalItem(
+            householdID: householdID, name: "chicken broth", learnedAliases: ["chicken stock"], aisle: .cannedAndJarred
+        )
+        canonicalItems.insert(stock)
+        try? canonicalItems.save()
+
+        XCTAssertEqual(store.suggestions(for: "chicken stock").map(\.name), ["chicken broth"])
+    }
+
+    func testSuggestionsSayWhatIsAlreadyTracked() {
+        let salt = item("kosher salt", aisle: .bakingAndSpices)
+        track(salt, .have)
+
+        XCTAssertEqual(store.suggestions(for: "salt").first?.isTracked, true)
+    }
+
+    func testTheGeneralItemComesBeforeTheSpecificOne() {
+        item("rice vinegar", aisle: .oilsAndCondiments)
+        item("rice", aisle: .riceGrainsBeans)
+        item("brown rice", aisle: .riceGrainsBeans)
+
+        XCTAssertEqual(store.suggestions(for: "rice").map(\.name).first, "rice",
+                       "somebody who typed rice means rice")
+    }
+
+    func testTrackingSomethingTheTableAlreadyKnows() throws {
+        item("dragonfruit")
+        let found = try XCTUnwrap(store.suggestions(for: "dragonfruit").first)
+
+        store.track(found, as: .low)
+
+        XCTAssertEqual(rows.map(\.name), ["dragonfruit"])
+        XCTAssertEqual(rows.first?.status, .low)
+        XCTAssertEqual(try canonicalItems.count(), 1, "tracking must not invent a second row for it")
+    }
+
+    func testAddingSomethingTheTableHasNeverHeardOf() throws {
+        XCTAssertTrue(store.addItem(named: "gochujang", aisle: .international, status: .have))
+
+        XCTAssertEqual(rows.map(\.name), ["gochujang"])
+        XCTAssertEqual(rows.first?.status, .have)
+
+        let added = try XCTUnwrap(canonicalItems.all().first { $0.name == "gochujang" })
+        XCTAssertEqual(added.aisle, .international)
+        XCTAssertFalse(added.isStaple, "the status is explicit, so nothing has to be inferred from staple-ness")
+    }
+
+    /// The id comes from the name, the same way seeding derives one, so two
+    /// phones that both add the same thing end up with one item and not two.
+    func testTwoPhonesAddingTheSameNameAgreeOnItsID() throws {
+        store.addItem(named: "gochujang", aisle: .international, status: .have)
+
+        XCTAssertEqual(
+            try canonicalItems.all().first { $0.name == "gochujang" }?.id,
+            StableID.canonicalItem(name: "gochujang")
+        )
+    }
+
+    func testAddingNormalisesWhatWasTyped() throws {
+        XCTAssertTrue(store.addItem(named: "  Gochujang  ", aisle: .international, status: .have))
+
+        let added = try XCTUnwrap(canonicalItems.all().first)
+        XCTAssertEqual(added.name, "gochujang", "lowercase and trimmed, the way the table stores them")
+    }
+
+    /// Names and aliases share one namespace. A second row for a name the
+    /// table already knows would quietly stop the two merging on the list,
+    /// which is the one thing the table exists to do.
+    func testANameTheTableAlreadyUsesIsRefused() throws {
+        item("kosher salt", aisle: .bakingAndSpices)
+
+        XCTAssertFalse(store.addItem(named: "kosher salt", aisle: .other, status: .have))
+        XCTAssertEqual(try canonicalItems.count(), 1)
+        XCTAssertNotNil(store.loadProblem, "a refusal nobody is told about reads as a bug")
+    }
+
+    func testASpellingAnotherItemAlreadyClaimsIsRefused() throws {
+        let onion = CanonicalItem(
+            householdID: householdID, name: "green onion", aliases: ["scallion"], aisle: .produce
+        )
+        canonicalItems.insert(onion)
+        try canonicalItems.save()
+
+        XCTAssertTrue(store.isNameTaken("scallion"))
+        XCTAssertFalse(store.addItem(named: "scallion", aisle: .produce, status: .have))
+        XCTAssertEqual(try canonicalItems.count(), 1,
+                       "a scallion row beside green onion would stop the two merging on the list")
+    }
+
+    func testAnEmptyNameIsNotAnItem() throws {
+        XCTAssertFalse(store.addItem(named: "   ", aisle: .other, status: .have))
+        XCTAssertEqual(try canonicalItems.count(), 0)
+    }
 }

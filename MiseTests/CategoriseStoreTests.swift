@@ -46,6 +46,7 @@ final class CategoriseStoreTests: XCTestCase {
         return recipe
     }
 
+    @discardableResult
     private func makeItem(_ name: String, aisle: Aisle) -> CanonicalItem {
         let item = CanonicalItem(householdID: householdID, name: name, aisle: aisle)
         canonicalItems.insert(item)

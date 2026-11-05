@@ -278,9 +278,16 @@ final class SeedInstallerTests: XCTestCase {
     func testAnExistingItemIsBroughtUpToDateRatherThanSkipped() throws {
         try makeInstaller().install(catalog)
 
-        let name = try XCTUnwrap(catalog.canonicalItems.first?.name)
-        let id = StableID.canonicalItem(name: name)
+        // An item that has something to be behind on, rather than whichever
+        // one happens to be first. The catalog's first entry is "bagels",
+        // which has no aliases and is not a staple, so blanking those fields
+        // changed nothing, nothing was counted as refreshed, and the test
+        // passed by asserting that empty equals empty. It went quiet the day
+        // the catalog was reordered and stayed quiet.
+        let seed = try XCTUnwrap(catalog.canonicalItems.first { !$0.aliases.isEmpty })
+        let id = StableID.canonicalItem(name: seed.name)
         let item = try XCTUnwrap(canonicalItems.find(id: id))
+        XCTAssertFalse(seed.aliases.isEmpty, "the fixture has to have something to restore")
 
         // Something the user's store is now behind on.
         item.aliases = []
@@ -290,8 +297,8 @@ final class SeedInstallerTests: XCTestCase {
         let second = try makeInstaller().install(catalog)
 
         let refreshed = try XCTUnwrap(canonicalItems.find(id: id))
-        XCTAssertEqual(refreshed.aliases, catalog.canonicalItems[0].aliases)
-        XCTAssertEqual(refreshed.isStaple, catalog.canonicalItems[0].isStaple)
+        XCTAssertEqual(refreshed.aliases, seed.aliases)
+        XCTAssertEqual(refreshed.isStaple, seed.isStaple)
         XCTAssertGreaterThan(second.canonicalItemsUpdated, 0)
         XCTAssertEqual(second.canonicalItemsInserted, 0, "nothing new was added, only refreshed")
     }

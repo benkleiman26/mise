@@ -221,4 +221,46 @@ final class SyncEngineTests: XCTestCase {
             "and between them they carry everything"
         )
     }
+
+    // MARK: - Reading back what was written
+
+    /// The mapper could not read a record it had just written. The encoder
+    /// spells an id `.uuid` and the reader only accepted `.string`, which is
+    /// what the wire produces, so the gap never showed on a real sync and
+    /// swallowed every record in a test that built one by hand. A guard that
+    /// returns false reads as validation rather than as a bug.
+    func testARecordSurvivesBeingWrittenAndReadBack() throws {
+        let items = SwiftDataCanonicalItemRepository(context: context)
+        let pantryRepository = SwiftDataPantryRepository(context: context)
+        let mapper = SyncMapper(
+            households: households,
+            users: SwiftDataUserRepository(context: context),
+            canonicalItems: items,
+            recipes: SwiftDataRecipeRepository(context: context),
+            pantry: pantryRepository,
+            plans: SwiftDataMealPlanRepository(context: context),
+            lists: SwiftDataGroceryListRepository(context: context)
+        )
+
+        let item = CanonicalItem(householdID: householdID, name: "gochujang", aisle: .international)
+        items.insert(item)
+        let entry = PantryEntry(householdID: householdID, canonicalItemID: item.id, status: .low)
+        pantryRepository.insert(entry)
+        try pantryRepository.save()
+
+        let written = try mapper.records(changedSince: nil)
+        let pantryRecord = try XCTUnwrap(written.first { $0.entity == .pantryEntry })
+
+        // Removed here, then handed back exactly as it was sent.
+        pantryRepository.delete(entry)
+        try pantryRepository.save()
+        XCTAssertEqual(try pantryRepository.count(), 0)
+
+        let taken = try mapper.apply([pantryRecord], as: householdID)
+
+        XCTAssertEqual(taken, 1, "the mapper has to be able to read its own handwriting")
+        let restored = try XCTUnwrap(pantryRepository.all().first)
+        XCTAssertEqual(restored.canonicalItemID, item.id)
+        XCTAssertEqual(restored.status, .low)
+    }
 }

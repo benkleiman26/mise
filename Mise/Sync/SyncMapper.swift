@@ -737,14 +737,28 @@ private extension SyncRecord {
         }
     }
 
+    /// Both spellings, and that is not belt and braces.
+    ///
+    /// The encoder writes `.uuid`, and everything that goes over the wire is
+    /// turned into text on the way out and comes back as `.string`, so only
+    /// the string case was ever exercised. Which meant the mapper could not
+    /// read back a record it had just written: every id came back nil and
+    /// every record was dropped, silently, by a guard that looks like
+    /// ordinary validation. It cost an afternoon of reading the engine.
     func uuid(_ key: String) -> UUID? {
-        guard case .string(let value) = fields[key] else { return nil }
-        return UUID(uuidString: value)
+        switch fields[key] {
+        case .uuid(let value): value
+        case .string(let value): UUID(uuidString: value)
+        default: nil
+        }
     }
 
     func uuids(_ key: String) -> [UUID]? {
-        guard case .strings(let values) = fields[key] else { return nil }
-        return values.compactMap(UUID.init(uuidString:))
+        switch fields[key] {
+        case .uuids(let values): values
+        case .strings(let values): values.compactMap(UUID.init(uuidString:))
+        default: nil
+        }
     }
 
     func strings(_ key: String) -> [String]? {
@@ -753,8 +767,11 @@ private extension SyncRecord {
     }
 
     func date(_ key: String) -> Date? {
-        guard case .string(let value) = fields[key] else { return nil }
-        return SupabaseSyncClient.date(from: value)
+        switch fields[key] {
+        case .date(let value): value
+        case .string(let value): SupabaseSyncClient.date(from: value)
+        default: nil
+        }
     }
 
     func enumeration<T: RawRepresentable>(_ key: String) -> T? where T.RawValue == String {

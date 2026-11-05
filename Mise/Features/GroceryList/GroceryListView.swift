@@ -48,7 +48,7 @@ struct GroceryListView: View {
             }
             .sheet(item: $showing) { item in
                 if let store {
-                    sources(for: item, in: store)
+                    GroceryItemDetail(item: item, store: store) { showing = nil }
                 }
             }
         }
@@ -143,55 +143,6 @@ struct GroceryListView: View {
         }
     }
 
-    /// What a row is for. Section 5.3 asks for this, and a shopper standing in
-    /// front of the parsley needs it to decide whether to bother.
-    @ViewBuilder
-    private func sources(for item: GroceryItem, in store: GroceryListStore) -> some View {
-        let meals = store.meals(for: item)
-
-        NavigationStack {
-            List {
-                Section {
-                    LabeledContent("Item", value: item.displayName)
-                    if let detail = amount(item) {
-                        LabeledContent("Amount", value: detail)
-                    }
-                    LabeledContent("Aisle", value: item.aisle.displayName)
-                }
-
-                Section("Needed for") {
-                    if meals.isEmpty {
-                        Text(item.isManual
-                             ? "You added this one yourself."
-                             : "Nothing in this week's plan, so this came from an earlier list.")
-                            .foregroundStyle(.secondary)
-                    } else {
-                        ForEach(meals, id: \.self) { meal in
-                            Text(meal)
-                        }
-                    }
-                }
-
-                Section {
-                    Button(role: .destructive) {
-                        store.delete(item)
-                        showing = nil
-                    } label: {
-                        Text("Remove from the list")
-                    }
-                }
-            }
-            .navigationTitle(item.displayName)
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .confirmationAction) {
-                    Button("Done") { showing = nil }
-                }
-            }
-        }
-        .presentationDetents([.medium])
-    }
-
     private func amount(_ item: GroceryItem) -> String? {
         item.quantities.isEmpty ? nil : item.formatted
     }
@@ -209,6 +160,100 @@ struct GroceryListView: View {
             : remaining == 1 ? "1 item left." : "\(remaining) items left."
 
         return [left, made].filter { !$0.isEmpty }.joined(separator: " ")
+    }
+}
+
+
+/// One line on the list, and everything a person wants to do to it.
+///
+/// It was read only, which made it a dead end: the one place in the app that
+/// shows what a line is and why it is there, with no way to fix a name the
+/// parser got wrong, an amount that is not what the shop sells, or an aisle
+/// that is wrong because nothing in the grocery table had heard of acai.
+///
+/// Edits are collected here and written once, on Done. Writing per keystroke
+/// would stamp the record twelve times for one correction and hand the other
+/// phone twelve changes to take.
+private struct GroceryItemDetail: View {
+    let item: GroceryItem
+    let store: GroceryListStore
+    let onDone: () -> Void
+
+    @State private var name = ""
+    @State private var amount = ""
+    @State private var aisle: Aisle = .other
+    @State private var hasRead = false
+
+    var body: some View {
+        NavigationStack {
+            List {
+                Section {
+                    TextField("Item", text: $name)
+                    TextField("Amount", text: $amount)
+                        .textInputAutocapitalization(.never)
+                    Picker("Aisle", selection: $aisle) {
+                        ForEach(Aisle.allCases, id: \.self) { option in
+                            Text(option.displayName).tag(option)
+                        }
+                    }
+                } footer: {
+                    // Says what the amount field actually accepts rather than
+                    // what would be nice: it reads a number and a unit, so
+                    // "a bunch" clears it instead of meaning anything.
+                    Text(item.canonicalItemID == nil
+                         ? "An amount needs a number: 2, 500 g, 1 bunch."
+                         : "An amount needs a number: 2, 500 g, 1 bunch. Changing the aisle moves this item for good, on every list and on the other phone.")
+                }
+
+                Section("Needed for") {
+                    let meals = store.meals(for: item)
+                    if meals.isEmpty {
+                        Text(item.isManual
+                             ? "You added this one yourself."
+                             : "Nothing in this week's plan, so this came from an earlier list.")
+                            .foregroundStyle(.secondary)
+                    } else {
+                        ForEach(meals, id: \.self) { meal in
+                            Text(meal)
+                        }
+                    }
+                }
+
+                Section {
+                    Button(role: .destructive) {
+                        store.delete(item)
+                        onDone()
+                    } label: {
+                        Text("Remove from the list")
+                    }
+                }
+            }
+            .navigationTitle(name.isEmpty ? item.displayName : name)
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .cancellationAction) {
+                    Button("Cancel") { onDone() }
+                }
+                ToolbarItem(placement: .confirmationAction) {
+                    Button("Done") {
+                        store.update(item, name: name, amount: amount, aisle: aisle)
+                        onDone()
+                    }
+                }
+            }
+            .onAppear {
+                // Once. A reappear after the keyboard moves would otherwise
+                // throw away what has been typed.
+                guard !hasRead else { return }
+                hasRead = true
+                name = item.displayName
+                amount = item.quantities.isEmpty ? "" : item.formatted
+                aisle = item.aisle
+            }
+        }
+        // Large as well, because half a screen with a keyboard over it leaves
+        // room for about one field.
+        .presentationDetents([.medium, .large])
     }
 }
 

@@ -243,6 +243,60 @@ final class GroceryListStore {
         }
     }
 
+    /// Applies what the detail sheet was edited to, in one write.
+    ///
+    /// One write rather than one per field, because every write stamps
+    /// `updatedAt` and becomes a record the other phone has to take, and a
+    /// person correcting a name types twelve times to mean one change.
+    func update(_ item: GroceryItem, name: String, amount: String, aisle: Aisle) {
+        do {
+            let newName = name.trimmingCharacters(in: .whitespacesAndNewlines)
+            let typed = amount.trimmingCharacters(in: .whitespacesAndNewlines)
+            var changed = false
+
+            if !newName.isEmpty, newName != item.displayName {
+                item.displayName = newName
+                changed = true
+            }
+
+            let amounts: [Quantity]
+            if typed.isEmpty {
+                amounts = []
+            } else {
+                let parsed = IngredientParser.parse(typed)
+                amounts = parsed.quantity.map { UnitConverter.combine([Quantity($0, parsed.unit)]) } ?? []
+            }
+            if amounts != item.quantities {
+                // Both, because a person who has typed over the amount means
+                // the list to say that, and the manual half is what survives
+                // the next regeneration.
+                item.quantities = amounts
+                item.manualQuantities = amounts
+                changed = true
+            }
+
+            if aisle != item.aisle {
+                item.aisle = aisle
+                // An item the grocery table knows moves the table with it.
+                // Putting acai in Produce once should put it there next week
+                // and on the other phone, not just on this line of this list.
+                if let canonicalID = item.canonicalItemID,
+                   let canonical = try canonicalItems.find(id: canonicalID) {
+                    canonical.aisle = aisle
+                    canonical.updatedAt = .now
+                }
+                changed = true
+            }
+
+            guard changed else { return }
+            item.updatedAt = .now
+            try lists.save()
+            load()
+        } catch {
+            problem = "That could not be saved. \(error)"
+        }
+    }
+
     func delete(_ item: GroceryItem) {
         do {
             item.list?.items.removeAll { $0.id == item.id }

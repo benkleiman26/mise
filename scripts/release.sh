@@ -86,7 +86,10 @@ xcodebuild test \
 say "Raising the build number"
 agvtool next-version -all >/dev/null
 BUILD=$(agvtool what-version -terse)
-VERSION=$(agvtool what-marketing-version -terse1)
+# From the project file rather than from agvtool, which answers nothing here:
+# MARKETING_VERSION is a build setting in this project and agvtool only reads
+# it out of an Info.plist. Every line this script printed said "Mise  (2)".
+VERSION=$(sed -n 's/.*MARKETING_VERSION = \([^;]*\);.*/\1/p' Mise.xcodeproj/project.pbxproj | head -1)
 say "Building Mise $VERSION ($BUILD)"
 
 # --- Archive ----------------------------------------------------------------
@@ -102,7 +105,7 @@ xcodebuild archive \
 fi
 
 BUILD="${BUILD:-$(agvtool what-version -terse)}"
-VERSION="${VERSION:-$(agvtool what-marketing-version -terse1)}"
+VERSION="${VERSION:-$(sed -n 's/.*MARKETING_VERSION = \([^;]*\);.*/\1/p' Mise.xcodeproj/project.pbxproj | head -1)}"
 
 # --- Upload -----------------------------------------------------------------
 
@@ -122,6 +125,18 @@ xcodebuild -exportArchive \
 which skips the tests and the archive."
 
 say "Sent. Mise $VERSION ($BUILD)"
+
+# Committed here rather than left for somebody to remember.
+#
+# The number lives in project.pbxproj, which is also the file Xcode rewrites
+# constantly and which update.sh parks and discards for exactly that reason.
+# So an uncommitted bump is thrown away by the next pull, the project goes
+# back to the number before the one already uploaded, and the next release is
+# rejected by Apple for reusing it. Build 2 went out and the project said 1.
+if [ "$UPLOAD_ONLY" = no ] && ! git diff --quiet -- Mise.xcodeproj/project.pbxproj; then
+  git add Mise.xcodeproj/project.pbxproj
+  git commit -q -m "Build $BUILD" && say "Committed the build number. Push it when you next push."
+fi
 cat <<'NEXT'
 
 Apple takes ten to twenty minutes to process it. Then, at
@@ -130,9 +145,5 @@ builds and goes out to your internal testers on its own.
 
 An external group needs its first build reviewed, usually within a day. After
 that one, later builds go out without review.
-
-The build number was raised, so commit it:
-
-    git commit -am "Build $(cd "$(dirname "$0")/.." && agvtool what-version -terse)"
 
 NEXT

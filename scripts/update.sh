@@ -31,6 +31,14 @@ if ! git diff --quiet || ! git diff --cached --quiet; then
     [ "$file" = "$GENERATED" ] || ONLY_GENERATED=no
   done < <(git diff --name-only HEAD)
 
+  # One thing in that generated file is not Xcode's: the build number. It is
+  # raised by release.sh, it is the one number Apple refuses to see twice, and
+  # discarding it sends the project back to a number already uploaded. If the
+  # parked change touches it, the change is a person's work and is kept.
+  if git diff -- "$GENERATED" | grep -qE '^[-+].*(CURRENT_PROJECT_VERSION|MARKETING_VERSION)'; then
+    ONLY_GENERATED=no
+  fi
+
   say "Parking local changes"
   git stash push --quiet --message "update.sh: before pull" || true
   STASHED=yes

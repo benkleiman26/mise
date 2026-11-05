@@ -19,7 +19,9 @@ struct RootView: View {
         case plan, list, recipes, pantry
     }
 
+    @Environment(AppContainer.self) private var container
     @State private var screen: Screen = .plan
+    @State private var hasReadStartupProblem = false
 
     var body: some View {
         TabView(selection: $screen) {
@@ -41,6 +43,30 @@ struct RootView: View {
             Tab("Pantry", systemImage: "cabinet", value: Screen.pantry) {
                 PantryView()
             }
+        }
+        // Said here rather than only in Settings.
+        //
+        // When the store will not open, the container falls back to memory so
+        // the app still runs, and what the user sees is every recipe, the
+        // week and the list gone. The explanation sat two taps away under
+        // Settings, which is nowhere near where somebody looks when the app
+        // comes up empty. An app that has lost its data has to say so on the
+        // screen it opens on.
+        .alert(
+            "Mise could not open its data",
+            isPresented: Binding(
+                get: { container.startupProblem != nil && !hasReadStartupProblem },
+                set: { if !$0 { hasReadStartupProblem = true } }
+            )
+        ) {
+            Button("OK") { hasReadStartupProblem = true }
+        } message: {
+            Text("""
+            Nothing you do now will be kept. Your recipes and your list are \
+            still on the phone, they just are not loaded.
+
+            \(container.startupProblem ?? "")
+            """)
         }
     }
 }

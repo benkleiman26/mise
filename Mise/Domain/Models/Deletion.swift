@@ -28,7 +28,14 @@ final class Deletion {
     /// value of type NSEntityDescription to NSString", from a stack frame that
     /// names neither this property nor this model. Every delete in the app
     /// writes one of these, so it took everything down with it.
-    var recordEntity: String
+    /// The default is what lets the store migrate itself.
+    ///
+    /// Renaming a property is a schema change, and SwiftData migrates in place
+    /// without being asked only when it can fill the new column on its own. A
+    /// mandatory attribute with no default gives it nothing to write, so the
+    /// store refuses to open, the container falls back to memory, and the app
+    /// launches looking like somebody deleted every recipe.
+    var recordEntity: String = ""
     /// The id of the record that was deleted.
     var recordID: UUID
     /// Which device did it, so a device can ignore the news of its own delete.

@@ -77,7 +77,14 @@ struct AddByLinkView: View {
                             state = .loading
                             Task {
                                 await store?.save(recipe)
-                                dismiss()
+                                // Only on success. It dismissed either way,
+                                // so a save that failed closed the sheet and
+                                // took its own explanation with it.
+                                if let message = store?.problem {
+                                    state = .failed(message)
+                                } else {
+                                    dismiss()
+                                }
                             }
                         }
                         .disabled(state == .loading)

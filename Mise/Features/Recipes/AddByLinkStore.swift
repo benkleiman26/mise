@@ -16,6 +16,15 @@ final class AddByLinkStore {
 
     private(set) var problem: String?
 
+    /// Why a recipe arrived without its picture, when it did.
+    ///
+    /// Every step of fetching a photo returns nothing on failure and says
+    /// nothing about why, so "the picture did not come through" could mean the
+    /// page publishes none, the download was refused, or the bytes arrived in
+    /// a format the phone could not read. Those need different answers and
+    /// looked identical.
+    private(set) var photoNote: String?
+
     init(
         recipes: any RecipeRepository,
         canonicalItems: any CanonicalItemRepository,
@@ -31,8 +40,19 @@ final class AddByLinkStore {
         // the save should not be interleaved with a network wait.
         // A reference to `shrink` would not do: it has a defaulted second
         // parameter, so its type is not the one flatMap wants.
-        let photo = await RecipeWebImporter.photo(at: imported.imageURLs?.first)
-            .flatMap { Self.shrink($0) }
+        let address = imported.imageURLs?.first
+        let downloaded = await RecipeWebImporter.photo(at: address)
+        let photo = downloaded.flatMap { Self.shrink($0) }
+
+        if photo != nil {
+            photoNote = nil
+        } else if address == nil {
+            photoNote = "This page does not publish a picture, so this recipe has none."
+        } else if downloaded == nil {
+            photoNote = "The picture could not be downloaded. Mise will show it from the web instead."
+        } else {
+            photoNote = "The picture arrived in a format the phone could not read. Mise will show it from the web instead."
+        }
 
         do {
             guard let household = try households.all().first else {

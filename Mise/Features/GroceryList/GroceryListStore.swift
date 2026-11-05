@@ -25,6 +25,22 @@ final class GroceryListStore {
     private(set) var generatedAt: Date?
     private(set) var problem: String?
 
+    /// A shopping list should get shorter as you shop. Ticked rows leave the
+    /// list rather than sitting there struck through, because the thing a
+    /// shopper wants to see is what is left.
+    var showsCompleted = false {
+        didSet { if showsCompleted != oldValue { load() } }
+    }
+
+    /// Counted off the whole list rather than off what is on screen, which is
+    /// the point: hiding the ticked ones must not change what the footer says
+    /// is left.
+    private(set) var remainingCount = 0
+    private(set) var completedCount = 0
+    /// Whether there is a list at all, as opposed to one with nothing left on
+    /// it. An empty screen means two very different things.
+    private(set) var hasList = false
+
     init(
         lists: any GroceryListRepository,
         plans: any MealPlanRepository,
@@ -54,15 +70,14 @@ final class GroceryListStore {
         return titles.sorted { $0.localizedCaseInsensitiveCompare($1) == .orderedAscending }
     }
 
-    var remainingCount: Int {
-        sections.flatMap(\.items).filter { !$0.isChecked }.count
-    }
-
     func load() {
         do {
             guard let list = try currentList() else {
                 sections = []
                 generatedAt = nil
+                hasList = false
+                remainingCount = 0
+                completedCount = 0
                 return
             }
             show(list)
@@ -311,8 +326,14 @@ final class GroceryListStore {
     // MARK: - Private
 
     private func show(_ list: GroceryList) {
+        let all = list.orderedItems
+        hasList = true
+        remainingCount = all.filter { !$0.isChecked }.count
+        completedCount = all.count - remainingCount
+
+        let shown = showsCompleted ? all : all.filter { !$0.isChecked }
         let walk = (try? aisleWalk()) ?? Aisle.allCases
-        let grouped = Dictionary(grouping: list.orderedItems, by: \.aisle)
+        let grouped = Dictionary(grouping: shown, by: \.aisle)
 
         sections = walk.compactMap { aisle in
             guard let items = grouped[aisle], !items.isEmpty else { return nil }

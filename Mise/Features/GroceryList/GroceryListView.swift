@@ -14,6 +14,20 @@ struct GroceryListView: View {
             Group {
                 if let store, !store.isEmpty {
                     list(store)
+                } else if let store, store.hasList, store.completedCount > 0 {
+                    // Not the same as having no list, and saying so matters:
+                    // offering "Make the list" to somebody who has just
+                    // finished the shop would throw away what they did.
+                    ContentUnavailableView {
+                        Label("Everything is ticked off", systemImage: "checkmark.circle")
+                    } description: {
+                        Text(store.completedCount == 1
+                             ? "One item, bought."
+                             : "All \(store.completedCount) items, bought.")
+                    } actions: {
+                        Button("Show what I ticked off") { store.showsCompleted = true }
+                            .buttonStyle(.borderedProminent)
+                    }
                 } else {
                     ContentUnavailableView {
                         Label("No grocery list yet", systemImage: "checklist")
@@ -27,6 +41,22 @@ struct GroceryListView: View {
             }
             .navigationTitle("List")
             .toolbar {
+                // Only once something has been ticked. Before that it is a
+                // control for a state that does not exist.
+                if let store, store.completedCount > 0 {
+                    ToolbarItem(placement: .topBarLeading) {
+                        Button {
+                            store.showsCompleted.toggle()
+                        } label: {
+                            Label(
+                                store.showsCompleted ? "Hide what I ticked off" : "Show what I ticked off",
+                                systemImage: store.showsCompleted
+                                    ? "line.3.horizontal.decrease.circle.fill"
+                                    : "line.3.horizontal.decrease.circle"
+                            )
+                        }
+                    }
+                }
                 ToolbarItem(placement: .topBarTrailing) {
                     Button {
                         newItem = ""
@@ -133,7 +163,9 @@ struct GroceryListView: View {
         }
         .contentShape(Rectangle())
         .onTapGesture {
-            store.toggle(item)
+            // Animated, because the row is about to leave the list and a row
+            // that vanishes without moving reads as a glitch.
+            withAnimation { store.toggle(item) }
         }
         // Ticking off is the thing a shopper does fifty times in a shop, so it
         // keeps the tap. Asking what a row is for is rarer and gets the longer
@@ -159,7 +191,11 @@ struct GroceryListView: View {
             ? "Everything is ticked off."
             : remaining == 1 ? "1 item left." : "\(remaining) items left."
 
-        return [left, made].filter { !$0.isEmpty }.joined(separator: " ")
+        let ticked = store.completedCount == 0 || store.showsCompleted
+            ? ""
+            : store.completedCount == 1 ? "1 ticked off, hidden." : "\(store.completedCount) ticked off, hidden."
+
+        return [left, ticked, made].filter { !$0.isEmpty }.joined(separator: " ")
     }
 }
 

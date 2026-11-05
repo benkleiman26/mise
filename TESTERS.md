@@ -1,8 +1,9 @@
 # Giving Mise to another household
 
-Everything here is TestFlight's external testing route. Internal testers have
-to be given a role in your Apple developer account, which is not something to
-do for friends.
+Everything here is TestFlight's external testing route, which is the right one
+for another household: internal testing needs a seat in your Apple developer
+account, and that is reasonable for your wife and not for friends. Her path is
+in [RELEASE.md](RELEASE.md).
 
 ## Before you can send it
 
@@ -24,7 +25,9 @@ within a day. They need:
 
 - Mise collects an **email address**, for the account, and only if someone
   turns sharing on
-- It stores **user content**: recipes, meal plans, grocery lists
+- It stores **user content**: recipes, meal plans, grocery lists. All of it
+  travels once sharing is on, apart from recipe photographs, which never
+  leave the phone that downloaded them
 - None of it is used for tracking or advertising
 - It is all in your Supabase project
 

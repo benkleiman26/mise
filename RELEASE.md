@@ -86,17 +86,42 @@ usually within a day; after that one, later builds go out without review.
 `MARKETING_VERSION` is the version people see, currently `0.1`. Raise it by
 hand in Xcode when something is worth calling new.
 
-## What she will and will not get
+## Getting it to your wife
 
-She gets the whole app: the library, the plan, the list, the pantry.
+Her phone does not have to be in the room. Add her as an **internal** tester
+and she installs it herself from TestFlight.
 
-She does not get **your** library. There is no sync yet, so her copy starts
-with the 45 built-in recipes and an empty plan, and the two of you keep
-separate lists. For one shared shop that is worse than one phone.
+Internal means a person with a seat in your App Store Connect account. For a
+spouse that is right, and it is worth it for one reason: internal builds skip
+Apple's beta review entirely and arrive within about twenty minutes of the
+upload finishing. External testers wait a day for the first one.
 
-So the order that actually works is: you use it for a week and find what is
-wrong, sync gets built, and then she installs. Putting it on her phone before
-sync gets her a demo and a disappointment.
+1. <https://appstoreconnect.apple.com> → **Users and Access** → **+**
+2. Her Apple ID email, role **Developer**, and tick access to the Mise app
+3. She accepts the invitation by email
+4. **Apps → Mise → TestFlight → Internal Testing → +**, make a group, add her
+5. She installs **TestFlight** from the App Store and Mise appears in it
+
+### What she gets, and what she has to do once
+
+She gets the whole app, and since sync works she gets your library too, but
+not automatically. On her phone:
+
+1. **Settings → sign in**, with her own account rather than yours
+2. **Join a household**, paste your invite code
+3. **Sync now**, and leave it a minute
+
+That first round pulls several thousand records: 427 recipes with their
+ingredients and steps, the grocery table, the pantry and the week. Her recipe
+count should end up matching yours.
+
+She does not import the recipe files. Recipes sync now, so importing as well
+would do the same work twice.
+
+Photographs do not sync, deliberately: they are most of a free database
+allowance spent on bytes both phones already have. A recipe that came from a
+link keeps the picture's address and fetches it, so most of the library looks
+right on her phone without the bytes ever crossing.
 
 ## Giving it to someone outside the household
 
@@ -106,7 +131,10 @@ in your Supabase project, which they should be told before they sign up.
 
 ## Known gaps before anyone relies on it
 
-- No sync, so one household means one device.
 - Nothing marks a meal as cooked, so the plan does not clear itself.
-- A recipe cannot be written down or edited beyond its serving count.
+- A recipe cannot be written down from scratch, and editing one is limited to
+  its serving count.
 - The aisle order is the spec's default, not your store's.
+- Sync runs while the app is open, when it is opened, and as it is closed.
+  Nothing moves while both phones are shut, because there is no server pushing
+  to them.

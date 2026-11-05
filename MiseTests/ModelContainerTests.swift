@@ -10,7 +10,7 @@ import XCTest
 final class ModelContainerTests: XCTestCase {
     func testTheContainerBuildsWithEveryModelRegistered() throws {
         let container = try MiseSchema.makeContainer(inMemory: true)
-        XCTAssertEqual(MiseSchema.models.count, 12)
+        XCTAssertEqual(MiseSchema.models.count, 13)
         XCTAssertEqual(container.schema.entities.count, MiseSchema.models.count)
     }
 
@@ -30,6 +30,7 @@ final class ModelContainerTests: XCTestCase {
         XCTAssertEqual(try context.fetchCount(FetchDescriptor<Household>()), 0)
         XCTAssertEqual(try context.fetchCount(FetchDescriptor<User>()), 0)
         XCTAssertEqual(try context.fetchCount(FetchDescriptor<HouseholdPreferences>()), 0)
+        XCTAssertEqual(try context.fetchCount(FetchDescriptor<Deletion>()), 0)
     }
 
     /// The repository is the only way anything is meant to reach the store, so

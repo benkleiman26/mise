@@ -84,7 +84,7 @@ final class ModelContainerTests: XCTestCase {
         XCTAssertEqual(try context.fetchCount(FetchDescriptor<Ingredient>()), 0)
         XCTAssertEqual(try context.fetchCount(FetchDescriptor<RecipeStep>()), 0)
     }
-\n
+
     /// Every delete in the app writes a tombstone, so a tombstone that cannot
     /// be saved takes the whole app with it. It did: `Deletion` had a property
     /// called `entity`, which every SwiftData model already has from

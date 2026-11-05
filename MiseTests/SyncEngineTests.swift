@@ -55,6 +55,7 @@ final class SyncEngineTests: XCTestCase {
         try await super.setUp()
         UserDefaults.standard.removeObject(forKey: "mise.sync.cursor.v2")
         UserDefaults.standard.removeObject(forKey: "mise.sync.sentUpTo")
+        UserDefaults.standard.removeObject(forKey: "mise.sync.sharedSetVersion")
 
         container = try MiseSchema.makeContainer(inMemory: true)
         context = ModelContext(container)
@@ -69,6 +70,7 @@ final class SyncEngineTests: XCTestCase {
                 households: households,
                 users: SwiftDataUserRepository(context: context),
                 canonicalItems: SwiftDataCanonicalItemRepository(context: context),
+                recipes: SwiftDataRecipeRepository(context: context),
                 pantry: SwiftDataPantryRepository(context: context),
                 plans: SwiftDataMealPlanRepository(context: context),
                 lists: SwiftDataGroceryListRepository(context: context)
@@ -88,6 +90,7 @@ final class SyncEngineTests: XCTestCase {
         container = nil
         UserDefaults.standard.removeObject(forKey: "mise.sync.cursor.v2")
         UserDefaults.standard.removeObject(forKey: "mise.sync.sentUpTo")
+        UserDefaults.standard.removeObject(forKey: "mise.sync.sharedSetVersion")
         SyncGroup.leave()
         try await super.tearDown()
     }
@@ -192,5 +195,30 @@ final class SyncEngineTests: XCTestCase {
 
         XCTAssertEqual(engine.lastReceived, 3)
         XCTAssertEqual(engine.status, .idle)
+    }
+
+    // MARK: - Sending
+
+    /// The first round after the recipe library joined the shared set is
+    /// around eight thousand rows. One request carrying all of them is a
+    /// multi-megabyte body that times out and takes the round with it.
+    func testItSendsInPages() async throws {
+        let items = SwiftDataCanonicalItemRepository(context: context)
+        for index in 0..<600 {
+            items.insert(CanonicalItem(householdID: householdID, name: "item \(index)", aisle: .other))
+        }
+        try items.save()
+
+        await engine.run()
+
+        XCTAssertGreaterThan(server.pushed.count, 1)
+        XCTAssertTrue(
+            server.pushed.allSatisfy { $0.records.count <= SyncEngine.pageSize },
+            "no request carries more than a page"
+        )
+        XCTAssertGreaterThanOrEqual(
+            server.pushed.reduce(0) { $0 + $1.records.count }, 600,
+            "and between them they carry everything"
+        )
     }
 }

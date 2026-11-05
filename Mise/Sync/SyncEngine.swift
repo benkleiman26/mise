@@ -34,6 +34,21 @@ final class SyncEngine {
     private static let cursorKey = "mise.sync.cursor.v2"
     private static let sentKey = "mise.sync.sentUpTo"
     private static let syncedKey = "mise.sync.lastSyncedAt"
+    private static let sharedSetKey = "mise.sync.sharedSetVersion"
+
+    /// Bumped whenever the set of things that travel grows.
+    ///
+    /// A device only sends what changed since it last sent, and a recipe
+    /// imported in October has not changed since. Without this, the library
+    /// joining the shared set would mean the library never going anywhere:
+    /// every row in it is older than the watermark. Bumping the number makes
+    /// the next round start from the beginning once, and the server's upsert
+    /// makes that cost nothing but time.
+    private static let sharedSetVersion = 2
+
+    /// How many records go in one request, out or in. A multi-megabyte body
+    /// times out and takes the whole round with it.
+    static let pageSize = 500
 
     init(
         client: any SyncClient,
@@ -115,21 +130,43 @@ final class SyncEngine {
                 try await drain(group: group, local: local)
             }
 
+            // Everything goes again when the shared set has grown.
+            if UserDefaults.standard.integer(forKey: Self.sharedSetKey) != Self.sharedSetVersion {
+                sentUpTo = nil
+                UserDefaults.standard.set(Self.sharedSetVersion, forKey: Self.sharedSetKey)
+            }
+
             // Out. Filtered by this device's own clock, never by the server
             // cursor, and only advanced once the server has actually taken it.
             let reachedBy = Date()
-            let outgoing = SyncBatch(
-                records: try mapper.records(changedSince: sentUpTo),
-                deletions: try pendingDeletions(householdID: local)
-            )
-            if !outgoing.records.isEmpty || !outgoing.deletions.isEmpty {
-                _ = try await client.push(outgoing, householdID: group, deviceID: deviceID)
-                try clearSentDeletions(outgoing.deletions)
+            let outgoingRecords = try mapper.records(changedSince: sentUpTo)
+            let outgoingDeletions = try pendingDeletions(householdID: local)
+
+            // In pages, because the first round after the library joined the
+            // shared set is around eight thousand rows and one request
+            // carrying all of them is a body nothing on either end wants.
+            for start in stride(from: 0, to: outgoingRecords.count, by: Self.pageSize) {
+                let end = min(start + Self.pageSize, outgoingRecords.count)
+                _ = try await client.push(
+                    SyncBatch(records: Array(outgoingRecords[start..<end])),
+                    householdID: group,
+                    deviceID: deviceID
+                )
             }
+
+            if !outgoingDeletions.isEmpty {
+                _ = try await client.push(
+                    SyncBatch(deletions: outgoingDeletions),
+                    householdID: group,
+                    deviceID: deviceID
+                )
+                try clearSentDeletions(outgoingDeletions)
+            }
+
             // Stamped from before the batch was gathered, so anything edited
             // while the push was in flight goes next time rather than never.
             sentUpTo = reachedBy
-            lastSent = outgoing.records.count + outgoing.deletions.count
+            lastSent = outgoingRecords.count + outgoingDeletions.count
 
             // In.
             try await drain(group: group, local: local)

@@ -26,8 +26,18 @@ protocol RecipeRepository {
     ///
     /// So the children go explicitly, and anything already stranded can be
     /// swept up.
+    /// Children arriving from the other phone have to be registered before
+    /// they are attached. Same reason as `MealPlanRepository.insertEntry`: a
+    /// model the store has no record of crashes partway through the save
+    /// rather than being refused.
+    func insertIngredient(_ ingredient: Ingredient)
+    func insertStep(_ step: RecipeStep)
     func deleteIngredient(_ ingredient: Ingredient)
     func deleteStep(_ step: RecipeStep)
+    /// Every ingredient and step there is, whatever recipe it belongs to, so a
+    /// tombstone naming one can find it without knowing its parent.
+    func allIngredients() throws -> [Ingredient]
+    func allSteps() throws -> [RecipeStep]
     func orphanedIngredients() throws -> [Ingredient]
     /// Every ingredient that resolved to no grocery item, so the user can say
     /// what it is once. Section 5.3 rule 2.

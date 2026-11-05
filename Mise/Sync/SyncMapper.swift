@@ -15,6 +15,7 @@ struct SyncMapper {
     let households: any HouseholdRepository
     let users: any UserRepository
     let canonicalItems: any CanonicalItemRepository
+    let recipes: any RecipeRepository
     let pantry: any PantryRepository
     let plans: any MealPlanRepository
     let lists: any GroceryListRepository
@@ -40,6 +41,15 @@ struct SyncMapper {
         }
         for item in try canonicalItems.all() where item.updatedAt > after {
             out.append(encode(item))
+        }
+        for recipe in try recipes.all() {
+            if recipe.updatedAt > after { out.append(encode(recipe)) }
+            for ingredient in recipe.ingredients where ingredient.updatedAt > after {
+                out.append(encode(ingredient, in: recipe))
+            }
+            for step in recipe.steps where step.updatedAt > after {
+                out.append(encode(step, in: recipe))
+            }
         }
         for entry in try pantry.all() where entry.updatedAt > after {
             out.append(encode(entry))
@@ -108,6 +118,79 @@ struct SyncMapper {
         ]
         if let unit = item.defaultUnit { fields["defaultUnit"] = .string(unit.rawValue) }
         return record(.canonicalItem, item, fields)
+    }
+
+    /// Everything but the picture.
+    ///
+    /// `imageData` is the one field deliberately left behind. 427 recipes'
+    /// photos is most of a free database allowance spent on bytes both phones
+    /// already have from the same import, and a grocery list that cannot sync
+    /// because the recipe pictures filled the disk is a bad trade. `imageURL`
+    /// travels, so a recipe imported from a link can fetch its own picture.
+    private func encode(_ recipe: Recipe) -> SyncRecord {
+        var fields: [String: SyncValue] = [
+            "title": .string(recipe.title),
+            "summary": .string(recipe.summary),
+            "sourceType": .string(recipe.sourceType.rawValue),
+            "prepMinutes": .integer(recipe.prepMinutes),
+            "cookMinutes": .integer(recipe.cookMinutes),
+            "baseServings": .integer(recipe.baseServings),
+            "tags": .strings(recipe.tags),
+            "dishTypes": .strings(recipe.dishTypes),
+            "cookware": .strings(recipe.cookware),
+            "isFavorite": .boolean(recipe.isFavorite),
+            "timesCooked": .integer(recipe.timesCooked),
+            "notes": .string(recipe.notes),
+        ]
+        if let url = recipe.sourceURL { fields["sourceURL"] = .string(url.absoluteString) }
+        if let url = recipe.imageURL { fields["imageURL"] = .string(url.absoluteString) }
+        if let cooked = recipe.lastCookedAt { fields["lastCookedAt"] = .date(cooked) }
+        if let text = Self.json(recipe.nutritionPerServing) { fields["nutrition"] = .string(text) }
+        if let text = Self.json(recipe.externalIDs) { fields["externalIDs"] = .string(text) }
+        return record(.recipe, recipe, fields)
+    }
+
+    private func encode(_ ingredient: Ingredient, in recipe: Recipe) -> SyncRecord {
+        var fields: [String: SyncValue] = [
+            "recipeID": .uuid(recipe.id),
+            "position": .integer(ingredient.position),
+            "name": .string(ingredient.name),
+            "isOptional": .boolean(ingredient.isOptional),
+            "aisle": .string(ingredient.aisle.rawValue),
+        ]
+        if let id = ingredient.canonicalItemID { fields["canonicalItemID"] = .uuid(id) }
+        if let amount = ingredient.quantity { fields["quantity"] = .number(amount) }
+        if let unit = ingredient.unit { fields["unit"] = .string(unit.rawValue) }
+        if let prep = ingredient.preparation { fields["preparation"] = .string(prep) }
+        return record(.ingredient, ingredient, fields)
+    }
+
+    private func encode(_ step: RecipeStep, in recipe: Recipe) -> SyncRecord {
+        var fields: [String: SyncValue] = [
+            "recipeID": .uuid(recipe.id),
+            "position": .integer(step.position),
+            "text": .string(step.text),
+            "ingredientRefs": .uuids(step.ingredientRefs),
+        ]
+        if let seconds = step.timerSeconds { fields["timerSeconds"] = .integer(seconds) }
+        return record(.recipeStep, step, fields)
+    }
+
+    /// Small structures travel as JSON in a string.
+    ///
+    /// `SyncValue` has no case for an object on purpose: every field is one a
+    /// reader can look at and understand, and adding a general object would
+    /// make the wire format a place to hide things. Two fields genuinely are
+    /// structures, so they say so by being text that happens to parse.
+    private static func json(_ value: (some Encodable)?) -> String? {
+        guard let value else { return nil }
+        guard let data = try? JSONEncoder().encode(value) else { return nil }
+        return String(data: data, encoding: .utf8)
+    }
+
+    private static func parse<T: Decodable>(_ type: T.Type, from text: String?) -> T? {
+        guard let text, let data = text.data(using: .utf8) else { return nil }
+        return try? JSONDecoder().decode(type, from: data)
     }
 
     private func encode(_ entry: PantryEntry) -> SyncRecord {
@@ -412,9 +495,111 @@ extension SyncMapper {
             canonicalItems.insert(item)
             return true
 
-        case .recipe, .ingredient, .recipeStep:
-            // Not shared. See SyncEntity.isShared.
-            return false
+        case .recipe:
+            guard let title = record.string("title"),
+                  let sourceType: RecipeSourceType = record.enumeration("sourceType")
+            else { return false }
+
+            let recipe: Recipe
+            if let existing = try recipes.find(id: record.id) {
+                guard record.updatedAt > existing.updatedAt else { return false }
+                recipe = existing
+            } else {
+                recipe = Recipe(
+                    id: record.id,
+                    householdID: householdID,
+                    title: title,
+                    sourceType: sourceType,
+                    baseServings: record.integer("baseServings") ?? 4
+                )
+                recipes.insert(recipe)
+            }
+
+            recipe.title = title
+            recipe.summary = record.string("summary") ?? ""
+            recipe.sourceType = sourceType
+            recipe.sourceURL = record.string("sourceURL").flatMap(URL.init(string:))
+            recipe.prepMinutes = record.integer("prepMinutes") ?? 0
+            recipe.cookMinutes = record.integer("cookMinutes") ?? 0
+            recipe.baseServings = record.integer("baseServings") ?? recipe.baseServings
+            recipe.tags = record.strings("tags") ?? []
+            recipe.dishTypes = record.strings("dishTypes") ?? []
+            recipe.cookware = record.strings("cookware") ?? []
+            recipe.imageURL = record.string("imageURL").flatMap(URL.init(string:))
+            recipe.isFavorite = record.boolean("isFavorite") ?? false
+            recipe.timesCooked = record.integer("timesCooked") ?? 0
+            recipe.lastCookedAt = record.date("lastCookedAt")
+            recipe.notes = record.string("notes") ?? ""
+            recipe.nutritionPerServing = Self.parse(Nutrition.self, from: record.string("nutrition"))
+            recipe.externalIDs = Self.parse([String: String].self, from: record.string("externalIDs")) ?? [:]
+            // imageData is deliberately untouched. It never travels, and a
+            // picture this phone already has must not be wiped by a record
+            // that was never carrying one.
+            recipe.updatedAt = record.updatedAt
+            return true
+
+        case .ingredient:
+            guard let name = record.string("name"),
+                  let recipeID = record.uuid("recipeID")
+            else { return false }
+            // Dropped rather than orphaned. The recipe sorts first and is in
+            // the same batch, so this only happens when a page boundary split
+            // them, and the next pull brings it again.
+            guard let recipe = try recipes.find(id: recipeID) else { return false }
+
+            let ingredient: Ingredient
+            if let existing = recipe.ingredients.first(where: { $0.id == record.id }) {
+                guard record.updatedAt > existing.updatedAt else { return false }
+                ingredient = existing
+            } else {
+                ingredient = Ingredient(
+                    id: record.id,
+                    householdID: householdID,
+                    position: record.integer("position") ?? 0,
+                    name: name
+                )
+                recipes.insertIngredient(ingredient)
+                ingredient.recipe = recipe
+            }
+
+            ingredient.position = record.integer("position") ?? ingredient.position
+            ingredient.name = name
+            ingredient.canonicalItemID = record.uuid("canonicalItemID")
+            ingredient.quantity = record.double("quantity")
+            ingredient.unit = record.enumeration("unit")
+            ingredient.preparation = record.string("preparation")
+            ingredient.isOptional = record.boolean("isOptional") ?? false
+            ingredient.aisle = record.enumeration("aisle") ?? .other
+            ingredient.updatedAt = record.updatedAt
+            return true
+
+        case .recipeStep:
+            guard let text = record.string("text"),
+                  let recipeID = record.uuid("recipeID")
+            else { return false }
+            guard let recipe = try recipes.find(id: recipeID) else { return false }
+
+            let step: RecipeStep
+            if let existing = recipe.steps.first(where: { $0.id == record.id }) {
+                guard record.updatedAt > existing.updatedAt else { return false }
+                step = existing
+            } else {
+                step = RecipeStep(
+                    id: record.id,
+                    householdID: householdID,
+                    position: record.integer("position") ?? 0,
+                    text: text
+                )
+                recipes.insertStep(step)
+                step.recipe = recipe
+            }
+
+            step.position = record.integer("position") ?? step.position
+            step.text = text
+            step.timerSeconds = record.integer("timerSeconds")
+            step.ingredientRefs = record.uuids("ingredientRefs") ?? []
+            step.updatedAt = record.updatedAt
+            return true
         }
     }
 
@@ -472,8 +657,26 @@ extension SyncMapper {
                     canonicalItems.delete(item)
                     removed += 1
                 }
-            case .recipe, .ingredient, .recipeStep:
-                continue
+            case .recipe:
+                if let recipe = try recipes.find(id: deletion.recordID),
+                   recipe.updatedAt <= deletion.deletedAt {
+                    for ingredient in Array(recipe.ingredients) { recipes.deleteIngredient(ingredient) }
+                    for step in Array(recipe.steps) { recipes.deleteStep(step) }
+                    recipes.delete(recipe)
+                    removed += 1
+                }
+            case .ingredient:
+                if let ingredient = try recipes.allIngredients().first(where: { $0.id == deletion.recordID }),
+                   ingredient.updatedAt <= deletion.deletedAt {
+                    recipes.deleteIngredient(ingredient)
+                    removed += 1
+                }
+            case .recipeStep:
+                if let step = try recipes.allSteps().first(where: { $0.id == deletion.recordID }),
+                   step.updatedAt <= deletion.deletedAt {
+                    recipes.deleteStep(step)
+                    removed += 1
+                }
             }
         }
 
@@ -501,6 +704,14 @@ private extension SyncRecord {
     func boolean(_ key: String) -> Bool? {
         if case .boolean(let value) = fields[key] { return value }
         return nil
+    }
+
+    func double(_ key: String) -> Double? {
+        switch fields[key] {
+        case .number(let value): value
+        case .integer(let value): Double(value)
+        default: nil
+        }
     }
 
     func uuid(_ key: String) -> UUID? {

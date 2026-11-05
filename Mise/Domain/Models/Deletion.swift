@@ -82,18 +82,20 @@ enum SyncEntity: String, Codable, CaseIterable, Sendable {
     case groceryList
     case groceryItem
 
-    /// Whether this travels between phones.
+    /// Whether this travels between phones. Everything does.
     ///
-    /// The recipe library does not, and that is the decision that makes sync
-    /// small enough to trust. 427 recipes with their ingredients and steps is
-    /// around eight thousand rows, most of them never changing, and sending
-    /// them would dominate every sync for no benefit: both phones can hold the
-    /// same library by importing the same files.
+    /// The recipe library was held back at first, on the grounds that 427
+    /// recipes with their ingredients and steps is around eight thousand rows
+    /// and both phones could hold the same library by importing the same
+    /// files. That is true, and it is not enough. It only covers the recipes
+    /// that came from a file. A recipe imported from a link, or written down,
+    /// exists on one phone, and the other phone's week can hold a meal
+    /// pointing at a recipe it has never heard of.
     ///
-    /// That works because an imported recipe's id is derived from its source
-    /// id rather than generated, so the same file produces the same ids on
-    /// both devices. A planned meal made here resolves to the right recipe
-    /// there without the recipe ever crossing the wire.
+    /// The eight thousand rows are a one-off. They go up once, almost none of
+    /// them ever change, and the sequence cursor means a device picks up where
+    /// it left off rather than starting again. What does not go is the
+    /// photographs: see the encoder.
     ///
     /// What has to be shared is what changes daily and has to agree: the week,
     /// the list, the pantry, and the household's settings.
@@ -110,11 +112,10 @@ enum SyncEntity: String, Codable, CaseIterable, Sendable {
     var isShared: Bool {
         switch self {
         case .household, .householdPreferences, .user,
-             .canonicalItem, .pantryEntry, .mealPlan, .plannedMeal,
+             .canonicalItem, .recipe, .ingredient, .recipeStep,
+             .pantryEntry, .mealPlan, .plannedMeal,
              .groceryList, .groceryItem:
             true
-        case .recipe, .ingredient, .recipeStep:
-            false
         }
     }
 

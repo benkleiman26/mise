@@ -72,6 +72,22 @@ class SwiftDataRepository<Entity> where Entity: PersistentModel, Entity: Househo
 
 @MainActor
 final class SwiftDataRecipeRepository: SwiftDataRepository<Recipe>, RecipeRepository {
+    func insertIngredient(_ ingredient: Ingredient) {
+        context.insert(ingredient)
+    }
+
+    func insertStep(_ step: RecipeStep) {
+        context.insert(step)
+    }
+
+    func allIngredients() throws -> [Ingredient] {
+        try context.fetch(FetchDescriptor<Ingredient>())
+    }
+
+    func allSteps() throws -> [RecipeStep] {
+        try context.fetch(FetchDescriptor<RecipeStep>())
+    }
+
     func deleteIngredient(_ ingredient: Ingredient) {
         recordDeletion(of: ingredient)
         context.delete(ingredient)

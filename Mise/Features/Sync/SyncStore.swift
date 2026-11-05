@@ -55,6 +55,7 @@ final class SyncStore {
                 households: container.households,
                 users: container.users,
                 canonicalItems: container.canonicalItems,
+                recipes: container.recipes,
                 pantry: container.pantry,
                 plans: container.mealPlans,
                 lists: container.groceryLists

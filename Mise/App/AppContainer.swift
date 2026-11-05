@@ -41,7 +41,15 @@ final class AppContainer {
 
     private var hasSeeded = false
 
+    /// Where seeding records what it has already offered.
+    ///
+    /// An in memory container is a test container, and a test must not read or
+    /// write the device's own settings: one test would find the previous one's
+    /// answers already recorded and quietly take a different path.
+    private let defaults: UserDefaults
+
     init(inMemory: Bool = false) {
+        defaults = inMemory ? Self.throwawayDefaults() : .standard
         let store = Self.openStore(inMemory: inMemory)
         modelContainer = store.container
 
@@ -71,7 +79,8 @@ final class AppContainer {
                 users: users,
                 canonicalItems: canonicalItems,
                 recipes: recipes,
-                pantry: pantry
+                pantry: pantry,
+                defaults: defaults
             )
             seedReport = try installer.install(catalog)
 
@@ -91,6 +100,12 @@ final class AppContainer {
     /// Falls back to a memory only store rather than refusing to launch. A
     /// first run that cannot write is still worth showing; one that crashes is
     /// not.
+    private static func throwawayDefaults() -> UserDefaults {
+        let name = "mise.ephemeral.\(UUID().uuidString)"
+        UserDefaults.standard.removePersistentDomain(forName: name)
+        return UserDefaults(suiteName: name) ?? .standard
+    }
+
     private static func openStore(inMemory: Bool) -> (container: ModelContainer, problem: String?) {
         do {
             return (try MiseSchema.makeContainer(inMemory: inMemory), nil)

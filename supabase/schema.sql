@@ -50,7 +50,21 @@ create table if not exists mise_records (
   primary key (household_id, entity, id)
 );
 
+-- What devices actually page through.
+--
+-- `server_at` cannot do this job alone. now() is the transaction timestamp, so
+-- every row written by one push shares a single value, and a page boundary
+-- landing inside that group means the next request, which asks for anything
+-- after the last value it saw, skips the rest of the group for good. A
+-- sequence has no ties, so there is no group to land inside.
+--
+-- An update has to take a new value or a device already past the old one would
+-- never be told, which is why the push function sets it on conflict rather
+-- than leaving it alone.
+alter table mise_records add column if not exists server_seq bigserial;
+
 create index if not exists mise_records_cursor on mise_records(household_id, server_at);
+create index if not exists mise_records_seq on mise_records(household_id, server_seq);
 
 -- Deletions, because the absence of a row is not information.
 create table if not exists mise_deletions (
@@ -63,7 +77,10 @@ create table if not exists mise_deletions (
   primary key (household_id, entity, record_id)
 );
 
+alter table mise_deletions add column if not exists server_seq bigserial;
+
 create index if not exists mise_deletions_cursor on mise_deletions(household_id, server_at);
+create index if not exists mise_deletions_seq on mise_deletions(household_id, server_seq);
 
 -- Row level security. Without this every signed in user of every Supabase
 -- project could read this household's data, and the anon key is published in
@@ -189,20 +206,49 @@ as $$
 declare
   now_at timestamptz := now();
 begin
+  -- One row per record before the insert sees it.
+  --
+  -- Postgres refuses an ON CONFLICT that would touch the same row twice in one
+  -- statement, and it refuses it by aborting the whole statement. A payload
+  -- that happened to carry a record twice would therefore fail every push that
+  -- contained it, forever, with an error about command semantics that says
+  -- nothing about what is actually stuck.
+  with incoming as (
+    select distinct on (household_id, entity, id) *
+    from (
+      select
+        (r->>'household_id')::uuid      as household_id,
+        r->>'entity'                    as entity,
+        (r->>'id')::uuid                as id,
+        r->'fields'                     as fields,
+        (r->>'updated_at')::timestamptz as updated_at,
+        (r->>'device_id')::uuid         as device_id
+      from jsonb_array_elements(payload) as r
+    ) flat
+    order by household_id, entity, id, updated_at desc
+  )
   insert into mise_records (household_id, entity, id, fields, updated_at, server_at, device_id)
-  select
-    (r->>'household_id')::uuid,
-    r->>'entity',
-    (r->>'id')::uuid,
-    r->'fields',
-    (r->>'updated_at')::timestamptz,
-    now_at,
-    (r->>'device_id')::uuid
-  from jsonb_array_elements(payload) as r
+  select i.household_id, i.entity, i.id, i.fields, i.updated_at, now_at, i.device_id
+  from incoming i
+  -- A record a tombstone already covers does not come back.
+  --
+  -- Without this, deleting something on one phone and pushing from the other
+  -- before it has pulled puts the row back: the tombstone removed it, so there
+  -- is nothing left for the conflict clause to compare against and the stale
+  -- copy inserts cleanly. The phone that deleted it then pulls it in again,
+  -- having thrown its own tombstone away as sent.
+  where not exists (
+    select 1 from mise_deletions d
+    where d.household_id = i.household_id
+      and d.entity       = i.entity
+      and d.record_id    = i.id
+      and d.deleted_at  >= i.updated_at
+  )
   on conflict (household_id, entity, id) do update
     set fields     = excluded.fields,
         updated_at = excluded.updated_at,
         server_at  = excluded.server_at,
+        server_seq = excluded.server_seq,
         device_id  = excluded.device_id
     where mise_records.updated_at < excluded.updated_at;
 
@@ -218,27 +264,39 @@ as $$
 declare
   now_at timestamptz := now();
 begin
-  insert into mise_deletions (household_id, entity, record_id, deleted_at, server_at, device_id)
-  select
-    (d->>'household_id')::uuid,
-    d->>'entity',
-    (d->>'record_id')::uuid,
-    (d->>'deleted_at')::timestamptz,
-    now_at,
-    (d->>'device_id')::uuid
-  from jsonb_array_elements(payload) as d
-  on conflict (household_id, entity, record_id) do update
-    set deleted_at = excluded.deleted_at,
-        server_at  = excluded.server_at
-    where mise_deletions.deleted_at < excluded.deleted_at;
-
-  -- A record that has been deleted does not need keeping.
+  with incoming as (
+    select distinct on (household_id, entity, record_id) *
+    from (
+      select
+        (d->>'household_id')::uuid      as household_id,
+        d->>'entity'                    as entity,
+        (d->>'record_id')::uuid         as record_id,
+        (d->>'deleted_at')::timestamptz as deleted_at,
+        (d->>'device_id')::uuid         as device_id
+      from jsonb_array_elements(payload) as d
+    ) flat
+    order by household_id, entity, record_id, deleted_at desc
+  ),
+  stored as (
+    insert into mise_deletions (household_id, entity, record_id, deleted_at, server_at, device_id)
+    select i.household_id, i.entity, i.record_id, i.deleted_at, now_at, i.device_id
+    from incoming i
+    on conflict (household_id, entity, record_id) do update
+      set deleted_at = excluded.deleted_at,
+          server_at  = excluded.server_at,
+          server_seq = excluded.server_seq
+      where mise_deletions.deleted_at < excluded.deleted_at
+    returning household_id, entity, record_id, deleted_at
+  )
+  -- A record that has been deleted does not need keeping. Driven off the
+  -- deduplicated set rather than off the payload, so a record named twice is
+  -- considered once.
   delete from mise_records r
-  using jsonb_array_elements(payload) as d
-  where r.household_id = (d->>'household_id')::uuid
-    and r.entity       = d->>'entity'
-    and r.id           = (d->>'record_id')::uuid
-    and r.updated_at   <= (d->>'deleted_at')::timestamptz;
+  using incoming i
+  where r.household_id = i.household_id
+    and r.entity       = i.entity
+    and r.id           = i.record_id
+    and r.updated_at  <= i.deleted_at;
 
   return now_at;
 end;

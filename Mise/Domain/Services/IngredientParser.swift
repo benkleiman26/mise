@@ -135,6 +135,14 @@ enum IngredientParser {
         let optional = stripOptional(&working)
         let parenthetical = stripParenthetical(&working)
         var preparation = stripTrailingPreparation(&working)
+        // A comma still sitting in the line means the comma rule declined to
+        // split it: "6 boneless, skinless chicken thighs" keeps its chicken
+        // only because nothing before the comma named an ingredient. Nothing
+        // was lost, but the parser overrode its own rule to get there, so the
+        // line belongs on section 5.1's review screen rather than saved unseen.
+        if preparation == nil, working.contains(",") {
+            confidence = confidence.lowered(to: .medium)
+        }
 
         var quantity: Double?
         if let reading = readQuantity(from: working) {
@@ -161,7 +169,11 @@ enum IngredientParser {
             }
         }
 
-        let tidied = tidy(working.trimmingCharacters(in: CharacterSet(charactersIn: " ,;:")).trimmingCharacters(in: .whitespaces))
+        let tidied = tidy(
+            working.trimmingCharacters(in: CharacterSet(charactersIn: " ,;:")).trimmingCharacters(in: .whitespaces),
+            unit: unit,
+            quantity: quantity
+        )
         let name = tidied.name
         if tidied.changed { confidence = confidence.lowered(to: .medium) }
         confidence = confidence.lowered(to: judge(name: name, quantity: quantity))
@@ -427,11 +439,19 @@ enum IngredientParser {
     /// A last pass over the name, for shapes the owner's real library threw up
     /// that the pieces above leave behind.
     ///
-    /// Each of these loses something, so each lowers confidence. A measure we
-    /// could not keep is better dropped from the name than left in it: "3 thyme
-    /// sprigs" has to reach the list as thyme, or it never merges with the
-    /// thyme another recipe asks for.
-    private static func tidy(_ name: String) -> (name: String, changed: Bool) {
+    /// Each of these loses something, so each lowers confidence.
+    ///
+    /// A measure we could not keep is better dropped from the name than left
+    /// in it: "3 thyme sprigs" has to reach the list as thyme, or it never
+    /// merges with the thyme another recipe asks for.
+    ///
+    /// But only when the word is a measure. "1 head garlic" is one head and
+    /// "1 1/2 pounds salmon fillet" is a cut of fish, and dropping the word
+    /// there asked the shopper for one garlic and a whole salmon. So the
+    /// quantity and the unit come in: a trailing word goes only when the count
+    /// is counting that word rather than measuring the thing, and a leading
+    /// one goes only when a name is left standing without it.
+    private static func tidy(_ name: String, unit: Unit?, quantity: Double?) -> (name: String, changed: Bool) {
         var working = name
         var changed = false
 
@@ -455,11 +475,22 @@ enum IngredientParser {
 
         // A measure we do not have a unit for, written either side of the name:
         // "2 slices whole grain bread", "3 thyme sprigs".
-        if let first = tokens.first, tokens.count > 1, unmeasuredWords.contains(key(first)) {
+        //
+        // A leading one only goes when a name of its own is left standing.
+        // "1 head garlic" came back as "garlic", so the list asked for one
+        // garlic and the only record of how much was gone.
+        if let first = tokens.first, tokens.count > 2, unmeasuredWords.contains(key(first)) {
             tokens.removeFirst()
             changed = true
         }
-        if let last = tokens.last, tokens.count > 1, unmeasuredWords.contains(key(last)) {
+        // A trailing one only goes when the quantity is counting the word
+        // rather than measuring the thing. "1 1/2 pounds salmon fillet" is
+        // already measured in pounds and "1 sourdough loaf" is one loaf, so in
+        // both the word is part of what the shopper buys: dropping it sent them
+        // for a whole salmon and for plain sourdough, and broke the seed round
+        // trip on four lines.
+        if let last = tokens.last, tokens.count > 1, unit == nil, (quantity ?? 1) > 1,
+           unmeasuredWords.contains(key(last)) {
             tokens.removeLast()
             changed = true
         }

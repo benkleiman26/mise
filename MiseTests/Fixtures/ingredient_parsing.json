@@ -438,7 +438,7 @@
       "input": "6 boneless, skinless chicken thighs",
       "quantity": 6,
       "unit": null,
-      "name": "skinless chicken thighs",
+      "name": "boneless, skinless chicken thighs",
       "confidence": "medium",
       "why": "the comma is inside the description, not between the name and the preparation. Splitting on it recorded the ingredient as \"boneless\" and threw the chicken away."
     },
@@ -446,7 +446,8 @@
       "input": "2 large bone-in, skin-on chicken breasts",
       "quantity": 2,
       "unit": null,
-      "name": "skin-on chicken breasts",
+      "name": "large bone-in, skin-on chicken breasts",
+      "why": "the same comma, and \"large\" stays for the same reason it stays in \"1 large lemon\": section 4 keeps the name as written.",
       "confidence": "medium"
     },
     {

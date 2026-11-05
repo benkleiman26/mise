@@ -89,11 +89,16 @@ enum DishTypeClassifier {
         let title: [String]
         /// Only counts alongside a title hit, or two of them together.
         let supporting: [String]
+        /// Longer title phrases that take the keyword back, because the longer
+        /// name is the dish. Without these, "Burrito Bowls" comes back a wrap
+        /// and "Sheet Pan Salmon and Green Beans" comes back a beans dish.
+        let unless: [String]
 
-        init(_ type: DishType, title: [String], supporting: [String] = []) {
+        init(_ type: DishType, title: [String], supporting: [String] = [], unless: [String] = []) {
             self.type = type
             self.title = title
             self.supporting = supporting
+            self.unless = unless
         }
     }
 
@@ -136,10 +141,12 @@ enum DishTypeClassifier {
             "grilled cheese", "sub", "hoagie", "wrap", "roll-up",
         ]),
 
+        // Plurals are spelled out because a keyword only matches a whole word:
+        // "quesadilla" never finds "Black Bean Quesadillas".
         Rule(.taco, title: [
-            "taco", "tacos", "quesadilla", "burrito", "enchilada", "tostada", "fajita",
-            "nachos", "tostadas",
-        ]),
+            "taco", "tacos", "quesadilla", "quesadillas", "burrito", "enchilada",
+            "tostada", "fajita", "nachos", "tostadas",
+        ], unless: ["burrito bowl", "burrito bowls"]),
 
         Rule(.pizza, title: [
             "pizza", "focaccia", "flatbread", "calzone", "pide", "manakish",
@@ -159,10 +166,12 @@ enum DishTypeClassifier {
             "polenta", "congee", "jambalaya", "bulgur", "barley",
         ]),
 
+        // Green beans are a vegetable alongside the main thing, not a legume
+        // dish, so they do not make a sheet pan salmon dinner a beans recipe.
         Rule(.beansAndLentils, title: [
             "beans", "lentil", "lentils", "chickpea", "chickpeas", "hummus", "falafel",
             "black bean", "white bean", "refried",
-        ]),
+        ], unless: ["green bean", "green beans"]),
 
         Rule(.roast, title: [
             "roast", "roasted", "porchetta", "prime rib", "spatchcock",
@@ -219,6 +228,16 @@ enum DishTypeClassifier {
         var fromTitle: Set<DishType> = []
 
         for rule in rules {
+            // The longer name in the title wins outright. A burrito bowl is a
+            // bowl and green beans are a vegetable, so the rule drops out here
+            // rather than being outvoted later.
+            // Parenthesised and labelled rather than a trailing closure: the
+            // condition of an `if` does not accept one, so `{ ... }` would be
+            // read as the body and the test left as an unapplied method.
+            if rule.unless.contains(where: { titleText.contains(" \(normalize($0)) ") }) {
+                continue
+            }
+
             let inTitle = rule.title.contains { titleText.contains(" \(normalize($0)) ") }
             if inTitle {
                 fromTitle.insert(rule.type)

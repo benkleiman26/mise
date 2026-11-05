@@ -157,7 +157,16 @@ struct CanonicalMatcher: Sendable {
 
     func match(_ ingredientName: String) -> CanonicalMatch {
         let direct = resolve(ingredientName)
-        if direct.item != nil { return direct }
+        // Containment is the last rung, so it must not answer before the
+        // readings below. It did: "chicken or vegetable broth" reported
+        // `contained` and kept whichever of the two broths the table happens
+        // to list first, both halves being equally contained. That is table
+        // order standing in for a decision, the same shape of guess as cutting
+        // at the "or" and keeping the first half, which cost about forty five
+        // lines their noun, though this one at least returns a real product.
+        // A contained hit is deferred, not discarded: if no
+        // reading resolves, the `return direct` below still hands it back.
+        if direct.item != nil, direct.reason != .contained { return direct }
 
         // 5: "chicken or vegetable broth" is one thing to buy, written as a
         // choice. Which half to keep cannot be decided without the table: the

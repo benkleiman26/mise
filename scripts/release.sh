@@ -114,6 +114,7 @@ xcodebuild -exportArchive \
   -authenticationKeyPath "$KEY_PATH" \
   -authenticationKeyID "$ASC_KEY_ID" \
   -authenticationKeyIssuerID "$ASC_ISSUER_ID" \
+  -allowProvisioningUpdates \
   || die "The upload failed. The archive is kept, so fix the cause and retry with:
 
     ./scripts/release.sh --upload-only

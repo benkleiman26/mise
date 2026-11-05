@@ -84,4 +84,30 @@ final class ModelContainerTests: XCTestCase {
         XCTAssertEqual(try context.fetchCount(FetchDescriptor<Ingredient>()), 0)
         XCTAssertEqual(try context.fetchCount(FetchDescriptor<RecipeStep>()), 0)
     }
+\n
+    /// Every delete in the app writes a tombstone, so a tombstone that cannot
+    /// be saved takes the whole app with it. It did: `Deletion` had a property
+    /// called `entity`, which every SwiftData model already has from
+    /// NSManagedObject, and the save died casting an NSEntityDescription to a
+    /// String from a frame that named neither.
+    func testDeletingSomethingWritesATombstoneThatSaves() throws {
+        let container = try MiseSchema.makeContainer(inMemory: true)
+        let context = ModelContext(container)
+        let repository = SwiftDataRecipeRepository(context: context)
+        let householdID = StableID.household()
+
+        let recipe = Recipe(householdID: householdID, title: "Test", sourceType: .manual, baseServings: 2)
+        repository.insert(recipe)
+        try repository.save()
+
+        let id = recipe.id
+        repository.delete(recipe)
+        try repository.save()
+
+        let tombstones = try context.fetch(FetchDescriptor<Deletion>())
+        XCTAssertEqual(tombstones.count, 1)
+        XCTAssertEqual(tombstones.first?.recordID, id)
+        XCTAssertEqual(tombstones.first?.kind, .recipe,
+                       "the other phone has to know which table the id belongs to")
+    }
 }

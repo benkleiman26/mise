@@ -19,7 +19,16 @@ final class Deletion {
     var updatedAt: Date
 
     /// Which table, as `SyncEntity`'s raw value.
-    var entity: String
+    ///
+    /// Not called `entity`, which is the obvious name and a trap. SwiftData is
+    /// built on Core Data, every model is an `NSManagedObject` underneath, and
+    /// `NSManagedObject` already has an `entity` property returning an
+    /// `NSEntityDescription`. The names collide, and the collision does not
+    /// show up at build time: it crashes inside the save with "Could not cast
+    /// value of type NSEntityDescription to NSString", from a stack frame that
+    /// names neither this property nor this model. Every delete in the app
+    /// writes one of these, so it took everything down with it.
+    var recordEntity: String
     /// The id of the record that was deleted.
     var recordID: UUID
     /// Which device did it, so a device can ignore the news of its own delete.
@@ -38,12 +47,12 @@ final class Deletion {
         self.householdID = householdID
         self.createdAt = createdAt
         self.updatedAt = updatedAt
-        self.entity = entity.rawValue
+        self.recordEntity = entity.rawValue
         self.recordID = recordID
         self.deviceID = deviceID
     }
 
-    var kind: SyncEntity? { SyncEntity(rawValue: entity) }
+    var kind: SyncEntity? { SyncEntity(rawValue: recordEntity) }
 }
 
 /// Everything sync carries, and the order it has to be applied in.

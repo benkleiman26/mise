@@ -15,7 +15,9 @@ final class DuplicateReconcilerTests: XCTestCase {
     private var reconciler: DuplicateReconciler!
 
     private let householdID = StableID.household()
-    private let monday = Date(timeIntervalSince1970: 1_793_923_200)
+    /// A calendar day in this machine's own zone, not a fixed instant. The
+    /// reconciler groups weeks by calendar day, so the fixture has to be one.
+    private let monday = Calendar.current.startOfDay(for: Date(timeIntervalSince1970: 1_793_923_200))
 
     override func setUp() async throws {
         try await super.setUp()

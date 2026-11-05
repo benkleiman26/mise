@@ -52,9 +52,18 @@ final class StableIDTests: XCTestCase {
 
     // MARK: - The ids two phones have to agree on
 
+    /// Built in this machine's own calendar rather than from a fixed instant.
+    ///
+    /// Six hours after a given moment is the same day in Denver and the next
+    /// day in New York, so a test written against an epoch constant passes or
+    /// fails by where the simulator thinks it is. The thing under test is a
+    /// calendar day, so the fixture has to be one too.
+    private var monday: Date {
+        Calendar.current.startOfDay(for: Date(timeIntervalSince1970: 1_793_923_200))
+    }
+
     func testTheWeekIsTheSameOnBothPhones() {
         let household = StableID.household()
-        let monday = Date(timeIntervalSince1970: 1_793_923_200)
         XCTAssertEqual(
             StableID.mealPlan(householdID: household, weekStartDate: monday),
             StableID.mealPlan(householdID: household, weekStartDate: monday)
@@ -65,7 +74,6 @@ final class StableIDTests: XCTestCase {
     /// not to the same instant.
     func testTheWeekIsTheSameAtAnyTimeOfThatDay() {
         let household = StableID.household()
-        let monday = Date(timeIntervalSince1970: 1_793_923_200)
         let laterThatDay = monday.addingTimeInterval(60 * 60 * 6)
 
         XCTAssertEqual(
@@ -80,7 +88,6 @@ final class StableIDTests: XCTestCase {
 
     func testADifferentWeekIsADifferentPlan() {
         let household = StableID.household()
-        let monday = Date(timeIntervalSince1970: 1_793_923_200)
         XCTAssertNotEqual(
             StableID.mealPlan(householdID: household, weekStartDate: monday),
             StableID.mealPlan(householdID: household, weekStartDate: monday.addingTimeInterval(7 * 86_400))

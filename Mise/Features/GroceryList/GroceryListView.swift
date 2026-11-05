@@ -4,10 +4,12 @@ import SwiftUI
 /// the household walks the store. Section 5.3.
 struct GroceryListView: View {
     @Environment(AppContainer.self) private var container
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @State private var store: GroceryListStore?
     @State private var isAddingItem = false
     @State private var newItem = ""
     @State private var showing: GroceryItem?
+    @State private var isCelebrating = false
 
     var body: some View {
         NavigationStack {
@@ -80,6 +82,20 @@ struct GroceryListView: View {
                 if let store {
                     GroceryItemDetail(item: item, store: store) { showing = nil }
                 }
+            }
+        }
+        .overlay {
+            if isCelebrating { Confetti() }
+        }
+        // The last item, not an empty list: a week with nothing on it has not
+        // been shopped for. And only on the way to zero, so re-showing the
+        // ticked ones and hiding them again does not set it off twice.
+        .onChange(of: store?.remainingCount) { was, now in
+            guard let was, let now, was > 0, now == 0, !reduceMotion else { return }
+            isCelebrating = true
+            Task { @MainActor in
+                try? await Task.sleep(for: .seconds(3))
+                isCelebrating = false
             }
         }
         .task {

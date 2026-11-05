@@ -11,6 +11,14 @@ struct GroceryListView: View {
     @State private var showing: GroceryItem?
     @State private var isCelebrating = false
 
+    /// Two states, said plainly: what is left to buy, or the whole list.
+    private var showsEverything: Binding<Bool> {
+        Binding(
+            get: { store?.showsCompleted ?? false },
+            set: { store?.showsCompleted = $0 }
+        )
+    }
+
     var body: some View {
         NavigationStack {
             Group {
@@ -27,7 +35,7 @@ struct GroceryListView: View {
                              ? "One item, bought."
                              : "All \(store.completedCount) items, bought.")
                     } actions: {
-                        Button("Show what I ticked off") { store.showsCompleted = true }
+                        Button("Show everything") { store.showsCompleted = true }
                             .buttonStyle(.borderedProminent)
                     }
                 } else {
@@ -43,20 +51,27 @@ struct GroceryListView: View {
             }
             .navigationTitle("List")
             .toolbar {
-                // Only once something has been ticked. Before that it is a
-                // control for a state that does not exist.
-                if let store, store.completedCount > 0 {
-                    ToolbarItem(placement: .topBarLeading) {
-                        Button {
-                            store.showsCompleted.toggle()
-                        } label: {
-                            Label(
-                                store.showsCompleted ? "Hide what I ticked off" : "Show what I ticked off",
-                                systemImage: store.showsCompleted
-                                    ? "line.3.horizontal.decrease.circle.fill"
-                                    : "line.3.horizontal.decrease.circle"
-                            )
+                // Always here, never conditional.
+                //
+                // It used to appear only once something had been ticked, and
+                // SwiftUI does not reliably re-evaluate a toolbar item behind
+                // a condition: it was built while the store was still nil and
+                // never came back. The only way to show the ticked items was
+                // the button on the finished screen, which is one way, so the
+                // list could be switched on and not off.
+                ToolbarItem(placement: .topBarLeading) {
+                    Menu {
+                        Picker("Show", selection: showsEverything) {
+                            Text("What I still need").tag(false)
+                            Text("Everything").tag(true)
                         }
+                    } label: {
+                        Label(
+                            "Show",
+                            systemImage: (store?.showsCompleted ?? false)
+                                ? "line.3.horizontal.decrease.circle.fill"
+                                : "line.3.horizontal.decrease.circle"
+                        )
                     }
                 }
                 ToolbarItem(placement: .topBarTrailing) {
@@ -215,7 +230,9 @@ struct GroceryListView: View {
 
         let ticked = store.completedCount == 0 || store.showsCompleted
             ? ""
-            : store.completedCount == 1 ? "1 ticked off, hidden." : "\(store.completedCount) ticked off, hidden."
+            : store.completedCount == 1
+                ? "1 ticked off, not shown."
+                : "\(store.completedCount) ticked off, not shown."
 
         return [left, ticked, made].filter { !$0.isEmpty }.joined(separator: " ")
     }

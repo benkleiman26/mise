@@ -62,8 +62,19 @@ struct RootView: View {
         // the other phone has had the whole time it was closed to change
         // something.
         .onChange(of: scenePhase) { _, phase in
-            guard phase == .active else { return }
-            Task { await container.sync?.syncIfPossible(force: true) }
+            switch phase {
+            case .active:
+                Task { await container.sync?.syncIfPossible(force: true) }
+            case .background:
+                // Leaving is the moment what this phone has done is most
+                // likely to be stranded on it. Not .inactive, which also fires
+                // for a notification banner or the app switcher being glanced
+                // at, and which would mean a round every time somebody looked
+                // at their phone sideways.
+                Task { await container.sync?.syncBeforeLeaving() }
+            default:
+                break
+            }
         }
         // Said here rather than only in Settings.
         //

@@ -1,5 +1,6 @@
 import Foundation
 import SwiftData
+import UIKit
 
 /// Sharing a household, as the Settings screen sees it.
 ///
@@ -284,6 +285,36 @@ final class SyncStore {
         if !force, let last = lastAttempt, Date().timeIntervalSince(last) < Self.quietPeriod { return }
         lastAttempt = Date()
         await sync()
+    }
+
+    /// Sends what this phone has done, on the way out.
+    ///
+    /// The half minute between rounds is fine while somebody is looking at the
+    /// app and useless at the moment they stop: adding milk and closing the
+    /// app takes about eight seconds, and without this that item sits on the
+    /// phone until the next time it is opened. The other person opens theirs,
+    /// pulls a server that has never heard of the milk, and reasonably
+    /// concludes that sharing does not work.
+    ///
+    /// iOS stops giving a backgrounded app time almost immediately, so this
+    /// asks for a few seconds first. If it does not finish, nothing is lost:
+    /// the push is sent again on the next round, which is what makes it safe
+    /// to attempt at all.
+    func syncBeforeLeaving() async {
+        guard engine != nil, step == .ready, !busy, SyncGroup.current != nil else { return }
+
+        var task = UIBackgroundTaskIdentifier.invalid
+        task = UIApplication.shared.beginBackgroundTask(withName: "Mise sync") {
+            UIApplication.shared.endBackgroundTask(task)
+            task = .invalid
+        }
+
+        await sync()
+
+        if task != .invalid {
+            UIApplication.shared.endBackgroundTask(task)
+            task = .invalid
+        }
     }
 
     func sync() async {

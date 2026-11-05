@@ -271,14 +271,26 @@ extension SyncMapper {
     /// arrived, and is what the user sees.
     @discardableResult
     func apply(_ records: [SyncRecord], as householdID: UUID) throws -> Int {
+        guard !records.isEmpty else { return 0 }
         var taken = 0
+
+        // The two tables big enough to matter, read once.
+        //
+        // `find(id:)` fetches a whole table and scans it, which is fine for
+        // twenty pantry entries and ruinous here: every one of eight thousand
+        // incoming ingredients was fetching all 427 recipes to find its
+        // parent. Two reads up front instead of eight thousand.
+        var lookup = Lookup(
+            recipes: Dictionary(try recipes.all().map { ($0.id, $0) }, uniquingKeysWith: { first, _ in first }),
+            canonicalItems: Dictionary(try canonicalItems.all().map { ($0.id, $0) }, uniquingKeysWith: { first, _ in first })
+        )
 
         // Parents before children: a planned meal arriving before its plan has
         // nothing to attach to. `SyncEntity.allCases` is declared in that
         // order so this cannot be got wrong by accident.
         for entity in SyncEntity.allCases {
             for record in records where record.entity == entity {
-                if try applyOne(record, as: householdID) { taken += 1 }
+                if try applyOne(record, as: householdID, lookup: &lookup) { taken += 1 }
             }
         }
 
@@ -286,7 +298,16 @@ extension SyncMapper {
         return taken
     }
 
-    private func applyOne(_ record: SyncRecord, as householdID: UUID) throws -> Bool {
+    /// What this batch has already seen, so a record made a moment ago is
+    /// found by the record that refers to it.
+    private struct Lookup {
+        var recipes: [UUID: Recipe]
+        var canonicalItems: [UUID: CanonicalItem]
+    }
+
+    private func applyOne(
+        _ record: SyncRecord, as householdID: UUID, lookup: inout Lookup
+    ) throws -> Bool {
         switch record.entity {
         case .household:
             guard let existing = try households.find(id: record.id) else {
@@ -470,7 +491,7 @@ extension SyncMapper {
             let isStaple = record.boolean("isStaple") ?? false
             let unit: Unit? = record.enumeration("defaultUnit")
 
-            if let existing = try canonicalItems.find(id: record.id) {
+            if let existing = lookup.canonicalItems[record.id] {
                 guard record.updatedAt > existing.updatedAt else { return false }
                 existing.name = name
                 existing.aliases = aliases
@@ -493,6 +514,7 @@ extension SyncMapper {
             )
             item.updatedAt = record.updatedAt
             canonicalItems.insert(item)
+            lookup.canonicalItems[item.id] = item
             return true
 
         case .recipe:
@@ -501,7 +523,7 @@ extension SyncMapper {
             else { return false }
 
             let recipe: Recipe
-            if let existing = try recipes.find(id: record.id) {
+            if let existing = lookup.recipes[record.id] {
                 guard record.updatedAt > existing.updatedAt else { return false }
                 recipe = existing
             } else {
@@ -513,6 +535,7 @@ extension SyncMapper {
                     baseServings: record.integer("baseServings") ?? 4
                 )
                 recipes.insert(recipe)
+                lookup.recipes[recipe.id] = recipe
             }
 
             recipe.title = title
@@ -545,7 +568,7 @@ extension SyncMapper {
             // Dropped rather than orphaned. The recipe sorts first and is in
             // the same batch, so this only happens when a page boundary split
             // them, and the next pull brings it again.
-            guard let recipe = try recipes.find(id: recipeID) else { return false }
+            guard let recipe = lookup.recipes[recipeID] else { return false }
 
             let ingredient: Ingredient
             if let existing = recipe.ingredients.first(where: { $0.id == record.id }) {
@@ -577,7 +600,7 @@ extension SyncMapper {
             guard let text = record.string("text"),
                   let recipeID = record.uuid("recipeID")
             else { return false }
-            guard let recipe = try recipes.find(id: recipeID) else { return false }
+            guard let recipe = lookup.recipes[recipeID] else { return false }
 
             let step: RecipeStep
             if let existing = recipe.steps.first(where: { $0.id == record.id }) {

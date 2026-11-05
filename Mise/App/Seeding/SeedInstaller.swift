@@ -133,12 +133,18 @@ struct SeedInstaller {
         household: Household,
         report: inout SeedReport
     ) throws -> [String: CanonicalItem] {
-        let existing = try canonicalItems.existingIDs()
         var byName: [String: CanonicalItem] = [:]
+        // By id as well as by name, because the loop below looks up every one
+        // of 395 seeds and `find(id:)` fetches the whole table and scans it.
+        // That is 395 full reads on every launch, for a table that was already
+        // read once right here.
+        var byID: [UUID: CanonicalItem] = [:]
 
         for item in try canonicalItems.all() {
             byName[SeedCatalog.key(item.name)] = item
+            byID[item.id] = item
         }
+        let existing = Set(byID.keys)
 
         for seed in catalog.canonicalItems {
             let id = StableID.canonicalItem(name: seed.name)
@@ -153,7 +159,7 @@ struct SeedInstaller {
             // keep growing every time an import finds a gap in it, so the
             // refresh matters more than the saving.
             if existing.contains(id) {
-                guard let item = try canonicalItems.find(id: id) else { continue }
+                guard let item = byID[id] else { continue }
                 if item.aliases != seed.aliases
                     || item.aisle != seed.aisle
                     || item.isStaple != seed.isStaple
@@ -186,6 +192,7 @@ struct SeedInstaller {
             )
             canonicalItems.insert(item)
             byName[SeedCatalog.key(seed.name)] = item
+            byID[item.id] = item
             report.canonicalItemsInserted += 1
         }
 

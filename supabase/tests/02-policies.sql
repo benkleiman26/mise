@@ -8,7 +8,12 @@
 grant usage on schema public, auth to authenticated, anon;
 grant select on auth.users to authenticated, anon;
 grant all on all tables in schema public to authenticated;
-grant all on all sequences in schema public to authenticated;
+-- Deliberately no blanket grant on sequences.
+--
+-- There was one, and it hid a real failure: every push on the live server was
+-- refused with "permission denied for sequence" while this file reported the
+-- push working. A test that hands out privileges the real thing does not is
+-- not testing the real thing. schema.sql grants what it needs by name.
 
 insert into auth.users (id) values
   ('11111111-1111-1111-1111-111111111111'),

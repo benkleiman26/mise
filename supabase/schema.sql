@@ -79,6 +79,31 @@ create table if not exists mise_deletions (
 
 alter table mise_deletions add column if not exists server_seq bigserial;
 
+-- A signed in person needs the sequence, not just the table.
+--
+-- `bigserial` means the column's default is nextval() on a sequence, and
+-- nextval is a privilege of its own. Granting insert on the table is not
+-- enough: every push is refused with "permission denied for sequence", from a
+-- message that names an object nobody wrote by hand and no policy mentions.
+--
+-- By name through pg_get_serial_sequence rather than by guessing it, because
+-- the generated name depends on the table and column and is not worth
+-- reproducing in two places.
+do $$
+declare
+  seq text;
+begin
+  for seq in
+    select pg_get_serial_sequence('mise_records', 'server_seq')
+    union all
+    select pg_get_serial_sequence('mise_deletions', 'server_seq')
+  loop
+    if seq is not null then
+      execute format('grant usage, select on sequence %s to authenticated', seq);
+    end if;
+  end loop;
+end $$;
+
 create index if not exists mise_deletions_cursor on mise_deletions(household_id, server_at);
 create index if not exists mise_deletions_seq on mise_deletions(household_id, server_seq);
 

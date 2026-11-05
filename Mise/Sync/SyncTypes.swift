@@ -62,10 +62,33 @@ enum SyncValue: Equatable, Sendable, Codable {
 struct SyncBatch: Equatable, Sendable {
     var records: [SyncRecord] = []
     var deletions: [SyncDeletion] = []
-    /// The server's clock at the moment this batch was taken, which is what
-    /// the device stores and sends next time. Device clocks disagree, sometimes
-    /// by minutes, and a cursor taken from the wrong clock loses changes.
-    var cursor: Date?
+    var cursor = SyncCursor()
+    /// Whether either table filled its page, so there is more to come.
+    var hasMore = false
+}
+
+/// How far a device has read, per table.
+///
+/// Two numbers, and both halves of that matter.
+///
+/// Two, because records and deletions are fetched by separate queries with
+/// separate page limits. Under one shared cursor, a full page of records
+/// ending at one point and a short page of deletions reaching further would
+/// move the shared mark to the further one, and every record in between was
+/// skipped for good.
+///
+/// Numbers rather than timestamps, because the server stamps `server_at` from
+/// `now()`, which is the transaction clock: every row written by one push
+/// shares a single value. A page boundary landing inside that group means the
+/// next request, which asks for anything after the last value it saw, skips
+/// the rest of the group. A sequence has no ties, so there is no group to land
+/// inside.
+struct SyncCursor: Equatable, Sendable, Codable {
+    /// Sequences start at 1, so zero means nothing has been read.
+    var records = 0
+    var deletions = 0
+
+    var isStart: Bool { records == 0 && deletions == 0 }
 }
 
 struct SyncDeletion: Equatable, Sendable {
@@ -82,7 +105,7 @@ struct SyncDeletion: Equatable, Sendable {
 protocol SyncClient: Sendable {
     /// Everything in the household changed after `since`, excluding what this
     /// device sent itself.
-    func pull(householdID: UUID, since: Date?, deviceID: UUID) async throws -> SyncBatch
+    func pull(householdID: UUID, since: SyncCursor, deviceID: UUID) async throws -> SyncBatch
 
     /// Sends local changes. Returns the server's clock, which becomes the next
     /// cursor.

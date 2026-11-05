@@ -23,41 +23,53 @@ struct SupabaseSyncClient: SyncClient {
 
     // MARK: - Pull
 
-    func pull(householdID: UUID, since: Date?, deviceID: UUID) async throws -> SyncBatch {
-        let cursor = since.map(Self.iso.string(from:))
+    func pull(householdID: UUID, since: SyncCursor, deviceID: UUID) async throws -> SyncBatch {
+        let household = householdID.uuidString.lowercased()
+        let device = deviceID.uuidString.lowercased()
 
         let records: [[String: Any]] = try await get(
             "mise_records",
             query: [
-                ("select", "entity,id,fields,updated_at,server_at"),
-                ("household_id", "eq.\(householdID.uuidString.lowercased())"),
+                ("select", "entity,id,fields,updated_at,server_seq"),
+                ("household_id", "eq.\(household)"),
                 // Its own writes come back as its own, which it already has.
-                ("device_id", "neq.\(deviceID.uuidString.lowercased())"),
-                ("order", "server_at.asc"),
+                ("device_id", "neq.\(device)"),
+                ("order", "server_seq.asc"),
                 ("limit", "\(Self.pageSize)"),
-            ] + (cursor.map { [("server_at", "gt.\($0)")] } ?? [])
+                ("server_seq", "gt.\(since.records)"),
+            ]
         )
 
         let deletions: [[String: Any]] = try await get(
             "mise_deletions",
             query: [
-                ("select", "entity,record_id,deleted_at,server_at,device_id"),
-                ("household_id", "eq.\(householdID.uuidString.lowercased())"),
-                ("device_id", "neq.\(deviceID.uuidString.lowercased())"),
-                ("order", "server_at.asc"),
+                ("select", "entity,record_id,deleted_at,server_seq,device_id"),
+                ("household_id", "eq.\(household)"),
+                ("device_id", "neq.\(device)"),
+                ("order", "server_seq.asc"),
                 ("limit", "\(Self.pageSize)"),
-            ] + (cursor.map { [("server_at", "gt.\($0)")] } ?? [])
+                ("server_seq", "gt.\(since.deletions)"),
+            ]
         )
 
         var batch = SyncBatch()
         batch.records = records.compactMap { Self.record(from: $0, householdID: householdID) }
         batch.deletions = deletions.compactMap { Self.deletion(from: $0, householdID: householdID) }
 
-        // The furthest point actually seen, so nothing between the newest row
-        // in this page and the server's current clock is skipped.
-        let seen = (records + deletions).compactMap { $0["server_at"] as? String }.compactMap(Self.iso.date(from:))
-        batch.cursor = seen.max() ?? since
+        // Each table keeps its own place, and each place comes from the rows
+        // as they arrived rather than from the ones that decoded. A row this
+        // version of the app cannot read is meant to be passed over, not
+        // waited on forever.
+        batch.cursor = SyncCursor(
+            records: Self.furthest(in: records) ?? since.records,
+            deletions: Self.furthest(in: deletions) ?? since.deletions
+        )
+        batch.hasMore = records.count >= Self.pageSize || deletions.count >= Self.pageSize
         return batch
+    }
+
+    private static func furthest(in rows: [[String: Any]]) -> Int? {
+        rows.compactMap { ($0["server_seq"] as? NSNumber)?.intValue }.max()
     }
 
     // MARK: - Push

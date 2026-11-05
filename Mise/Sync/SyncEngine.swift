@@ -28,7 +28,10 @@ final class SyncEngine {
     private(set) var lastSent = 0
     private(set) var lastReceived = 0
 
-    private static let cursorKey = "mise.sync.cursor"
+    // A new key, because what it holds is no longer a date. A device carrying
+    // the old one starts from the beginning, reads everything once and settles,
+    // which costs a slow first sync and nothing else.
+    private static let cursorKey = "mise.sync.cursor.v2"
     private static let sentKey = "mise.sync.sentUpTo"
     private static let syncedKey = "mise.sync.lastSyncedAt"
 
@@ -52,19 +55,25 @@ final class SyncEngine {
     /// Per device rather than synced, which is the point: it records what this
     /// phone has seen, and a phone restored from a backup should sync again
     /// rather than assume it is up to date.
-    private var cursor: Date? {
-        get { UserDefaults.standard.object(forKey: Self.cursorKey) as? Date }
-        set { UserDefaults.standard.set(newValue, forKey: Self.cursorKey) }
+    private var cursor: SyncCursor {
+        get {
+            guard let data = UserDefaults.standard.data(forKey: Self.cursorKey),
+                  let stored = try? JSONDecoder().decode(SyncCursor.self, from: data)
+            else { return SyncCursor() }
+            return stored
+        }
+        set { UserDefaults.standard.set(try? JSONEncoder().encode(newValue), forKey: Self.cursorKey) }
     }
 
     /// How far this device has got through its own changes, by its own clock.
     ///
     /// Separate from `cursor`, and the two must never be confused. `cursor` is
-    /// a server timestamp, and the records waiting to be sent are stamped by
-    /// this phone. Using one to filter the other compares two clocks that
-    /// disagree, sometimes by minutes: a phone running behind the server would
-    /// decide its own fresh edits were older than the last thing it heard
-    /// about and never send them at all, silently, forever.
+    /// a position in the server's own sequence and says nothing about time at
+    /// all; the records waiting to be sent are stamped by this phone's clock.
+    /// It was a server timestamp once, and filtering one by the other compared
+    /// two clocks that disagree, sometimes by minutes: a phone running behind
+    /// the server decided its own fresh edits were older than the last thing
+    /// it had heard about and never sent them, silently, forever.
     private var sentUpTo: Date? {
         get { UserDefaults.standard.object(forKey: Self.sentKey) as? Date }
         set { UserDefaults.standard.set(newValue, forKey: Self.sentKey) }
@@ -102,8 +111,8 @@ final class SyncEngine {
             // established household before looking at it is how a joining
             // phone overwrites a year of somebody's pantry with its own
             // factory settings.
-            if cursor == nil {
-                try await pull(group: group, local: local)
+            if cursor.isStart {
+                try await drain(group: group, local: local)
             }
 
             // Out. Filtered by this device's own clock, never by the server
@@ -123,7 +132,7 @@ final class SyncEngine {
             lastSent = outgoing.records.count + outgoing.deletions.count
 
             // In.
-            try await pull(group: group, local: local)
+            try await drain(group: group, local: local)
 
             lastSyncedAt = Date()
             UserDefaults.standard.set(lastSyncedAt, forKey: Self.syncedKey)
@@ -133,22 +142,40 @@ final class SyncEngine {
         }
     }
 
-    /// One pull, applied and counted.
+    /// Pulls until there is nothing left, not one page and done.
     ///
-    /// Deletions last: a record that arrives and is then deleted in the same
-    /// round should end up deleted, not resurrected. Records arrive stamped
-    /// with the group id and are stored under this database's own household
-    /// id, so everything local agrees about which household it belongs to.
-    private func pull(group: UUID, local: UUID) async throws {
-        let incoming = try await client.pull(householdID: group, since: cursor, deviceID: deviceID)
-        let taken = try mapper.apply(incoming.records, as: local)
-        let removed = try mapper.apply(incoming.deletions)
-        lastReceived += taken + removed
-        if let moved = incoming.cursor { cursor = moved }
+    /// A page is 500 rows and a first sync is several thousand, so stopping
+    /// after one page would mean the rest arrives whenever somebody happens to
+    /// tap the button again. Nothing tells them to.
+    ///
+    /// Deletions are applied after records within each page: a record that
+    /// arrives and is then deleted in the same round should end up deleted,
+    /// not resurrected. Records arrive stamped with the group id and are
+    /// stored under this database's own household id, so everything local
+    /// agrees about which household it belongs to.
+    private func drain(group: UUID, local: UUID) async throws {
+        // Bounded, because a loop that depends on the far end agreeing to stop
+        // is a loop that hangs the app when it does not.
+        for _ in 0..<Self.maximumPages {
+            let incoming = try await client.pull(householdID: group, since: cursor, deviceID: deviceID)
+
+            let taken = try mapper.apply(incoming.records, as: local)
+            let removed = try mapper.apply(incoming.deletions)
+            lastReceived += taken + removed
+
+            // Nothing moved, so asking again would fetch the same page forever.
+            guard incoming.cursor != cursor else { return }
+            cursor = incoming.cursor
+            guard incoming.hasMore else { return }
+        }
     }
 
+    /// 500 rows a page, so twenty thousand rows in one sync, which is more
+    /// than the whole library and comfortably more than a week of changes.
+    private static let maximumPages = 40
+
     var cursorDescription: String {
-        cursor.map { $0.formatted(date: .abbreviated, time: .standard) } ?? "nothing yet"
+        cursor.isStart ? "nothing yet" : "records \(cursor.records), deletions \(cursor.deletions)"
     }
 
     /// What a sync would send right now, without sending it.
@@ -159,7 +186,7 @@ final class SyncEngine {
     /// Starts this device over: everything is sent and everything is taken.
     /// For after a restore, or when the two phones have plainly drifted.
     func resetCursor() {
-        cursor = nil
+        cursor = SyncCursor()
         sentUpTo = nil
     }
 

@@ -54,6 +54,12 @@ struct RecipesView: View {
             }
             store?.load()
         }
+        // A sync that arrives while this screen is open changes the database
+        // underneath a view built from an earlier fetch. Without this the
+        // list keeps showing what it showed and the sync looks broken.
+        .onChange(of: container.dataVersion) {
+            store?.load()
+        }
     }
 
     // MARK: - The list

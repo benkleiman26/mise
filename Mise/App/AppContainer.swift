@@ -34,6 +34,20 @@ final class AppContainer {
     /// What the last seed run did. Nil until it has run.
     private(set) var seedReport: SeedReport?
 
+    /// Sharing, owned here rather than by the Settings screen.
+    ///
+    /// It used to be made by `SyncSettingsView` in its `.task`, which meant
+    /// sync existed only while somebody was looking at Settings. Nothing can
+    /// happen on its own under that arrangement.
+    private(set) var sync: SyncStore?
+
+    /// Bumped whenever a sync brings something in.
+    ///
+    /// Without it, syncing on its own is invisible: the database changes
+    /// underneath a screen that was built from a fetch made before it, and
+    /// the list keeps showing what it showed. Screens watch this and reload.
+    private(set) var dataVersion = 0
+
     /// Plain text for Settings when something went wrong on launch. Mise opens
     /// and says so rather than crashing, because section 0 asks for the first
     /// run to work for a stranger rather than only for the owner.
@@ -95,6 +109,16 @@ final class AppContainer {
         } catch {
             startupProblem = "The starter recipes and grocery items could not be loaded. \(error)"
         }
+    }
+
+    /// Made once, after the container exists, because it needs the container.
+    func startSyncing() {
+        guard sync == nil else { return }
+        sync = SyncStore(container: self)
+    }
+
+    func dataChanged() {
+        dataVersion += 1
     }
 
     /// Falls back to a memory only store rather than refusing to launch. A

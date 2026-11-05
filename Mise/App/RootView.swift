@@ -20,6 +20,7 @@ struct RootView: View {
     }
 
     @Environment(AppContainer.self) private var container
+    @Environment(\.scenePhase) private var scenePhase
     @State private var screen: Screen = .plan
     @State private var hasReadStartupProblem = false
 
@@ -43,6 +44,26 @@ struct RootView: View {
             Tab("Pantry", systemImage: "cabinet", value: Screen.pantry) {
                 PantryView()
             }
+        }
+        .task {
+            // Sharing starts with the app, not with somebody opening Settings.
+            container.startSyncing()
+            await container.sync?.load()
+            await container.sync?.syncIfPossible(force: true)
+
+            // And keeps going while the app is open, so a tick in the shop
+            // reaches the other phone without either person thinking about it.
+            while !Task.isCancelled {
+                try? await Task.sleep(for: .seconds(30))
+                await container.sync?.syncIfPossible()
+            }
+        }
+        // Coming back to the app is the moment most likely to be out of date:
+        // the other phone has had the whole time it was closed to change
+        // something.
+        .onChange(of: scenePhase) { _, phase in
+            guard phase == .active else { return }
+            Task { await container.sync?.syncIfPossible(force: true) }
         }
         // Said here rather than only in Settings.
         //

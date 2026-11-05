@@ -11,7 +11,10 @@ import SwiftUI
 /// old build rather than as a bug.
 struct SyncSettingsView: View {
     @Environment(AppContainer.self) private var container
-    @State private var store: SyncStore?
+    /// The container's, not one of this screen's own. Sharing has to exist
+    /// whether or not anybody is looking at Settings, which is the whole point
+    /// of syncing on its own.
+    private var store: SyncStore? { container.sync }
     @State private var email = ""
     @State private var password = ""
     @State private var code = ""
@@ -32,7 +35,7 @@ struct SyncSettingsView: View {
             Text(footer)
         }
         .task {
-            if store == nil { store = SyncStore(container: container) }
+            container.startSyncing()
             await store?.load()
         }
         .alert("Join a household", isPresented: $isJoining) {

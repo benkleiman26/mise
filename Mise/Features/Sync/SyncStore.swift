@@ -20,6 +20,16 @@ final class SyncStore {
     private let config: SupabaseConfig?
     private let auth: SupabaseAuth?
     private let engine: SyncEngine?
+    /// Weak, because the container owns this. Used only to say that a sync
+    /// brought something in, so the open screens reload.
+    private weak var container: AppContainer?
+
+    private var lastAttempt: Date?
+
+    /// How close together automatic rounds may be. Thirty seconds is the gap
+    /// between one phone ticking something off in a shop and the other one
+    /// showing it, which is the only moment this has to be quick.
+    private static let quietPeriod: TimeInterval = 30
 
     private(set) var step: Step = .notConfigured
     private(set) var problem: String?
@@ -39,6 +49,7 @@ final class SyncStore {
     private(set) var serverSays: String?
 
     init(container: AppContainer) {
+        self.container = container
         self.config = SupabaseConfig.load()
 
         guard let config else {
@@ -262,7 +273,23 @@ final class SyncStore {
 
     // MARK: - Syncing
 
+    /// Syncs when it can, and does nothing at all when it cannot.
+    ///
+    /// Everything automatic goes through here rather than through `sync()`,
+    /// which is the button. It refuses when there is nothing set up, when a
+    /// round is already running, and when the last one was recent, so opening
+    /// the app twice in a minute does not mean two rounds.
+    func syncIfPossible(force: Bool = false) async {
+        guard engine != nil, step == .ready, !busy, SyncGroup.current != nil else { return }
+        if !force, let last = lastAttempt, Date().timeIntervalSince(last) < Self.quietPeriod { return }
+        lastAttempt = Date()
+        await sync()
+    }
+
     func sync() async {
+        // Counted as an attempt whoever asked, so tapping the button does not
+        // get an automatic round half a second later.
+        lastAttempt = Date()
         problem = nil
         serverSays = nil
 
@@ -293,6 +320,8 @@ final class SyncStore {
         }
 
         await engine.run()
+
+        if engine.lastReceived > 0 { container?.dataChanged() }
 
         switch engine.status {
         case .failed(let message):

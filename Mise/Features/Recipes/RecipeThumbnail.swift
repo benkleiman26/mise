@@ -17,6 +17,16 @@ struct RecipeThumbnail: View {
                 Image(uiImage: image)
                     .resizable()
                     .scaledToFill()
+            } else if let address = recipe.imageURL {
+                // No bytes but an address: the recipe came over the wire from
+                // the other phone, which does not send pictures, or its
+                // download failed at import. Either way the picture is one
+                // request away and the placeholder is a worse answer.
+                AsyncImage(url: address) { image in
+                    image.resizable().scaledToFill()
+                } placeholder: {
+                    placeholder
+                }
             } else {
                 placeholder
             }

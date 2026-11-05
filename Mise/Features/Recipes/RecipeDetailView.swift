@@ -32,6 +32,17 @@ struct RecipeDetailView: View {
                         .clipped()
                         .listRowInsets(EdgeInsets())
                 }
+            } else if let address = recipe.imageURL {
+                Section {
+                    AsyncImage(url: address) { image in
+                        image.resizable().scaledToFill()
+                    } placeholder: {
+                        Color.clear
+                    }
+                    .frame(height: 200)
+                    .clipped()
+                    .listRowInsets(EdgeInsets())
+                }
             }
 
             Section {

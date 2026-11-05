@@ -58,6 +58,11 @@ final class AddByLinkStore {
             var report = RecipeImporter.Report()
             let recipe = importer.build(imported, source: "link", into: &report)
             recipe.imageData = photo
+            // The address is kept whether or not the download worked. It is
+            // what lets a recipe that arrived without its picture fetch one
+            // later, and it is the only way the other phone gets a picture at
+            // all, since the bytes deliberately do not sync.
+            recipe.imageURL = imported.imageURLs?.first.flatMap { URL(string: $0) }
             recipes.insert(recipe)
             try recipes.save()
             problem = nil

@@ -238,6 +238,11 @@ private struct GroceryItemDetail: View {
                             Text(option.displayName).tag(option)
                         }
                     }
+                    // A pushed list rather than a floating menu. Eighteen
+                    // aisles in a menu opens somewhere in the middle, scrolled,
+                    // with no top or bottom in sight, and reads as a short list
+                    // that is missing the one you wanted.
+                    .pickerStyle(.navigationLink)
                 } footer: {
                     // Says what the amount field actually accepts rather than
                     // what would be nice: it reads a number and a unit, so

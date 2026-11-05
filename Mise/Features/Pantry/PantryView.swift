@@ -216,6 +216,7 @@ private struct AddPantryItemView: View {
                                 Text(option.displayName).tag(option)
                             }
                         }
+                        .pickerStyle(.navigationLink)
                         Button("Add \"\(cleaned)\"") {
                             if store.addItem(named: cleaned, aisle: aisle, status: status) {
                                 dismiss()

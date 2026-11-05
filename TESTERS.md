@@ -89,3 +89,64 @@ Not "what do you think". Ask:
 - What made you go back to your old way of doing this?
 
 The useful answers come from the third one.
+
+## What to send them
+
+The one thing they can get wrong is joining **your** household instead of
+making their own. If they paste your invite code they get your grocery list
+and your recipe library, which is both wrong for them and not yours to hand
+over: most of that library is the New York Times's.
+
+So the order matters. One of them starts a household, the other joins it with
+*that* code.
+
+Copy from here down.
+
+---
+
+**Mise, a meal planner and grocery list**
+
+You will get an email from TestFlight. Install the TestFlight app from the App
+Store first, then open the email on your phone and tap View in TestFlight.
+
+Once Mise is installed, one of you sets up sharing and the other joins.
+
+**One of you, first:**
+
+1. Open Mise, tap the gear on the Plan tab
+2. Create an account with your email
+3. Tap **Start sharing**
+4. Send the invite code to the other person
+
+**The other one, after that:**
+
+1. Open Mise, tap the gear on the Plan tab
+2. Create an account with **your own** email, not the same one
+3. Tap **Join with an invite code** and paste the code you were sent
+4. Tap **Sync now**
+
+From then on the week, the grocery list and the pantry are shared. Tick
+something off in the shop and it ticks on the other phone within about half a
+minute, or as soon as either of you opens the app.
+
+**What is in it**
+
+45 recipes to start with. Add your own from a link: Recipes tab, the plus at
+the top left, paste a URL from almost any recipe site.
+
+Plan the week on the Plan tab, then tap **Make the list**. It merges what the
+recipes share, sorts it by aisle, and leaves out whatever your pantry says you
+already have.
+
+**Two things worth knowing**
+
+Your data sits in a database on my account. Row level security means the app
+cannot show my household's list to yours, but I own the project, so I could go
+and read it if I wanted to. Saying so plainly rather than letting you assume
+otherwise.
+
+It only syncs while the app is open, being opened, or being closed. Nothing
+moves between two phones that are both shut. If something you added has not
+appeared, open the app on both and give it a moment.
+
+---

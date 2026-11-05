@@ -107,19 +107,20 @@ final class GroceryListStore {
                 // merges on the canonical item so this should not happen, but
                 // the tie-break has to be deterministic rather than lucky:
                 // both phones must land on the same answer.
+                var tieBreak = 0
                 var id = StableID.groceryItem(
                     listID: list.id,
                     canonicalItemID: item.canonicalItemID,
                     displayName: item.displayName
                 )
-                var attempt = 1
                 while kept.contains(id) {
+                    tieBreak += 1
                     id = StableID.groceryItem(
                         listID: list.id,
                         canonicalItemID: item.canonicalItemID,
-                        displayName: "\(item.displayName)#\(attempt)"
+                        displayName: item.displayName,
+                        tieBreak: tieBreak
                     )
-                    attempt += 1
                 }
                 kept.insert(id)
 

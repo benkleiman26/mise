@@ -49,4 +49,91 @@ final class StableIDTests: XCTestCase {
         XCTAssertEqual(bytes[6] & 0xF0, 0x50)
         XCTAssertEqual(bytes[8] & 0xC0, 0x80)
     }
+
+    // MARK: - The ids two phones have to agree on
+
+    func testTheWeekIsTheSameOnBothPhones() {
+        let household = StableID.household()
+        let monday = Date(timeIntervalSince1970: 1_793_923_200)
+        XCTAssertEqual(
+            StableID.mealPlan(householdID: household, weekStartDate: monday),
+            StableID.mealPlan(householdID: household, weekStartDate: monday)
+        )
+    }
+
+    /// Both phones compute the week start themselves, within the same day but
+    /// not to the same instant.
+    func testTheWeekIsTheSameAtAnyTimeOfThatDay() {
+        let household = StableID.household()
+        let monday = Date(timeIntervalSince1970: 1_793_923_200)
+        let laterThatDay = monday.addingTimeInterval(60 * 60 * 6)
+
+        XCTAssertEqual(
+            StableID.day(monday), StableID.day(laterThatDay),
+            "the key is the calendar day, not the instant"
+        )
+        XCTAssertEqual(
+            StableID.mealPlan(householdID: household, weekStartDate: monday),
+            StableID.mealPlan(householdID: household, weekStartDate: laterThatDay)
+        )
+    }
+
+    func testADifferentWeekIsADifferentPlan() {
+        let household = StableID.household()
+        let monday = Date(timeIntervalSince1970: 1_793_923_200)
+        XCTAssertNotEqual(
+            StableID.mealPlan(householdID: household, weekStartDate: monday),
+            StableID.mealPlan(householdID: household, weekStartDate: monday.addingTimeInterval(7 * 86_400))
+        )
+    }
+
+    /// Surprising, and worth pinning down, because it is what the tie break
+    /// exists for: two lines that merged onto one grocery item are the same
+    /// line whatever either of them happens to be called.
+    func testALineKeysOnItsGroceryItemAndNotOnItsName() {
+        let list = UUID()
+        let lemon = UUID()
+        XCTAssertEqual(
+            StableID.groceryItem(listID: list, canonicalItemID: lemon, displayName: "lemons"),
+            StableID.groceryItem(listID: list, canonicalItemID: lemon, displayName: "2 lemons, halved")
+        )
+    }
+
+    /// Which is exactly why the tie break cannot be smuggled into the name. A
+    /// caller that varied the name to break a tie would be handed the same id
+    /// back every time and spin forever. One did.
+    func testTheTieBreakChangesTheIDEvenThoughTheNameDoesNot() {
+        let list = UUID()
+        let lemon = UUID()
+        let first = StableID.groceryItem(listID: list, canonicalItemID: lemon, displayName: "lemons")
+        var seen: Set<UUID> = [first]
+
+        for tieBreak in 1...5 {
+            let next = StableID.groceryItem(
+                listID: list, canonicalItemID: lemon, displayName: "lemons", tieBreak: tieBreak
+            )
+            XCTAssertFalse(seen.contains(next), "tie break \(tieBreak) repeated an earlier id")
+            seen.insert(next)
+        }
+    }
+
+    func testAHandWrittenLineKeysOnItsName() {
+        let list = UUID()
+        XCTAssertEqual(
+            StableID.groceryItem(listID: list, canonicalItemID: nil, displayName: "Paper Towels"),
+            StableID.groceryItem(listID: list, canonicalItemID: nil, displayName: "  paper towels  "),
+            "both phones have to land on the same line for the same thing typed"
+        )
+    }
+
+    func testOneListPerHousehold() {
+        XCTAssertEqual(
+            StableID.groceryList(householdID: StableID.household()),
+            StableID.groceryList(householdID: StableID.household())
+        )
+        XCTAssertNotEqual(
+            StableID.groceryList(householdID: StableID.household()),
+            StableID.groceryList(householdID: StableID.household(key: "other"))
+        )
+    }
 }

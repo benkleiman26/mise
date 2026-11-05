@@ -68,10 +68,18 @@ enum StableID {
     /// phones generate the list from the same plan and would otherwise each
     /// invent their own "2 lemons". The canonical item is the key where there
     /// is one, since that is exactly what the generator merges on.
-    static func groceryItem(listID: UUID, canonicalItemID: UUID?, displayName: String) -> UUID {
+    /// `tieBreak` is for the caller that finds two lines keying the same. It
+    /// has to be a separate argument rather than something smuggled into the
+    /// name, because a line with a canonical item keys on that id alone and
+    /// ignores the name completely: a caller varying the name to break a tie
+    /// would get the same id back every time and loop forever. It did.
+    static func groceryItem(
+        listID: UUID, canonicalItemID: UUID?, displayName: String, tieBreak: Int = 0
+    ) -> UUID {
         let key = canonicalItemID?.uuidString
             ?? "name:\(displayName.trimmingCharacters(in: .whitespacesAndNewlines).lowercased())"
-        return uuid(name: "groceryItem:\(listID.uuidString):\(key)")
+        let suffix = tieBreak == 0 ? "" : ":\(tieBreak)"
+        return uuid(name: "groceryItem:\(listID.uuidString):\(key)\(suffix)")
     }
 
     /// The calendar day a date falls on, as this phone's own calendar sees it.

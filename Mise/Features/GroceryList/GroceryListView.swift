@@ -35,7 +35,7 @@ struct GroceryListView: View {
                              ? "One item, bought."
                              : "All \(store.completedCount) items, bought.")
                     } actions: {
-                        Button("Show everything") { store.showsCompleted = true }
+                        Button("Show completed items") { store.showsCompleted = true }
                             .buttonStyle(.borderedProminent)
                     }
                 } else {
@@ -62,8 +62,8 @@ struct GroceryListView: View {
                 ToolbarItem(placement: .topBarLeading) {
                     Menu {
                         Picker("Show", selection: showsEverything) {
-                            Text("What I still need").tag(false)
-                            Text("Everything").tag(true)
+                            Text("To buy").tag(false)
+                            Text("All").tag(true)
                         }
                     } label: {
                         Label(

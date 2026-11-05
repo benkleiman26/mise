@@ -17,6 +17,13 @@ ROOT="$PWD"
 ARCHIVE="$ROOT/build/Mise.xcarchive"
 SECRETS="$ROOT/scripts/appstore.env"
 
+# An upload that fails leaves a good archive behind, and rebuilding it costs
+# the tests, the build number and five minutes of archiving to produce a file
+# that is already on disk. Most upload failures are a wrong credential, which
+# is fixed in seconds and should be retried in seconds.
+UPLOAD_ONLY=no
+[ "${1:-}" = "--upload-only" ] && UPLOAD_ONLY=yes
+
 say() { printf "\n\033[1m%s\033[0m\n" "$*"; }
 die() { printf "\n\033[31m%s\033[0m\n" "$*" >&2; exit 1; }
 
@@ -33,10 +40,36 @@ source "$SECRETS"
 KEY_PATH="${ASC_KEY_PATH/#\~/$HOME}"
 [ -f "$KEY_PATH" ] || die "No App Store Connect key at $KEY_PATH"
 
+# Checked for shape, not just for being set.
+#
+# A placeholder left in appstore.env is a non empty string, so every check
+# that only asked whether the value exists was satisfied by the words
+# PASTE_ISSUER_ID_HERE, and the first thing that noticed was App Store Connect
+# refusing the upload, fifteen minutes and one spent build number later.
+case "$ASC_KEY_ID" in
+  *XXXX*|*PASTE*|*HERE*|"") die "ASC_KEY_ID in scripts/appstore.env is still a placeholder." ;;
+esac
+case "$ASC_ISSUER_ID" in
+  *XXXX*|*PASTE*|*HERE*|"") die "ASC_ISSUER_ID in scripts/appstore.env is still a placeholder. It is the UUID above the table on the App Store Connect API keys page." ;;
+esac
+# The issuer is always a uuid. Saying so here beats finding out from a web
+# service that answers "Unauthenticated" and names nothing.
+printf '%s' "$ASC_ISSUER_ID" | grep -Eq '^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$' \
+  || die "ASC_ISSUER_ID does not look like a uuid: $ASC_ISSUER_ID"
+
 [ -f "$ROOT/Mise/Resources/supabase.json" ] \
   || say "Note: no supabase.json, so this build will have sharing switched off."
 
 # --- Check it works before shipping it --------------------------------------
+
+if [ "$UPLOAD_ONLY" = yes ]; then
+  [ -d "$ARCHIVE" ] || die "No archive at $ARCHIVE to upload. Run without --upload-only."
+  say "Skipping the tests and the archive: uploading what is already built"
+fi
+
+# Everything from here to the matching fi is the expensive half, and
+# --upload-only skips all of it.
+if [ "$UPLOAD_ONLY" = no ]; then
 
 say "Running the tests"
 xcodebuild test \
@@ -66,6 +99,10 @@ xcodebuild archive \
   -archivePath "$ARCHIVE" \
   -quiet \
   || die "The archive failed."
+fi
+
+BUILD="${BUILD:-$(agvtool what-version -terse)}"
+VERSION="${VERSION:-$(agvtool what-marketing-version -terse1)}"
 
 # --- Upload -----------------------------------------------------------------
 
@@ -77,7 +114,11 @@ xcodebuild -exportArchive \
   -authenticationKeyPath "$KEY_PATH" \
   -authenticationKeyID "$ASC_KEY_ID" \
   -authenticationKeyIssuerID "$ASC_ISSUER_ID" \
-  || die "The upload failed. The archive is kept at $ARCHIVE, so this can be retried without rebuilding."
+  || die "The upload failed. The archive is kept, so fix the cause and retry with:
+
+    ./scripts/release.sh --upload-only
+
+which skips the tests and the archive."
 
 say "Sent. Mise $VERSION ($BUILD)"
 cat <<'NEXT'

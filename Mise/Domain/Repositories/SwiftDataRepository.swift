@@ -104,6 +104,10 @@ final class SwiftDataPantryRepository: SwiftDataRepository<PantryEntry>, PantryR
 
 @MainActor
 final class SwiftDataMealPlanRepository: SwiftDataRepository<MealPlan>, MealPlanRepository {
+    func insertEntry(_ meal: PlannedMeal) {
+        context.insert(meal)
+    }
+
     func deleteEntry(_ meal: PlannedMeal) {
         recordDeletion(of: meal)
         context.delete(meal)
@@ -112,6 +116,10 @@ final class SwiftDataMealPlanRepository: SwiftDataRepository<MealPlan>, MealPlan
 
 @MainActor
 final class SwiftDataGroceryListRepository: SwiftDataRepository<GroceryList>, GroceryListRepository {
+    func insertItem(_ item: GroceryItem) {
+        context.insert(item)
+    }
+
     func deleteItem(_ item: GroceryItem) {
         recordDeletion(of: item)
         context.delete(item)

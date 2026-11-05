@@ -35,15 +35,18 @@ struct DuplicateReconciler {
     func run() throws -> Report {
         guard let householdID = try households.all().first?.id else { return Report() }
 
+        // Each half saves its own work rather than both sharing one save at
+        // the end, so a failure says which half it was in.
         var report = Report()
         try mergePlans(householdID: householdID, into: &report)
         try mergeLists(householdID: householdID, into: &report)
-
-        if !report.didNothing {
-            try mealPlans.save()
-            try groceryLists.save()
-        }
         return report
+    }
+
+    /// Two phones that put the same recipe in the same slot on the same day
+    /// planned one meal between them, not two.
+    private static func key(_ meal: PlannedMeal) -> String {
+        "\(meal.recipeID.uuidString)|\(meal.slot.rawValue)|\(meal.date.map(StableID.day) ?? "unscheduled")"
     }
 
     // MARK: - The week
@@ -70,9 +73,16 @@ struct DuplicateReconciler {
                 keeper = made
             }
 
+            // What the keeper already holds, tracked here rather than read back
+            // off the relationship. Attaching a meal updates the inverse when
+            // the store gets round to it, and a merge that asked the array
+            // mid-transaction would be told the meal is not there yet and add
+            // it twice.
+            var held = Set(keeper.entries.map(Self.key))
+
             for stray in strays {
                 for meal in Array(stray.entries) {
-                    if !keeper.holds(meal) {
+                    if !held.contains(Self.key(meal)) {
                         let moved = PlannedMeal(
                             householdID: householdID,
                             position: meal.position,
@@ -82,8 +92,13 @@ struct DuplicateReconciler {
                             servings: meal.servings,
                             isCooked: meal.isCooked
                         )
+                        // Registered before it is attached, and attached on one
+                        // side only. The inverse maintains itself, and setting
+                        // both sides by hand puts the same meal in the plan
+                        // twice.
+                        mealPlans.insertEntry(moved)
                         moved.plan = keeper
-                        keeper.entries.append(moved)
+                        held.insert(Self.key(meal))
                         report.mealsMoved += 1
                     }
                     // Explicitly, because the cascade would take the row out of
@@ -91,12 +106,16 @@ struct DuplicateReconciler {
                     // phone would put it straight back.
                     mealPlans.deleteEntry(meal)
                 }
-                stray.entries.removeAll()
+                // The entries array is not cleared by hand. The store maintains
+                // it as each child is deleted, and emptying it afterwards hands
+                // the save a relationship full of references to rows that are
+                // already gone.
                 mealPlans.delete(stray)
                 report.plansMerged += 1
             }
 
             keeper.updatedAt = .now
+            try mealPlans.save()
         }
     }
 
@@ -159,8 +178,8 @@ struct DuplicateReconciler {
                         isManual: item.isManual,
                         note: item.note
                     )
+                    groceryLists.insertItem(moved)
                     moved.list = keeper
-                    keeper.items.append(moved)
                     byID[id] = moved
                     position += 1
                     report.itemsMoved += 1
@@ -168,24 +187,12 @@ struct DuplicateReconciler {
 
                 groceryLists.deleteItem(item)
             }
-            stray.items.removeAll()
             groceryLists.delete(stray)
             report.listsMerged += 1
         }
 
         keeper.generatedAt = max(keeper.generatedAt, strays.map(\.generatedAt).max() ?? keeper.generatedAt)
         keeper.updatedAt = .now
-    }
-}
-
-private extension MealPlan {
-    /// Two phones that put the same recipe in the same slot on the same day
-    /// planned one meal between them, not two.
-    func holds(_ meal: PlannedMeal) -> Bool {
-        entries.contains { other in
-            other.recipeID == meal.recipeID
-                && other.slot == meal.slot
-                && other.date.map(StableID.day) == meal.date.map(StableID.day)
-        }
+        try groceryLists.save()
     }
 }

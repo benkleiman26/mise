@@ -66,6 +66,11 @@ protocol MealPlanRepository {
     func count() throws -> Int
     func insert(_ plan: MealPlan)
     func delete(_ plan: MealPlan)
+    /// A meal built by a caller rather than by a fetch has to be registered
+    /// before it is saved. Attaching it to a plan is not enough: the store
+    /// crashes partway through the save rather than refusing it, which costs
+    /// an afternoon to read.
+    func insertEntry(_ meal: PlannedMeal)
     /// Removing a meal from `plan.entries` only breaks the link: the record
     /// would stay in the store with no plan. The caller needs a way to delete
     /// one, and it cannot reach the context itself.
@@ -81,6 +86,8 @@ protocol GroceryListRepository {
     func count() throws -> Int
     func insert(_ list: GroceryList)
     func delete(_ list: GroceryList)
+    /// Same reason as `MealPlanRepository.insertEntry`.
+    func insertItem(_ item: GroceryItem)
     /// Same reason as `MealPlanRepository.deleteEntry`: regenerating a list
     /// replaces its rows, and a row dropped from the array would otherwise
     /// linger in the store forever.

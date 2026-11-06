@@ -2,6 +2,31 @@
 
 Known gaps, found while building. Section 11 asks for this list to be kept.
 
+## Where it stands, 2026-11-05
+
+Two phones in one household, two accounts, sharing the week, the grocery list,
+the pantry, the grocery table and all 428 recipes. Deletions stick. Sync runs
+on launch, on returning, every thirty seconds while open, and on the way out.
+Build 3 is with Apple for the other household.
+
+Open, in the order I would take them:
+
+- [ ] **Applying records runs on the main actor.** Tonight's fixes made it
+      bearable rather than right: the push side no longer reads the whole
+      library to find what changed, and the apply yields every fifty records.
+      A device that falls badly behind will still stutter while it catches up.
+      The fix is a background `ModelContext`.
+- [ ] **Records and deletions page on separate cursors**, so a device can see a
+      deletion before the record that supersedes it. Within one page the order
+      is right; across pages the guarantee is gone. It self corrects today, but
+      only because a replacement carries a newer timestamp than the tombstone.
+- [ ] **Nothing marks a meal as cooked**, so the week never clears itself.
+- [ ] **A recipe cannot be written down from scratch**, and editing one is
+      limited to its serving count.
+- [ ] **The aisle order is the spec's default**, not anybody's actual store.
+- [ ] **The wife's phone runs a development build** that expires a year from
+      2026-11-05. An internal TestFlight group would fix that permanently.
+
 ## Blocked on the owner
 
 - [x] Mealime rescue ran on 2026-09-14 from the owner's signed-in Chrome. No

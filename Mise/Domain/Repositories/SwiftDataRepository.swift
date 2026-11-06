@@ -84,6 +84,18 @@ final class SwiftDataRecipeRepository: SwiftDataRepository<Recipe>, RecipeReposi
         try context.fetch(FetchDescriptor<Ingredient>())
     }
 
+    func changed(since: Date) throws -> [Recipe] {
+        try context.fetch(FetchDescriptor<Recipe>(predicate: #Predicate { $0.updatedAt > since }))
+    }
+
+    func changedIngredients(since: Date) throws -> [Ingredient] {
+        try context.fetch(FetchDescriptor<Ingredient>(predicate: #Predicate { $0.updatedAt > since }))
+    }
+
+    func changedSteps(since: Date) throws -> [RecipeStep] {
+        try context.fetch(FetchDescriptor<RecipeStep>(predicate: #Predicate { $0.updatedAt > since }))
+    }
+
     func allSteps() throws -> [RecipeStep] {
         try context.fetch(FetchDescriptor<RecipeStep>())
     }
@@ -113,7 +125,11 @@ final class SwiftDataRecipeRepository: SwiftDataRepository<Recipe>, RecipeReposi
 }
 
 @MainActor
-final class SwiftDataCanonicalItemRepository: SwiftDataRepository<CanonicalItem>, CanonicalItemRepository {}
+final class SwiftDataCanonicalItemRepository: SwiftDataRepository<CanonicalItem>, CanonicalItemRepository {
+    func changed(since: Date) throws -> [CanonicalItem] {
+        try context.fetch(FetchDescriptor<CanonicalItem>(predicate: #Predicate { $0.updatedAt > since }))
+    }
+}
 
 @MainActor
 final class SwiftDataPantryRepository: SwiftDataRepository<PantryEntry>, PantryRepository {}

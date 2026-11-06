@@ -39,17 +39,28 @@ struct SyncMapper {
         for user in try users.all() where user.updatedAt > after {
             out.append(encode(user))
         }
-        for item in try canonicalItems.all() where item.updatedAt > after {
+        // Asked of the store, not filtered afterwards.
+        //
+        // These two tables are the whole library. Reading all of it to find
+        // what changed cost about ten seconds of a phone that would not answer
+        // a touch, every thirty seconds, on both phones, for ever: the walk is
+        // the same size whether anything changed or not. A fetch with a
+        // predicate normally returns nothing and costs nothing.
+        for item in try canonicalItems.changed(since: after) {
             out.append(encode(item))
         }
-        for recipe in try recipes.all() {
-            if recipe.updatedAt > after { out.append(encode(recipe)) }
-            for ingredient in recipe.ingredients where ingredient.updatedAt > after {
-                out.append(encode(ingredient, in: recipe))
-            }
-            for step in recipe.steps where step.updatedAt > after {
-                out.append(encode(step, in: recipe))
-            }
+        for recipe in try recipes.changed(since: after) {
+            out.append(encode(recipe))
+        }
+        for ingredient in try recipes.changedIngredients(since: after) {
+            // Without a recipe it is a stray, and sending it would describe a
+            // child of nothing.
+            guard let recipe = ingredient.recipe else { continue }
+            out.append(encode(ingredient, in: recipe))
+        }
+        for step in try recipes.changedSteps(since: after) {
+            guard let recipe = step.recipe else { continue }
+            out.append(encode(step, in: recipe))
         }
         for entry in try pantry.all() where entry.updatedAt > after {
             out.append(encode(entry))

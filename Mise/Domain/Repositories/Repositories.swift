@@ -38,6 +38,15 @@ protocol RecipeRepository {
     /// tombstone naming one can find it without knowing its parent.
     func allIngredients() throws -> [Ingredient]
     func allSteps() throws -> [RecipeStep]
+    /// Only what has changed, asked of the store rather than filtered after.
+    ///
+    /// Sync asks this every thirty seconds, and walking 428 recipes and eight
+    /// thousand ingredients and steps to discover that nothing changed is ten
+    /// seconds of a phone that will not answer a touch. A fetch with a
+    /// predicate normally returns nothing and costs nothing.
+    func changed(since: Date) throws -> [Recipe]
+    func changedIngredients(since: Date) throws -> [Ingredient]
+    func changedSteps(since: Date) throws -> [RecipeStep]
     func orphanedIngredients() throws -> [Ingredient]
     /// Every ingredient that resolved to no grocery item, so the user can say
     /// what it is once. Section 5.3 rule 2.
@@ -49,6 +58,8 @@ protocol RecipeRepository {
 @MainActor
 protocol CanonicalItemRepository {
     func all() throws -> [CanonicalItem]
+    /// Same reason as `RecipeRepository.changed(since:)`.
+    func changed(since: Date) throws -> [CanonicalItem]
     func find(id: UUID) throws -> CanonicalItem?
     func existingIDs() throws -> Set<UUID>
     func count() throws -> Int

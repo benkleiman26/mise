@@ -38,7 +38,7 @@ struct SyncSettingsView: View {
             container.startSyncing()
             await store?.load()
         }
-        .alert("Join a household", isPresented: $isJoining) {
+        .alert("Join another household", isPresented: $isJoining) {
             TextField("Invite code", text: $code)
                 .textInputAutocapitalization(.never)
                 .autocorrectionDisabled()
@@ -49,7 +49,7 @@ struct SyncSettingsView: View {
             }
             Button("Cancel", role: .cancel) { code = "" }
         } message: {
-            Text("Paste the code from the other phone.")
+            Text("Only do this if you live with the person who sent the code. Your plan, list, pantry and recipes are combined with theirs, and both phones can then see and change everything.")
         }
         .confirmationDialog(
             "Stop sharing this household?",
@@ -176,7 +176,7 @@ struct SyncSettingsView: View {
                 Button {
                     isJoining = true
                 } label: {
-                    Label("Join with an invite code", systemImage: "arrow.right.circle")
+                    Label("Join another household", systemImage: "arrow.right.circle")
                 }
                 .disabled(store.busy)
             }
@@ -192,8 +192,8 @@ struct SyncSettingsView: View {
             return "Sign in on both phones with your own accounts, then share the invite code so you shop from one list."
         case .ready:
             return store.isSharing
-                ? "The week, the grocery list and the pantry are shared. Recipes are not: import the same files on both phones and they line up."
-                : "Start on one phone, then join from the other with the code it shows. Whoever starts keeps their plan and list."
+                ? "The week, the grocery list, the pantry and the recipes are shared with everyone holding this household's code."
+                : "This phone already has its own household and keeps it whatever you do here. Start sharing to add a second phone in your home, then paste the code into that phone. Joining instead puts this phone into somebody else's household, which combines both sides' plans, lists, pantries and recipes."
         }
     }
 }

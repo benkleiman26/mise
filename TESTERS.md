@@ -58,11 +58,25 @@ Then **Xcode → Window → Organizer → Archives**, newest archive,
 
 In App Store Connect, once it has processed:
 
-1. **TestFlight → External Testing → +** to make a group, call it something
-   like "Other households"
-2. Add their email addresses
-3. Attach the build, fill in the test notes, submit for review
-4. When it passes, they get an email with a link and install TestFlight
+1. **TestFlight → Test Information** and fill it in. External testing stays
+   hidden until this is complete.
+2. **Internal Testing → +** and make a group with just you in it. This is a
+   prerequisite, not optional: App Store Connect does not show the External
+   Testing section at all until one internal group exists. It is useful on its
+   own too, because internal builds skip Beta App Review entirely.
+3. **External Testing → +** to make a group, call it something like
+   "Other households"
+4. Either add their email addresses, or turn on the group's **public link**
+   and send them the URL. If you use the link, set the tester limit low. These
+   links are public, they get scraped, and anyone who installs from one is
+   somebody you never got to tell about the database.
+5. Attach the build, fill in the test notes, submit for review
+6. When it passes, they get an email with a link, or the public link starts
+   working
+
+**Only one build per version can sit in Beta App Review at a time.** If 0.1 (2)
+is in review, 0.1 (3) cannot be submitted until 2 is approved or expired. Expire
+the one you do not want rather than waiting it out.
 
 ## What they should expect, and what to tell them
 
@@ -73,9 +87,9 @@ list and the pantry all work on one phone.
 rescued library and most of them are New York Times recipes, which are not
 yours to redistribute. They can add their own by pasting links.
 
-**Sharing is brand new and has never run against the real server.** Expect it
-to break. Ask them to send you the message from Settings when it does, not just
-"it didn't work".
+**Sharing is new.** It runs between two phones in one household and has done
+so for a while, but it has not had many hands on it. Ask them to send you the
+message from Settings when something goes wrong, not just "it didn't work".
 
 **The invite code is a key.** Whoever has it, plus any account, can read and
 change that household's list. One code per household, sent to one person.
@@ -122,10 +136,11 @@ Once Mise is installed, one of you sets up sharing and the other joins.
 
 1. Open Mise, tap the gear on the Plan tab
 2. Create an account with **your own** email, not the same one
-3. Tap **Join with an invite code** and paste the code you were sent
+3. Tap **Join another household** and paste the code you were sent
 4. Tap **Sync now**
 
-From then on the week, the grocery list and the pantry are shared. Tick
+From then on the week, the grocery list, the pantry and the recipes are
+shared. Tick
 something off in the shop and it ticks on the other phone within about half a
 minute, or as soon as either of you opens the app.
 

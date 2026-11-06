@@ -46,7 +46,14 @@ if ! git diff --quiet || ! git diff --cached --quiet; then
 fi
 
 say "Pulling"
-git pull --quiet
+# --rebase, stated here rather than left to whatever git is configured to do.
+#
+# release.sh commits the build number, so this repository does have local
+# commits, and the moment one of them meets a commit from elsewhere git stops
+# with "divergent branches" and a hint listing three options rather than
+# picking one. Rebase is the right one here: the local commits are small and
+# nobody else is building on them, and the history stays a line.
+git pull --rebase --quiet
 
 AFTER=$(git rev-parse HEAD)
 

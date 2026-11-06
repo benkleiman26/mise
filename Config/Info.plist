@@ -27,5 +27,17 @@
 	     than copying it somewhere else first. -->
 	<key>LSSupportsOpeningDocumentsInPlace</key>
 	<true/>
+
+	<!-- Answers Apple's export compliance question once, here, rather than by
+	     hand on every build.
+
+	     The honest answer for Mise: it uses encryption, because it talks to
+	     Supabase over HTTPS, and that encryption is entirely the operating
+	     system's. Nothing in this app implements or contains any of its own,
+	     which is the exemption this key declares. Left unanswered, every
+	     upload sits in App Store Connect flagged "Missing Compliance" and
+	     reaches nobody until somebody clicks through the same two questions. -->
+	<key>ITSAppUsesNonExemptEncryption</key>
+	<false/>
 </dict>
 </plist>

@@ -110,4 +110,34 @@ final class ModelContainerTests: XCTestCase {
         XCTAssertEqual(tombstones.first?.kind, .recipe,
                        "the other phone has to know which table the id belongs to")
     }
+
+    /// Replacing is not deleting, and recording it as one is expensive.
+    ///
+    /// A re-import puts the same ids straight back. A tombstone for one of
+    /// them tells the other phone to remove the recipe and tells the server to
+    /// refuse the replacement, because a record a tombstone covers does not
+    /// come back. 26 recipes ended up on one phone, missing on the other, and
+    /// rejected in between.
+    func testReplacingARecipeLeavesNoTombstone() throws {
+        let container = try MiseSchema.makeContainer(inMemory: true)
+        let context = ModelContext(container)
+        let repository = SwiftDataRecipeRepository(context: context)
+        let householdID = StableID.household()
+
+        let recipe = Recipe(householdID: householdID, title: "Test", sourceType: .manual, baseServings: 2)
+        recipe.ingredients = [Ingredient(householdID: householdID, position: 0, name: "salt")]
+        recipe.steps = [RecipeStep(householdID: householdID, position: 0, text: "Season it.")]
+        repository.insert(recipe)
+        try repository.save()
+
+        repository.replace(recipe)
+        try repository.save()
+
+        XCTAssertEqual(try context.fetchCount(FetchDescriptor<Recipe>()), 0)
+        XCTAssertEqual(try context.fetchCount(FetchDescriptor<Ingredient>()), 0,
+                       "the children go too, or they linger attached to nothing")
+        XCTAssertEqual(try context.fetchCount(FetchDescriptor<RecipeStep>()), 0)
+        XCTAssertEqual(try context.fetchCount(FetchDescriptor<Deletion>()), 0,
+                       "and nothing is told it was deleted, because it was not")
+    }
 }

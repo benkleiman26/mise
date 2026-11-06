@@ -36,7 +36,13 @@ final class SyncEngine {
     private static let syncedKey = "mise.sync.lastSyncedAt"
     private static let sharedSetKey = "mise.sync.sharedSetVersion"
 
-    /// Bumped whenever the set of things that travel grows.
+    /// Bumped whenever the set of things that travel grows, or when what has
+    /// already been sent has to go again.
+    ///
+    /// Raised to 3 after a re-import recorded a deletion for every recipe it
+    /// replaced. The tombstones blocked the replacements at the server, so 26
+    /// recipes existed on one phone and nowhere else. Once the tombstones are
+    /// cleared, this is what sends the recipes back up.
     ///
     /// A device only sends what changed since it last sent, and a recipe
     /// imported in October has not changed since. Without this, the library
@@ -44,7 +50,7 @@ final class SyncEngine {
     /// every row in it is older than the watermark. Bumping the number makes
     /// the next round start from the beginning once, and the server's upsert
     /// makes that cost nothing but time.
-    private static let sharedSetVersion = 2
+    private static let sharedSetVersion = 3
 
     /// How many records go in one request, out or in. A multi-megabyte body
     /// times out and takes the whole round with it.

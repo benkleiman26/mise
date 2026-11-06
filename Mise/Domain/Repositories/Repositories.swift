@@ -44,6 +44,15 @@ protocol RecipeRepository {
     /// thousand ingredients and steps to discover that nothing changed is ten
     /// seconds of a phone that will not answer a touch. A fetch with a
     /// predicate normally returns nothing and costs nothing.
+    /// Takes a recipe and its children out without recording a thing.
+    ///
+    /// For a caller that is about to put the same ids straight back. A
+    /// re-import does exactly that, and recording it as a deletion tells the
+    /// other phone to remove the recipe and tells the server to refuse the
+    /// replacement, because a record a tombstone covers does not come back.
+    /// That is how 26 recipes ended up existing on one phone, missing on the
+    /// other, and rejected by the server in between.
+    func replace(_ recipe: Recipe)
     func changed(since: Date) throws -> [Recipe]
     func changedIngredients(since: Date) throws -> [Ingredient]
     func changedSteps(since: Date) throws -> [RecipeStep]

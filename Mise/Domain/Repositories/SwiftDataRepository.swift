@@ -84,6 +84,12 @@ final class SwiftDataRecipeRepository: SwiftDataRepository<Recipe>, RecipeReposi
         try context.fetch(FetchDescriptor<Ingredient>())
     }
 
+    func replace(_ recipe: Recipe) {
+        for ingredient in recipe.ingredients { context.delete(ingredient) }
+        for step in recipe.steps { context.delete(step) }
+        context.delete(recipe)
+    }
+
     func changed(since: Date) throws -> [Recipe] {
         try context.fetch(FetchDescriptor<Recipe>(predicate: #Predicate { $0.updatedAt > since }))
     }

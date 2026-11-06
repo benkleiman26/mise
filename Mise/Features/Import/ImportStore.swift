@@ -142,13 +142,18 @@ final class ImportStore {
             let id = importer.id(for: imported, source: source)
             if existing.contains(id) {
                 if let old = try recipes.find(id: id) {
-                    // The cascade rule is not enough on its own. Deleting the
-                    // recipe alone left every ingredient row behind, attached
-                    // to nothing, where it still counted as an unmatched
-                    // ingredient and could never be reparsed.
-                    for ingredient in old.ingredients { recipes.deleteIngredient(ingredient) }
-                    for step in old.steps { recipes.deleteStep(step) }
-                    recipes.delete(old)
+                    // Replaced, not deleted, and the difference is not
+                    // cosmetic. The same ids go straight back in below, so
+                    // recording a deletion tells the other phone to remove the
+                    // recipe and tells the server to refuse the replacement,
+                    // since a record a tombstone covers does not come back.
+                    //
+                    // The cascade rule is not enough on its own either:
+                    // deleting the recipe alone left every ingredient row
+                    // behind, attached to nothing, where it still counted as
+                    // an unmatched ingredient and could never be reparsed.
+                    // `replace` takes the children too.
+                    recipes.replace(old)
                 }
                 report.recipesUpdated += 1
             } else {

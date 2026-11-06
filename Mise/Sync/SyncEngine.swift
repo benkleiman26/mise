@@ -206,7 +206,7 @@ final class SyncEngine {
         for _ in 0..<min(pages, Self.maximumPages) {
             let incoming = try await client.pull(householdID: group, since: cursor, deviceID: deviceID)
 
-            let taken = try mapper.apply(incoming.records, as: local)
+            let taken = try await mapper.apply(incoming.records, as: local)
             let removed = try mapper.apply(incoming.deletions)
             lastReceived += taken + removed
 

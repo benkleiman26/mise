@@ -270,9 +270,18 @@ extension SyncMapper {
     /// Returns how many were actually taken, which is not the same as how many
     /// arrived, and is what the user sees.
     @discardableResult
-    func apply(_ records: [SyncRecord], as householdID: UUID) throws -> Int {
+    /// Async so it can breathe.
+    ///
+    /// This runs on the main actor, because the store does. A page of five
+    /// hundred records takes about ten seconds, and for all ten of them the
+    /// screen does not answer a touch. Yielding between pages was not enough:
+    /// one page is the whole freeze. So it yields inside, every fifty records,
+    /// which hands the run loop a turn often enough that the phone stays alive
+    /// while the work goes on.
+    func apply(_ records: [SyncRecord], as householdID: UUID) async throws -> Int {
         guard !records.isEmpty else { return 0 }
         var taken = 0
+        var sinceBreath = 0
 
         // The two tables big enough to matter, read once.
         //
@@ -291,12 +300,22 @@ extension SyncMapper {
         for entity in SyncEntity.allCases {
             for record in records where record.entity == entity {
                 if try applyOne(record, as: householdID, lookup: &lookup) { taken += 1 }
+
+                sinceBreath += 1
+                if sinceBreath >= Self.recordsPerBreath {
+                    sinceBreath = 0
+                    await Task.yield()
+                }
             }
         }
 
         if taken > 0 { try households.save() }
         return taken
     }
+
+    /// How many records go by before the run loop gets a turn. Fifty is about
+    /// a fifth of a second of work, which is short enough that a tap lands.
+    private static let recordsPerBreath = 50
 
     /// What this batch has already seen, so a record made a moment ago is
     /// found by the record that refers to it.

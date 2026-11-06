@@ -229,7 +229,7 @@ final class SyncEngineTests: XCTestCase {
     /// what the wire produces, so the gap never showed on a real sync and
     /// swallowed every record in a test that built one by hand. A guard that
     /// returns false reads as validation rather than as a bug.
-    func testARecordSurvivesBeingWrittenAndReadBack() throws {
+    func testARecordSurvivesBeingWrittenAndReadBack() async throws {
         let items = SwiftDataCanonicalItemRepository(context: context)
         let pantryRepository = SwiftDataPantryRepository(context: context)
         let mapper = SyncMapper(
@@ -256,7 +256,7 @@ final class SyncEngineTests: XCTestCase {
         try pantryRepository.save()
         XCTAssertEqual(try pantryRepository.count(), 0)
 
-        let taken = try mapper.apply([pantryRecord], as: householdID)
+        let taken = try await mapper.apply([pantryRecord], as: householdID)
 
         XCTAssertEqual(taken, 1, "the mapper has to be able to read its own handwriting")
         let restored = try XCTUnwrap(pantryRepository.all().first)

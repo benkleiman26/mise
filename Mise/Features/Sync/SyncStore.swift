@@ -284,7 +284,10 @@ final class SyncStore {
         guard engine != nil, step == .ready, !busy, SyncGroup.current != nil else { return }
         if !force, let last = lastAttempt, Date().timeIntervalSince(last) < Self.quietPeriod { return }
         lastAttempt = Date()
-        await sync()
+        // A few pages, not all of them. Nobody asked for this round and nobody
+        // is watching it, so it must not be the reason the screen stops
+        // answering. What it leaves behind, the next round takes.
+        await sync(pages: SyncEngine.automaticPages)
     }
 
     /// Sends what this phone has done, on the way out.
@@ -309,7 +312,10 @@ final class SyncStore {
             task = .invalid
         }
 
-        await sync()
+        // Bounded like any other automatic round. There are seconds here, not
+        // minutes, and what matters on the way out is that this phone's own
+        // changes get sent, not that it finishes reading everybody else's.
+        await sync(pages: SyncEngine.automaticPages)
 
         if task != .invalid {
             UIApplication.shared.endBackgroundTask(task)
@@ -317,7 +323,7 @@ final class SyncStore {
         }
     }
 
-    func sync() async {
+    func sync(pages: Int = SyncEngine.maximumPages) async {
         // Counted as an attempt whoever asked, so tapping the button does not
         // get an automatic round half a second later.
         lastAttempt = Date()
@@ -350,7 +356,7 @@ final class SyncStore {
             return
         }
 
-        await engine.run()
+        await engine.run(pages: pages)
 
         if engine.lastReceived > 0 { container?.dataChanged() }
 

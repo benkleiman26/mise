@@ -94,7 +94,15 @@ final class SyncEngine {
         set { UserDefaults.standard.set(newValue, forKey: Self.sentKey) }
     }
 
-    func run() async {
+    /// One round.
+    ///
+    /// `pages` bounds how much it will take in before stopping, because
+    /// applying records happens on the main actor and a phone that has eight
+    /// thousand waiting will sit there, frozen, until they are all in. An
+    /// automatic round takes a few pages and leaves the rest for the next one;
+    /// the button takes everything, because somebody is watching it and knows
+    /// why it is busy.
+    func run(pages: Int = maximumPages) async {
         guard status != .working else { return }
         status = .working
 
@@ -127,7 +135,7 @@ final class SyncEngine {
             // phone overwrites a year of somebody's pantry with its own
             // factory settings.
             if cursor.isStart {
-                try await drain(group: group, local: local)
+                try await drain(group: group, local: local, pages: pages)
             }
 
             // Everything goes again when the shared set has grown.
@@ -169,7 +177,7 @@ final class SyncEngine {
             lastSent = outgoingRecords.count + outgoingDeletions.count
 
             // In.
-            try await drain(group: group, local: local)
+            try await drain(group: group, local: local, pages: pages)
 
             lastSyncedAt = Date()
             UserDefaults.standard.set(lastSyncedAt, forKey: Self.syncedKey)
@@ -190,10 +198,12 @@ final class SyncEngine {
     /// not resurrected. Records arrive stamped with the group id and are
     /// stored under this database's own household id, so everything local
     /// agrees about which household it belongs to.
-    private func drain(group: UUID, local: UUID) async throws {
-        // Bounded, because a loop that depends on the far end agreeing to stop
-        // is a loop that hangs the app when it does not.
-        for _ in 0..<Self.maximumPages {
+    private func drain(group: UUID, local: UUID, pages: Int) async throws {
+        // Bounded twice over. By `pages`, so a round ends while the phone is
+        // still answering taps, and by maximumPages, because a loop that
+        // depends on the far end agreeing to stop is a loop that hangs the app
+        // when it does not.
+        for _ in 0..<min(pages, Self.maximumPages) {
             let incoming = try await client.pull(householdID: group, since: cursor, deviceID: deviceID)
 
             let taken = try mapper.apply(incoming.records, as: local)
@@ -204,12 +214,25 @@ final class SyncEngine {
             guard incoming.cursor != cursor else { return }
             cursor = incoming.cursor
             guard incoming.hasMore else { return }
+
+            // Applying a page is a long stretch of main actor work and the
+            // next one starts the moment this returns. Without this the loop
+            // never gives the run loop a turn, the screen stops responding to
+            // touches, and iOS can decide the app has hung and kill it, which
+            // leaves the cursor where it was and does the whole thing again on
+            // the next launch. That is the shape of "it freezes every time".
+            await Task.yield()
         }
     }
 
     /// 500 rows a page, so twenty thousand rows in one sync, which is more
     /// than the whole library and comfortably more than a week of changes.
-    private static let maximumPages = 40
+    static let maximumPages = 40
+
+    /// What an automatic round will take in before leaving the rest for the
+    /// next one. Four pages is two thousand records, which is a second or two
+    /// of work rather than a minute of frozen screen.
+    static let automaticPages = 4
 
     var cursorDescription: String {
         cursor.isStart ? "nothing yet" : "records \(cursor.records), deletions \(cursor.deletions)"

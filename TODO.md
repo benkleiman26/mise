@@ -11,6 +11,24 @@ Build 3 is with Apple for the other household.
 
 Open, in the order I would take them:
 
+- [ ] **Integer fields whose value is 0 or 1 do not survive a sync.**
+      `value(from:)` at `Mise/Sync/SupabaseSyncClient.swift:221` tests `Bool`
+      before `Int`, and `JSONSerialization` hands back an `NSNumber` that
+      bridges to `Bool` when it holds 0 or 1. So the value arrives as
+      `.boolean`, `integer(_:)` refuses it, and the field falls back. On a
+      record built fresh by the receiver that fallback is `?? 0`, so an
+      ingredient at position 1 lands at position 0 and the order of a synced
+      recipe is quietly wrong. Also hits `servings`, `weekStartsOn`,
+      `timesCooked`, `prepMinutes` and `cookMinutes`. Test
+      `CFGetTypeID(number) == CFBooleanGetTypeID()` instead of leaning on the
+      bridge. Found 2026-11-07. See ANDROID.md.
+- [ ] **A row that fails to decode is passed forever.** The pull cursor comes
+      from the raw rows rather than the ones that applied
+      (`SupabaseSyncClient.swift:63-66`, `SyncEngine.swift:219`). The comment
+      says so deliberately, and for one client that is a reasonable trade. It
+      stops being one the moment a second client exists, because then every
+      encoding disagreement is permanent instead of a retry. See ANDROID.md.
+
 - [ ] **Applying records runs on the main actor.** Tonight's fixes made it
       bearable rather than right: the push side no longer reads the whole
       library to find what changed, and the apply yields every fifty records.

@@ -17,6 +17,7 @@ In this order, and do not skip the first two:
   before you "fix" something that looks wrong.
 - `ANDROID.md` if anything touches the sync wire format. It lists what is load
   bearing across clients and what is already known to be broken.
+- `RECIPES.md` before adding or editing anything in `Mise/Resources`.
 - `RELEASE.md` for shipping, `TESTERS.md` for giving it to another household,
   `SPEC.md` for the original requirements.
 

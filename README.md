@@ -30,20 +30,14 @@ Full requirements live in the build spec, linked from `SPEC.md`. Decisions made 
 
 ## Status
 
-Phase 0a is done for Mealime: the rescue ran on 2026-09-14 and the data is in
-`data/mealime/`, which is git ignored.
+Shipped and in use. The app is on TestFlight, two iPhones share one household,
+and the library is 428 recipes. Sharing runs on launch, on returning to the
+app, every thirty seconds while it is open, and on the way out.
 
-`tools/nyt-export` has run: 96 of about 163 recipes are in `data/nyt/`, parked
-short of complete on purpose, see `TODO.md`. `tools/bulk-import` is written and
-tested but has not been run against a real bookmarks file.
+`tools/mealime-export` and `tools/nyt-export` have both run; the rescued data
+is in `data/`, which is git ignored.
 
-Phase 0b is written but has never been compiled. It was built in a cloud
-session with no Swift toolchain and no Xcode, so the project, the models, the
-repositories, the seed loader and the tests all exist and none of them have been
-through a compiler. Opening it on the Mac and running the tests is the first
-thing to do. `PHASE-0B.md` is the handoff that describes the phase.
-
-See `TODO.md`.
+`TODO.md` opens with where it actually stands and what is still open.
 
 ## Getting started
 

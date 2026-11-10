@@ -5091,8 +5091,8 @@
       "summary": "Chickpeas simmered down in a deeply cooked onion and tomato masala, better on day two and built to be spooned over rice at the table.",
       "sourceType": "builtIn",
       "prepMinutes": 10,
-      "cookMinutes": 40,
-      "totalMinutes": 50,
+      "cookMinutes": 45,
+      "totalMinutes": 55,
       "baseServings": 6,
       "tags": [
         "standby",
@@ -5133,8 +5133,8 @@
           "unit": "tbsp"
         },
         {
-          "name": "canned diced tomatoes",
-          "canonicalItem": "canned diced tomatoes",
+          "name": "canned crushed tomatoes",
+          "canonicalItem": "canned crushed tomatoes",
           "quantity": 1,
           "unit": "can"
         },
@@ -5159,7 +5159,7 @@
         {
           "name": "coriander",
           "canonicalItem": "coriander",
-          "quantity": 2,
+          "quantity": 3,
           "unit": "tsp"
         },
         {
@@ -5184,7 +5184,7 @@
         {
           "name": "kosher salt",
           "canonicalItem": "kosher salt",
-          "quantity": 1.5,
+          "quantity": 2,
           "unit": "tsp"
         },
         {
@@ -5250,16 +5250,16 @@
           "timerSeconds": 30
         },
         {
-          "text": "Stir in the tomato paste, then the tomatoes and the rest of the salt. Cook at a lively simmer until the mixture darkens and pulls together and you can see the oil coming back out at the edges, 8 to 10 minutes.",
+          "text": "Stir in the tomato paste, then the crushed tomatoes and the rest of the salt. Cook at a lively simmer until the mixture darkens and pulls together and you can see the oil coming back out at the edges, 10 to 12 minutes.",
           "ingredientRefs": [
             "tomato paste",
-            "canned diced tomatoes",
+            "canned crushed tomatoes",
             "kosher salt"
           ],
-          "timerSeconds": 540
+          "timerSeconds": 660
         },
         {
-          "text": "Add the chickpeas and a cup of water. Simmer uncovered for 15 minutes, then crush a ladleful of the chickpeas against the side of the pot and stir them back in, which thickens the whole thing without any cream.",
+          "text": "Add the chickpeas and half a cup of water. Simmer uncovered for 15 minutes, then crush a ladleful of the chickpeas against the side of the pot and stir them back in, which thickens the whole thing without any cream. Add a splash more water if it tightens past the point where it will spoon over rice.",
           "ingredientRefs": [
             "canned chickpeas"
           ],
@@ -5289,7 +5289,7 @@
           ]
         },
         {
-          "text": "Cooled and covered, it keeps five days in the fridge and is better on day two. Reheat in a pot over low heat with a splash of water to loosen it, stirring until it is hot through, about 8 minutes, and finish with fresh lemon.",
+          "text": "Cooled and covered, it keeps four days in the fridge and is better on day two. Reheat in a pot over low heat with a splash of water to loosen it, stirring until it is hot through, about 8 minutes, and finish with fresh lemon.",
           "ingredientRefs": [
             "lemon"
           ],
@@ -5358,7 +5358,7 @@
         {
           "name": "vegetable broth",
           "canonicalItem": "vegetable broth",
-          "quantity": 6,
+          "quantity": 8,
           "unit": "cup"
         },
         {
@@ -5445,14 +5445,20 @@
           "timerSeconds": 60
         },
         {
-          "text": "Tip in the beans and the broth, drop in the bay leaves and the parmesan rind if you have one, and bring it to a gentle simmer. Cook 20 minutes, which is long enough for the rind to give up its salt and the beans to stop tasting of the tin.",
+          "text": "Pour in the broth, drop in the bay leaves and a parmesan rind if you have one, and hold it at a gentle simmer for 10 minutes. The rind needs this head start on its own, before the beans go in, which is the whole reason the broth ends up tasting of more than vegetables.",
           "ingredientRefs": [
-            "canned cannellini beans",
             "vegetable broth",
             "bay leaves",
             "parmesan"
           ],
-          "timerSeconds": 1200
+          "timerSeconds": 600
+        },
+        {
+          "text": "Tip in the rinsed beans and simmer 10 minutes more, which is long enough for them to stop tasting of the tin. Do not take them further: canned beans are already fully cooked, and a hard or long boil collapses them into a sludge you cannot undo.",
+          "ingredientRefs": [
+            "canned cannellini beans"
+          ],
+          "timerSeconds": 600
         },
         {
           "text": "Crush a ladleful of the beans against the side of the pot and stir them back in. That is the whole thickening trick, and it works better than flour or cream because it tastes of the soup.",
@@ -5461,7 +5467,7 @@
           ]
         },
         {
-          "text": "Stir in the kale and simmer until it is tender but still dark green, about 5 minutes. Fish out the bay leaves and the rind, then taste and correct with the rest of the salt and the pepper.",
+          "text": "Tear the kale leaves off their stems and throw the thick stems away, since they stay woody long after the leaves are done. Stir the leaves in and simmer until tender but still dark green. Flat lacinato leaves want about 5 minutes and curly kale closer to 10, so chew a piece rather than trust the clock. Fish out the bay leaves and the rind, then taste and correct with the rest of the salt and the pepper.",
           "ingredientRefs": [
             "kale",
             "bay leaves",
@@ -5589,8 +5595,8 @@
         {
           "name": "kosher salt",
           "canonicalItem": "kosher salt",
-          "quantity": 1.5,
-          "unit": "tsp"
+          "quantity": 1,
+          "unit": "tbsp"
         },
         {
           "name": "black pepper",
@@ -5608,16 +5614,15 @@
       ],
       "steps": [
         {
-          "text": "Boil the pasta in well salted water, but pull it two minutes before it is tender. It finishes cooking in the sauce in the oven, and pasta boiled all the way goes soft there. Drain it and toss it with a spoonful of the oil so it does not set into a block.",
+          "text": "Heat the oven to 375F and put a large pot of well salted water on to boil. Cook the penne two minutes less than the box says, so it is still firm in the middle. It keeps cooking in the sauce in the oven, and pasta boiled all the way through turns soft there.",
           "ingredientRefs": [
             "penne",
-            "kosher salt",
-            "olive oil"
+            "kosher salt"
           ],
-          "timerSeconds": 420
+          "timerSeconds": 540
         },
         {
-          "text": "Warm the rest of the oil in a skillet with the garlic and the red pepper flakes until the garlic smells sweet, about a minute, then pour in the marinara with the oregano and let it bubble gently for five minutes. This is what makes a jar of sauce taste like someone cooked it.",
+          "text": "While the pasta boils, warm the oil in the skillet with the garlic and the red pepper flakes until the garlic smells sweet, about a minute, then pour in the marinara with the oregano and let it bubble gently for five minutes. This is what makes a jar of sauce taste like someone cooked it.",
           "ingredientRefs": [
             "olive oil",
             "garlic",
@@ -5628,7 +5633,7 @@
           "timerSeconds": 300
         },
         {
-          "text": "In a bowl, beat the ricotta with the egg, half the parmesan, the salt, the pepper, and half the basil. The egg is what keeps the ricotta in soft pockets instead of letting it run out into the sauce.",
+          "text": "In a bowl, beat the ricotta with the egg, half the parmesan, a teaspoon of the salt, the pepper, and half the basil. The egg is what keeps the ricotta in soft pockets instead of letting it run out into the sauce.",
           "ingredientRefs": [
             "ricotta",
             "eggs",
@@ -5639,14 +5644,14 @@
           ]
         },
         {
-          "text": "Stir most of the sauce through the drained pasta, keeping about a cup back.",
+          "text": "Drain the pasta and tip it straight back into its hot pot, then stir most of the sauce through it, keeping about a cup of sauce back. Do not oil the drained pasta first: bare hot pasta takes the sauce in, oiled pasta sheds it.",
           "ingredientRefs": [
-            "marinara sauce",
-            "penne"
+            "penne",
+            "marinara sauce"
           ]
         },
         {
-          "text": "Spread a thin layer of the reserved sauce in the baking dish. Add half the pasta, drop half the ricotta over it in spoonfuls, and scatter on a third of the mozzarella. Repeat with the rest of the pasta and ricotta, then spread the last of the sauce on top and finish with the remaining mozzarella and parmesan.",
+          "text": "Spread a few spoonfuls of the reserved sauce thinly over the bottom of a 9x13 baking dish. Add half the pasta, drop half the ricotta over it in spoonfuls, and scatter on a third of the mozzarella. Repeat with the rest of the pasta, the rest of the ricotta, and another third of the mozzarella, then spoon the last of the reserved sauce over the top and finish with the final third of the mozzarella and the remaining parmesan.",
           "ingredientRefs": [
             "marinara sauce",
             "penne",
@@ -5662,7 +5667,7 @@
           ]
         },
         {
-          "text": "Cover the dish with foil and bake at 375F for 25 minutes, then uncover and bake another 15 until the edges bubble and the top has brown spots. Let it sit for 10 minutes before cutting or the first serving slides apart. Scatter the rest of the basil over the top.",
+          "text": "Cover the dish with foil and bake for 25 minutes, then uncover and bake another 15 until the edges bubble and the top has brown spots. Let it sit for 10 minutes before cutting or the first serving slides apart. Scatter the rest of the basil over the top.",
           "ingredientRefs": [
             "basil"
           ],
@@ -5692,7 +5697,7 @@
       ],
       "cookware": [
         "large skillet",
-        "skillet"
+        "small skillet"
       ],
       "ingredients": [
         {
@@ -5722,13 +5727,13 @@
         {
           "name": "cumin",
           "canonicalItem": "cumin",
-          "quantity": 2,
+          "quantity": 1.5,
           "unit": "tsp"
         },
         {
           "name": "smoked paprika",
           "canonicalItem": "smoked paprika",
-          "quantity": 1.5,
+          "quantity": 2,
           "unit": "tsp"
         },
         {
@@ -5832,7 +5837,7 @@
           "ingredientRefs": []
         },
         {
-          "text": "Make eight shallow wells with the back of a spoon and crack an egg into each. Salt the tops, cover the pan, and cook over low heat until the whites set and the yolks still wobble, about 8 minutes. Pull them a shade early, because the hot sauce keeps cooking them at the table.",
+          "text": "Make eight shallow wells with the back of a spoon and crack an egg into each. Salt the tops, cover the pan, and hold the heat at medium low, where the sauce still blips but does not spit, until the whites set and the yolks wobble, 8 to 10 minutes. Pull them a shade early, because the hot sauce keeps cooking them at the table.",
           "ingredientRefs": [
             "eggs",
             "kosher salt"
@@ -5858,11 +5863,11 @@
     {
       "id": "seed-abendbrot",
       "title": "Abendbrot",
-      "summary": "Bread, cheese, eggs and cold vegetables, all of it on the table at once so everyone builds their own supper. Five minutes of arranging and no heat at all.",
+      "summary": "Bread, cheese, eggs and cold vegetables, all of it on the table at once so everyone builds their own supper. Fifteen minutes of slicing and arranging, and nothing goes near the stove.",
       "sourceType": "builtIn",
-      "prepMinutes": 5,
+      "prepMinutes": 15,
       "cookMinutes": 0,
-      "totalMinutes": 5,
+      "totalMinutes": 15,
       "baseServings": 4,
       "tags": [
         "standby",
@@ -5897,6 +5902,12 @@
           "canonicalItem": "cream cheese",
           "quantity": 8,
           "unit": "oz"
+        },
+        {
+          "name": "milk",
+          "canonicalItem": "milk",
+          "quantity": 2,
+          "unit": "tbsp"
         },
         {
           "name": "chives, chopped",
@@ -5943,7 +5954,7 @@
         {
           "name": "kosher salt",
           "canonicalItem": "kosher salt",
-          "quantity": 1,
+          "quantity": 1.5,
           "unit": "tsp"
         },
         {
@@ -5969,46 +5980,56 @@
       ],
       "steps": [
         {
-          "text": "Take the butter out of the fridge before anything else so it is spreadable by the time you sit down. Cold butter tears the bread, and the bread is the floor the whole meal stands on.",
+          "text": "Take the butter and the cream cheese out of the fridge before you do anything else. Cold butter tears the bread and cold cream cheese will not stir, and the bread is the floor the whole meal stands on.",
           "ingredientRefs": [
             "butter",
-            "sourdough loaf"
-          ]
-        },
-        {
-          "text": "Slice the bread thicker than you would for a sandwich, six or eight slices, and leave the rest of the loaf out with the knife beside it so a second round does not mean a trip back to the kitchen.",
-          "ingredientRefs": [
-            "sourdough loaf"
-          ]
-        },
-        {
-          "text": "Stir the chives into the cream cheese and put it in a small dish with its own knife. Slice the gouda thin and lay the slices overlapping rather than stacked, so taking one does not knock over the pile.",
-          "ingredientRefs": [
             "cream cheese",
-            "chives",
-            "gouda"
+            "sourdough loaf"
           ]
         },
         {
-          "text": "Cut the cucumber into coins, halve the radishes so the cut sides show, and slice the tomatoes thick. Salt the tomatoes on their own plate and leave them for five minutes, which is the whole difference between a tomato and a garnish.",
+          "text": "Slice the tomatoes thick, lay them on a plate of their own, and salt them now so the five minutes they need passes while you deal with everything else. Salting is the whole difference between a tomato and a garnish.",
           "ingredientRefs": [
-            "cucumber",
-            "radish",
             "tomato",
             "kosher salt"
           ],
           "timerSeconds": 300
         },
         {
-          "text": "Peel the eggs, halve them lengthwise, and set them yolk side up with salt and plenty of pepper over them. Halved eggs get eaten; whole ones sit there all evening.",
+          "text": "Slice the bread thicker than you would for a sandwich, two or three slices each, and leave the rest of the loaf out with the knife beside it so a second round does not mean a trip back to the kitchen. This is the whole dinner rather than a side, so cut more than looks necessary. A dense rye or rye and wheat loaf is the traditional choice here and carries a loaded slice better than an airy crumb does.",
           "ingredientRefs": [
-            "eggs",
+            "sourdough loaf"
+          ]
+        },
+        {
+          "text": "Stir about three tablespoons of the chives into the cream cheese along with the milk, a pinch of the salt and some pepper, beating it until it spreads without dragging at the bread. Keep the rest of the chives back for the eggs. Put the cheese in a small dish with its own knife.",
+          "ingredientRefs": [
+            "cream cheese",
+            "chives",
+            "milk",
             "kosher salt",
             "black pepper"
           ]
         },
         {
-          "text": "Give the pickles one small dish and the mustard another, each with its own spoon. Wet things sitting straight on the board soak the bread and are what makes a table look like leftovers instead of dinner.",
+          "text": "Lay the gouda out in overlapping slices rather than a stack, so taking one does not knock the pile over. Cut the cucumber into coins and halve the radishes so the cut sides show, and give each of them a small dish.",
+          "ingredientRefs": [
+            "gouda",
+            "cucumber",
+            "radish"
+          ]
+        },
+        {
+          "text": "Peel the eggs, halve them lengthwise, and set them yolk side up with salt, plenty of pepper and the last of the chives over them. These come out of the fridge already hard boiled, which is why nothing here needs the stove; if there are none, eleven minutes in boiling water and a hard chill in cold water gets you there and pushes dinner back by a quarter of an hour. Halved eggs get eaten, whole ones sit there all evening.",
+          "ingredientRefs": [
+            "eggs",
+            "kosher salt",
+            "black pepper",
+            "chives"
+          ]
+        },
+        {
+          "text": "Give the pickles one small dish and the mustard another, each with its own spoon. Wet things sitting straight on the board soak into the bread, and that is what makes a table look like leftovers instead of dinner.",
           "ingredientRefs": [
             "pickles",
             "whole grain mustard"
@@ -6030,22 +6051,23 @@
     {
       "id": "seed-meze-plate",
       "title": "Meze Plate",
-      "summary": "Hummus, labneh, feta and cut vegetables on the table at once, with warm pita and nothing on the stove.",
+      "summary": "Hummus, labneh, feta and cut vegetables on the table at once, with warm pita and nothing to cook but the bread.",
       "sourceType": "builtIn",
       "prepMinutes": 15,
-      "cookMinutes": 0,
-      "totalMinutes": 15,
+      "cookMinutes": 3,
+      "totalMinutes": 18,
       "baseServings": 4,
       "tags": [
         "standby",
         "assemble",
         "vegetarian",
-        "no cook",
         "under 20",
         "kid friendly",
         "mediterranean"
       ],
-      "cookware": [],
+      "cookware": [
+        "skillet"
+      ],
       "ingredients": [
         {
           "name": "hummus",
@@ -6150,7 +6172,16 @@
       ],
       "steps": [
         {
-          "text": "Spread the hummus across a wide shallow bowl or plate, pushing it out to the rim with the back of a spoon and leaving a shallow well in the middle. Pour a tablespoon of the olive oil into the well and scatter the za'atar over the top.",
+          "text": "Before anything else, take the hummus, labneh, feta and olives out of the fridge and leave them on the counter while you work. This is the one thing on the plate that cannot be rushed at the end: cold hummus is stiff and tastes flat, cold feta shatters instead of slicing, and olive oil poured over either of them sits there thick. Fifteen minutes of counter time is less than the hour a cheese counter would ask for, but it is most of the difference.",
+          "ingredientRefs": [
+            "hummus",
+            "labneh",
+            "feta",
+            "olives"
+          ]
+        },
+        {
+          "text": "Stir the hummus in its tub until it slackens and looks glossy again, loosening it with a spoonful of water if it is very thick. Spread it across a wide shallow bowl or plate, pushing it out to the rim with the back of a spoon and leaving a shallow well in the middle. Pour a tablespoon of the olive oil into the well and scatter a teaspoon of the za'atar over the top.",
           "ingredientRefs": [
             "hummus",
             "olive oil",
@@ -6158,15 +6189,16 @@
           ]
         },
         {
-          "text": "Spoon the labneh into its own small bowl, smooth the top, and finish it with another tablespoon of olive oil and a pinch of the salt. Keeping it separate matters more than it sounds like it should, because anyone who only wants bread and labneh can have exactly that.",
+          "text": "Spoon the labneh onto its own small plate and spread it thin with the back of a spoon, almost to the edge, swirling as you go rather than leaving it mounded in a bowl. Drizzle a second tablespoon of olive oil over it, add the rest of the za'atar and a pinch of the salt. Spread thin, every scoop comes up with oil and spice on it instead of the first one taking all of it. Keeping it on its own dish matters more than it sounds like it should, because anyone who wants only bread and labneh can have exactly that.",
           "ingredientRefs": [
             "labneh",
             "olive oil",
+            "za'atar",
             "kosher salt"
           ]
         },
         {
-          "text": "Put the feta on the board in one piece with the last of the olive oil over it, the red pepper flakes if you want them, and a knife alongside. A slab people break pieces off travels better than crumbles do.",
+          "text": "Put the feta on the board in one piece with the last of the olive oil over it, the red pepper flakes if you want them, and a knife alongside. A slab people break pieces off travels better than crumbles do, and after its time on the counter it will cut instead of crumbling.",
           "ingredientRefs": [
             "feta",
             "olive oil",
@@ -6174,7 +6206,7 @@
           ]
         },
         {
-          "text": "Cut the cucumbers into spears rather than coins so they can be dipped, halve the tomatoes and the radishes, and set each one out in its own small dish or in its own stripe on the board. Salt the cucumbers and tomatoes lightly and tuck the lemon wedges in somewhere.",
+          "text": "Cut the cucumbers into spears rather than coins so they can be dipped, halve the tomatoes and the radishes, and set each one out in its own small dish or in its own stripe on the board. Salt the tomatoes, which only improves them, and leave the cucumbers bare, because salt pulls the water straight out of them and they go limp and weepy within minutes. Tuck the lemon wedges in somewhere and let anyone who wants salt on a cucumber add it at the table.",
           "ingredientRefs": [
             "cucumber",
             "cherry tomatoes",
@@ -6184,7 +6216,7 @@
           ]
         },
         {
-          "text": "Add the olives in a bowl small enough that the pits have somewhere to go, and shower the parsley over the hummus and the vegetables.",
+          "text": "Tip the olives into a small bowl, and if they have pits put an empty bowl beside it. Buy them pitted when the children are eating from this plate, since a whole olive is mostly stone and nobody watches a plate like this closely. Shower the parsley over the hummus and the vegetables.",
           "ingredientRefs": [
             "olives",
             "parsley",
@@ -6192,11 +6224,11 @@
           ]
         },
         {
-          "text": "Warm the pita for a minute or two in a dry pan, a toaster or the oven until it puffs and smells like bread again, then cut it into wedges and bring it to the table in a towel so it stays soft.",
+          "text": "Warm the pita two at a time in a dry skillet over medium high heat, about forty seconds a side, until it is soft, flexible and steaming faintly. Flick a few drops of water onto any piece that has dried out before it goes in the pan. Do not wait for it to balloon: that happens to raw dough in a very hot oven, not to bread that was baked last week, and a pita held in a medium pan waiting for it only turns into a cracker. If you would rather not stand over it, wrap the whole stack in foil and put it in a 350F oven for eight minutes while you lay out everything else. Cut into wedges and bring it to the table wrapped in a towel so it stays soft.",
           "ingredientRefs": [
             "pita bread"
           ],
-          "timerSeconds": 120
+          "timerSeconds": 180
         },
         {
           "text": "If anyone wants fish or meat, lay the sardines out in one small dish and the salami in another, each with its own fork, and put them on the table alongside everything else rather than on the board. That way the plate stays something all four people can eat from and whoever wants them takes them onto their own plate.",
@@ -6220,7 +6252,7 @@
         "standby",
         "assemble",
         "vegetarian",
-        "under 20",
+        "under 30",
         "kid friendly"
       ],
       "cookware": [
@@ -6237,14 +6269,14 @@
         {
           "name": "sweet potato, roasted",
           "canonicalItem": "sweet potato",
-          "quantity": 2,
-          "unit": "count"
+          "quantity": 1,
+          "unit": "lb"
         },
         {
           "name": "broccoli, roasted",
           "canonicalItem": "broccoli",
           "quantity": 1,
-          "unit": "count"
+          "unit": "bunch"
         },
         {
           "name": "canned chickpeas, drained",
@@ -6277,9 +6309,15 @@
           "unit": "clove"
         },
         {
+          "name": "ice water",
+          "canonicalItem": "water",
+          "quantity": 0.25,
+          "unit": "cup"
+        },
+        {
           "name": "kosher salt",
           "canonicalItem": "kosher salt",
-          "quantity": 1,
+          "quantity": 1.5,
           "unit": "tsp"
         },
         {
@@ -6291,8 +6329,15 @@
         {
           "name": "red wine vinegar",
           "canonicalItem": "red wine vinegar",
-          "quantity": 3,
-          "unit": "tbsp"
+          "quantity": 0.25,
+          "unit": "cup"
+        },
+        {
+          "name": "honey",
+          "canonicalItem": "honey",
+          "quantity": 1,
+          "unit": "tsp",
+          "isOptional": true
         },
         {
           "name": "feta, crumbled",
@@ -6326,22 +6371,32 @@
           "ingredientRefs": []
         },
         {
-          "text": "Whisk the tahini with the juice of the lemon, the garlic, and a good pinch of the salt. It will seize up and go pale and stiff, which is correct. Add cold water a spoonful at a time, whisking, until it loosens and falls off the whisk in a ribbon.",
+          "text": "Start the onion first, because it needs the longest and it needs nothing from you. Put the sliced onion in a small bowl, pour over the vinegar and half a teaspoon of the salt, and stir in the honey if you want the edge taken off it for the children. Press the slices down so the liquid covers them, adding a splash of water if it does not quite, then leave it while you do everything else. Twenty minutes turns it pink and takes out the raw bite, and thirty is better if the rest of dinner is slow.",
+          "ingredientRefs": [
+            "red onion",
+            "red wine vinegar",
+            "kosher salt",
+            "honey"
+          ],
+          "timerSeconds": 1200
+        },
+        {
+          "text": "Grate the garlic into a bowl and squeeze the lemon over it. Ten minutes sitting in the juice is what keeps one clove from tasting like three, so leave it there while you deal with the vegetables and come back to it. For a milder sauce, tip the juice through a small strainer afterwards and leave the garlic behind.",
+          "ingredientRefs": [
+            "garlic",
+            "lemon"
+          ],
+          "timerSeconds": 600
+        },
+        {
+          "text": "Whisk the tahini with the lemon and garlic and half a teaspoon of the salt. It will seize up and go pale and stiff, which is correct and not a broken sauce. Add the ice water a spoonful at a time, whisking hard after each one, until it turns glossy and falls off the whisk in a ribbon. A quarter cup of water is about right, though every jar of tahini drinks a different amount.",
           "ingredientRefs": [
             "tahini",
             "lemon",
             "garlic",
-            "kosher salt"
+            "kosher salt",
+            "water"
           ]
-        },
-        {
-          "text": "Cover the sliced onion with the vinegar and a pinch of salt in a small bowl and leave it alone while you do everything else. Twenty minutes turns it pink and takes the raw bite out of it.",
-          "ingredientRefs": [
-            "red onion",
-            "red wine vinegar",
-            "kosher salt"
-          ],
-          "timerSeconds": 1200
         },
         {
           "text": "Warm the roasted vegetables in a dry skillet over medium heat for a few minutes, until they stop being fridge cold. One warm component in an otherwise cool bowl is most of what makes this read as dinner rather than as leftovers.",
@@ -6352,14 +6407,14 @@
           "timerSeconds": 240
         },
         {
-          "text": "Toss the chickpeas with the olive oil and a pinch of salt so they are seasoned on their own. Halve the eggs. Crumble the feta. Chop the parsley.",
+          "text": "Toss the chickpeas with the olive oil and a quarter teaspoon of the salt so they are seasoned on their own. Halve the eggs. If there are none already boiled, eleven minutes in boiling water and then straight into ice water gives a yolk that is set through, and seven gives a jammy one. Crumble the feta and chop the parsley.",
           "ingredientRefs": [
             "canned chickpeas",
             "olive oil",
+            "kosher salt",
             "eggs",
             "feta",
-            "parsley",
-            "kosher salt"
+            "parsley"
           ]
         },
         {
@@ -6370,7 +6425,7 @@
           ]
         },
         {
-          "text": "Build in order so it works: grains first, then the warm vegetables, then the legume, then the sauce over all of it, then the sharp things last so they stay sharp. Dress only what you are about to eat, because a dressed bowl goes soft in the fridge and the undressed components keep for days.",
+          "text": "Build in order so it works: grains first, then the warm vegetables, then the legume, then the sauce over all of it, then the sharp things last so they stay sharp. Dress only what you are about to eat. A dressed bowl goes soft overnight and is a lunch at best, while the components keep apart: grains and roasted vegetables 5 days, dressed chickpeas 3, the sauce a week with a spoonful of cold water whisked back in, the onions 2 weeks, and eggs a week if you leave them in the shell. To reheat, put the grains and vegetables in a pan with a splash of water, cover, and warm over medium heat for 3 or 4 minutes, or spread the vegetables on a hot pan at 425F for 6 to 8 minutes if you want their edges back.",
           "ingredientRefs": [
             "farro",
             "sweet potato",
@@ -6378,7 +6433,8 @@
             "tahini",
             "red onion",
             "feta",
-            "parsley"
+            "parsley",
+            "eggs"
           ]
         }
       ]
@@ -6388,8 +6444,8 @@
       "title": "Nicoise Plate",
       "summary": "Potatoes, green beans, boiled eggs, tomatoes, olives, and a bowl of tuna, all put out at once so everyone builds their own plate.",
       "sourceType": "builtIn",
-      "prepMinutes": 10,
-      "cookMinutes": 18,
+      "prepMinutes": 8,
+      "cookMinutes": 20,
       "totalMinutes": 28,
       "baseServings": 4,
       "tags": [
@@ -6456,13 +6512,13 @@
         {
           "name": "red wine vinegar",
           "canonicalItem": "red wine vinegar",
-          "quantity": 3,
+          "quantity": 4,
           "unit": "tbsp"
         },
         {
           "name": "olive oil",
           "canonicalItem": "olive oil",
-          "quantity": 6,
+          "quantity": 8,
           "unit": "tbsp"
         },
         {
@@ -6507,34 +6563,13 @@
       ],
       "steps": [
         {
-          "text": "Fill a large pot with water, salt it like pasta water, and bring it to a boil. One pot does the potatoes, then the eggs, then the beans, in that order.",
+          "text": "Put a large pot of water on to boil and salt it like pasta water. One pot does the potatoes and the eggs together, then the beans.",
           "ingredientRefs": [
             "kosher salt"
           ]
         },
         {
-          "text": "Boil the potatoes until a knife slides into one with no resistance, 12 to 14 minutes. Lift them out with a slotted spoon and leave the water on the heat.",
-          "ingredientRefs": [
-            "potato"
-          ],
-          "timerSeconds": 780
-        },
-        {
-          "text": "Lower the eggs into the same water and cook them 9 minutes for a yolk that is set at the edge and still bright in the middle. Move them straight into cold water.",
-          "ingredientRefs": [
-            "eggs"
-          ],
-          "timerSeconds": 540
-        },
-        {
-          "text": "Drop the green beans into the pot and cook 3 to 4 minutes, until they are bright and still squeak when you bite one. Drain and run them under cold water so they hold their color.",
-          "ingredientRefs": [
-            "green beans"
-          ],
-          "timerSeconds": 210
-        },
-        {
-          "text": "While the pot works, whisk the mustard, vinegar, shallot, salt, and pepper in a bowl, then pour in the olive oil slowly, whisking, until it thickens. Make it sharper than tastes right on a spoon, because potatoes and eggs flatten a dressing.",
+          "text": "While it heats, whisk the mustard, vinegar, shallot, salt, and pepper in a bowl, then pour in the olive oil slowly, whisking, until it thickens. Make it sharper than tastes right on a spoon, because potatoes and eggs flatten a dressing.",
           "ingredientRefs": [
             "dijon mustard",
             "red wine vinegar",
@@ -6545,13 +6580,41 @@
           ]
         },
         {
+          "text": "Halve the potatoes, quartering any bigger than a golf ball, and drop them into the boiling water. Halves this size need 10 to 12 minutes, until a knife slides into one with no resistance.",
+          "ingredientRefs": [
+            "potato"
+          ],
+          "timerSeconds": 660
+        },
+        {
+          "text": "Two minutes behind the potatoes, lower the eggs into the same water on a spoon. Nine minutes gives a yolk set through with a moist center, which is what holds its shape cut in half on a platter. Eggs and potatoes come out together.",
+          "ingredientRefs": [
+            "eggs"
+          ],
+          "timerSeconds": 540
+        },
+        {
+          "text": "Scoop the eggs into a bowl of ice water and lift the potatoes out with a slotted spoon. Leave the water on the heat.",
+          "ingredientRefs": [
+            "eggs",
+            "potato"
+          ]
+        },
+        {
           "text": "Spoon a third of the vinaigrette over the potatoes while they are still warm, when they drink it in instead of shedding it.",
           "ingredientRefs": [
             "potato"
           ]
         },
         {
-          "text": "Peel and halve the eggs. Break the tuna into a bowl and loosen it with a spoonful of vinaigrette and a squeeze of lemon.",
+          "text": "Drop the green beans into the same pot. Thin beans want about 3 minutes and ordinary thicker ones about 5, until they are bright and still squeak when you bite one. Drain them and drop them into the ice water so they hold their color.",
+          "ingredientRefs": [
+            "green beans"
+          ],
+          "timerSeconds": 240
+        },
+        {
+          "text": "Peel and halve the eggs. Break the tuna into a bowl and loosen it with a spoonful of vinaigrette and a squeeze of lemon. Buy it packed in oil if you have the choice, because it stays in big flakes instead of going to shreds.",
           "ingredientRefs": [
             "eggs",
             "canned tuna",
@@ -6559,7 +6622,7 @@
           ]
         },
         {
-          "text": "Put everything on the table in its own bowl: potatoes, beans, eggs, tuna, tomatoes, olives, with the lettuce, capers, parsley, and the rest of the vinaigrette alongside. Everyone builds their own plate, so the tuna is one choice among six rather than the dinner. Boiled potatoes, eggs, and beans keep three days covered in the fridge, which makes the leftovers tomorrow's lunch.",
+          "text": "Put everything on the table in its own bowl: potatoes, beans, eggs, tuna, tomatoes, olives, with the lettuce, capers, parsley, and the rest of the vinaigrette alongside. Everyone builds their own plate, so the tuna is one choice among six rather than the dinner. The boiled potatoes, eggs, and beans keep three days covered in the fridge, each in its own tub, and nothing is reheated: it eats cold or at room temperature, which makes the leftovers tomorrow's lunch.",
           "ingredientRefs": [
             "potato",
             "green beans",
@@ -6580,8 +6643,8 @@
       "summary": "Spaghetti, a head of garlic, and good oil. Nothing fresh required, and the tossing is the whole recipe.",
       "sourceType": "builtIn",
       "prepMinutes": 5,
-      "cookMinutes": 10,
-      "totalMinutes": 15,
+      "cookMinutes": 15,
+      "totalMinutes": 20,
       "baseServings": 4,
       "tags": [
         "standby",
@@ -6625,7 +6688,8 @@
           "name": "parmesan, grated",
           "canonicalItem": "parmesan",
           "quantity": 2,
-          "unit": "oz"
+          "unit": "oz",
+          "isOptional": true
         },
         {
           "name": "parsley, chopped",
@@ -6637,13 +6701,13 @@
         {
           "name": "kosher salt",
           "canonicalItem": "kosher salt",
-          "quantity": 1,
+          "quantity": 2,
           "unit": "tbsp"
         }
       ],
       "steps": [
         {
-          "text": "Boil water in the large pot and salt it well. Use a bit less water than usual, about four quarts for a pound, so it ends up starchier. That starch is the only thickener in this dish.",
+          "text": "Bring three quarts of water to a boil in the large pot and stir in the salt. Three quarts for a pound is less than the four to six most recipes call for, which leaves the water starchier. That starch is the only thickener in this dish, so resist topping the pot up.",
           "ingredientRefs": [
             "kosher salt"
           ]
@@ -6655,12 +6719,12 @@
           ]
         },
         {
-          "text": "Put the garlic and the oil in the cold skillet together, then set it over low heat. Let it come up slowly until the slices are barely pale gold at the edges and the oil smells sweet, three or four minutes. Stop there and slide the pan off the burner.",
+          "text": "Put the garlic and the oil in the cold skillet together, then set it over low heat. Coming up from cold takes five to seven minutes, and it is worth the wait. Go by color rather than the clock: pull the pan off the burner the moment the slices are barely pale gold at the edges and the oil smells sweet.",
           "ingredientRefs": [
             "garlic",
             "olive oil"
           ],
-          "timerSeconds": 240
+          "timerSeconds": 360
         },
         {
           "text": "Stir the pepper flakes into the warm oil off the heat. If someone at the table wants no heat at all, spoon a little plain garlic oil into a bowl first and dress that portion with it at the end.",
@@ -6677,13 +6741,13 @@
           "timerSeconds": 480
         },
         {
-          "text": "Set the skillet over medium heat, add the drained pasta and half a cup of the pasta water, and toss hard and without stopping for about a minute. The oil and water start out separate and thin, then turn into one glossy sauce that coats every strand. Splash in more water if it looks oily; keep tossing if it looks watery.",
+          "text": "Set the skillet over medium heat, add the drained pasta and one cup of the pasta water, and toss hard and without stopping for a minute or two. The oil and water start out separate and thin, then turn into one glossy sauce that coats every strand. Splash in more water if it looks oily; keep tossing if it looks watery.",
           "ingredientRefs": [
             "spaghetti"
           ]
         },
         {
-          "text": "Off the heat, add the parmesan in two handfuls with a good toss between them. Off the heat matters here: in a hot pan the cheese tightens into strings instead of melting into the sauce.",
+          "text": "If you want cheese, add the parmesan off the heat in two handfuls with a good toss between them. Off the heat matters here: in a hot pan it tightens into strings instead of melting into the sauce. The dish is finished without it, so skip it freely.",
           "ingredientRefs": [
             "parmesan"
           ]
@@ -6702,9 +6766,9 @@
       "title": "Rice with a Fried Egg",
       "summary": "Hot rice, a crisp edged fried egg, and a shower of furikake, built from a shelf with nothing fresh on it.",
       "sourceType": "builtIn",
-      "prepMinutes": 3,
-      "cookMinutes": 25,
-      "totalMinutes": 28,
+      "prepMinutes": 5,
+      "cookMinutes": 20,
+      "totalMinutes": 25,
       "baseServings": 4,
       "tags": [
         "standby",
@@ -6753,13 +6817,13 @@
         {
           "name": "vegetable oil",
           "canonicalItem": "vegetable oil",
-          "quantity": 3,
+          "quantity": 4,
           "unit": "tbsp"
         },
         {
           "name": "kosher salt",
           "canonicalItem": "kosher salt",
-          "quantity": 1,
+          "quantity": 1.5,
           "unit": "tsp"
         },
         {
@@ -6778,36 +6842,38 @@
           ]
         },
         {
-          "text": "Put the rice in a saucepan with 2 and a quarter cups water and a big pinch of salt. Bring it to a boil, cover it, and turn the heat to low.",
+          "text": "Put the rice in a saucepan with 2 and a quarter cups water and 1 teaspoon of the salt. If your rice is Japanese short grain, use only 1 and 3 quarter cups water, since it drinks less than long grain. Bring it to a boil, cover it, and turn the heat to low.",
           "ingredientRefs": [
             "white rice",
             "kosher salt"
           ]
         },
         {
-          "text": "Cook undisturbed for 15 minutes, then pull the pan off the heat and leave the lid on for 10 minutes more. The resting does real work, so do not peek.",
-          "ingredientRefs": [],
-          "timerSeconds": 900
-        },
-        {
-          "text": "While the rice rests, put the furikake, the soy sauce, the sesame oil, and the scallions on the table in small bowls so everyone seasons their own.",
+          "text": "Cook undisturbed for 15 minutes. While it simmers, put the furikake, the soy sauce, the sesame oil, and the scallions on the table in small bowls so everyone seasons their own bowl.",
           "ingredientRefs": [
             "furikake",
             "soy sauce",
             "sesame oil",
             "scallions"
-          ]
+          ],
+          "timerSeconds": 900
         },
         {
-          "text": "Heat the vegetable oil in a large skillet over medium high heat until it thins out and shimmers. There should be enough to pool, not just slick the pan.",
+          "text": "Pull the pan off the heat and leave the lid on for 10 minutes. The resting does real work, so do not peek.",
+          "ingredientRefs": [],
+          "timerSeconds": 600
+        },
+        {
+          "text": "With about 4 minutes of the rest left, heat the vegetable oil in a large skillet over medium high heat until it shimmers and runs thin. It should not smoke. There needs to be enough to pool when you tilt the pan, not just slick it.",
           "ingredientRefs": [
             "vegetable oil"
           ]
         },
         {
-          "text": "Crack in as many eggs as fit without touching and leave them alone. The whites bubble, set, and go brown and lacy at the rim in about 2 minutes. Tilt the pan and spoon the hot oil over the whites until they are firm and the yolks still move.",
+          "text": "Crack in 2 or 3 eggs, as many as sit clear of each other, salt them as they land, and leave them alone. The whites bubble, set, and go brown and lacy at the rim in about 2 minutes. Tilt the pan and spoon the hot oil over the whites until they are firm and the yolks still move, then fry the rest the same way.",
           "ingredientRefs": [
-            "eggs"
+            "eggs",
+            "kosher salt"
           ],
           "timerSeconds": 120
         },
@@ -6827,7 +6893,7 @@
     {
       "id": "seed-tuna-tomato-pasta",
       "title": "Pasta with Tomato and Tuna",
-      "summary": "The tin never reaches the table. A garlicky tomato sauce gets the tuna folded in off the heat, in big flakes, and the sharp things stay in bowls on the side.",
+      "summary": "The tin never reaches the table. A garlicky tomato sauce gets the tuna folded in at the end, in big flakes, and the sharp things stay in bowls on the side.",
       "sourceType": "builtIn",
       "prepMinutes": 8,
       "cookMinutes": 20,
@@ -6869,7 +6935,7 @@
         {
           "name": "red pepper flakes",
           "canonicalItem": "red pepper flakes",
-          "quantity": 0.5,
+          "quantity": 0.25,
           "unit": "tsp"
         },
         {
@@ -6879,7 +6945,7 @@
           "unit": "can"
         },
         {
-          "name": "canned tuna, drained",
+          "name": "canned tuna",
           "canonicalItem": "canned tuna",
           "quantity": 2,
           "unit": "can"
@@ -6936,14 +7002,15 @@
           "ingredientRefs": []
         },
         {
-          "text": "Toast the breadcrumbs in a dry small skillet over medium heat, shaking often, until they smell nutty and turn the color of sand. Tip them into a bowl for the table.",
+          "text": "Toast the breadcrumbs in a small skillet with a teaspoon of the olive oil over medium heat, shaking often, until they smell nutty and turn the color of sand, 2 to 4 minutes. They go from golden to burnt in seconds, so tip them into a bowl for the table the moment they are there.",
           "ingredientRefs": [
-            "breadcrumbs"
+            "breadcrumbs",
+            "olive oil"
           ],
           "timerSeconds": 180
         },
         {
-          "text": "Warm the olive oil in a wide skillet over low heat with the garlic and the pepper flakes. Keep the heat low enough that the garlic never colors, about 3 minutes. You want it soft and sweet, not toasted.",
+          "text": "Warm the rest of the olive oil in a wide skillet over low heat with the garlic and the pepper flakes. Keep the heat low enough that the garlic never colors, about 3 minutes. You want it soft and sweet, not toasted.",
           "ingredientRefs": [
             "olive oil",
             "garlic",
@@ -6952,7 +7019,7 @@
           "timerSeconds": 180
         },
         {
-          "text": "Add the tomatoes and the salt, bring it up to a lively simmer, and cook until a spoon dragged through the pan leaves a track that fills in slowly, 10 to 12 minutes. A jar of marinara stands in here; give it 5 minutes to thicken instead.",
+          "text": "Add the tomatoes and the salt. Use a large 28 ounce can; a small one will not sauce a pound of pasta. Bring it up to a lively simmer and cook until a spoon dragged through the pan leaves a track that fills in slowly, 10 to 12 minutes. A jar of marinara stands in here; give it 5 minutes to thicken instead.",
           "ingredientRefs": [
             "canned crushed tomatoes",
             "kosher salt"
@@ -6960,21 +7027,22 @@
           "timerSeconds": 660
         },
         {
-          "text": "Boil the spaghetti until just short of tender. Save a mug of the water before you drain it.",
+          "text": "Drop the spaghetti as soon as the sauce goes on to simmer, so the two are ready together. Boil it a minute short of tender and save a mug of the water before you drain it.",
           "ingredientRefs": [
             "spaghetti"
           ],
           "timerSeconds": 540
         },
         {
-          "text": "Turn the heat off under the sauce. Add the tuna and the capers and fold them through in large flakes rather than stirring them smooth. The tuna is already cooked and only needs to warm, and the flakes are what keep this tasting like dinner rather than like a tin.",
+          "text": "Turn the heat down to low. Tip in the tuna along with the oil from the tin, add the capers, and fold them through in large flakes rather than stirring them smooth. Buy tuna packed in oil rather than water and let that oil into the pan; it is most of the flavor. Two minutes is enough to warm it, since it is already cooked and turns dry and chalky if you simmer it.",
           "ingredientRefs": [
             "canned tuna",
             "capers"
-          ]
+          ],
+          "timerSeconds": 120
         },
         {
-          "text": "Add the drained pasta and a splash of the saved water and toss until the sauce coats every strand. Finish with the juice of half the lemon and the black pepper, then taste and add more lemon if it needs lifting.",
+          "text": "Add the drained pasta and a splash of the saved water and toss over low heat until the sauce coats every strand, adding more water a little at a time. Grate in the zest of half the lemon, add the black pepper, and taste for salt.",
           "ingredientRefs": [
             "spaghetti",
             "lemon",
@@ -6982,11 +7050,13 @@
           ]
         },
         {
-          "text": "Bring the parsley, the olives, and the toasted breadcrumbs to the table in their own small bowls instead of scattering them over the pan. That way one plate can be plain tomato pasta and the next can have all three, and nobody has to pick anything out.",
+          "text": "Cut the rest of the lemon into wedges and bring it to the table with the parsley, the olives and the toasted breadcrumbs, each in its own small bowl, instead of scattering them over the pan. That way one plate can be plain tomato pasta and the next can have all four, and nobody has to pick anything out. Leave the pepper flakes out too, for whoever wants more heat.",
           "ingredientRefs": [
             "parsley",
             "olives",
-            "breadcrumbs"
+            "breadcrumbs",
+            "lemon",
+            "red pepper flakes"
           ]
         }
       ]
@@ -6996,9 +7066,9 @@
       "title": "Tuna Melt",
       "summary": "A grilled cheese that happens to have tuna in it. Everything comes off the pantry shelf.",
       "sourceType": "builtIn",
-      "prepMinutes": 8,
-      "cookMinutes": 10,
-      "totalMinutes": 18,
+      "prepMinutes": 10,
+      "cookMinutes": 16,
+      "totalMinutes": 26,
       "baseServings": 4,
       "tags": [
         "standby",
@@ -7023,14 +7093,14 @@
         {
           "name": "mayonnaise",
           "canonicalItem": "mayonnaise",
-          "quantity": 4,
+          "quantity": 5,
           "unit": "tbsp"
         },
         {
           "name": "dijon mustard",
           "canonicalItem": "dijon mustard",
-          "quantity": 2,
-          "unit": "tsp"
+          "quantity": 1,
+          "unit": "tbsp"
         },
         {
           "name": "pickles, chopped",
@@ -7039,11 +7109,24 @@
           "unit": "tbsp"
         },
         {
+          "name": "celery, diced",
+          "canonicalItem": "celery",
+          "quantity": 1,
+          "unit": "count",
+          "isOptional": true
+        },
+        {
           "name": "scallions, thinly sliced",
           "canonicalItem": "scallions",
           "quantity": 2,
           "unit": "count",
           "isOptional": true
+        },
+        {
+          "name": "lemon",
+          "canonicalItem": "lemon",
+          "quantity": 1,
+          "unit": "count"
         },
         {
           "name": "black pepper",
@@ -7066,30 +7149,32 @@
         {
           "name": "butter, softened",
           "canonicalItem": "butter",
-          "quantity": 3,
+          "quantity": 4,
           "unit": "tbsp"
         }
       ],
       "steps": [
         {
-          "text": "Drain the tuna hard, pressing it against the lid of the tin to get the last of the water out. Wet tuna steams the bread from the inside.",
+          "text": "Drain the tuna hard, pressing it against the lid of the tin to get the last of the water out. Wet tuna steams the bread from the inside. Solid tuna holds its texture here, where the flaked kind turns to paste once the mayonnaise goes in.",
           "ingredientRefs": [
             "canned tuna"
           ]
         },
         {
-          "text": "Flake it into a bowl with the mayonnaise, mustard, pickles, scallions, and pepper. You want it to hold together in a spoon, not slump.",
+          "text": "Flake it into a bowl with the mayonnaise, mustard, pickles, celery, scallions, pepper and a good squeeze of the lemon. You want it to hold together in a spoon, not slump.",
           "ingredientRefs": [
             "canned tuna",
             "mayonnaise",
             "dijon mustard",
             "pickles",
+            "celery",
             "scallions",
+            "lemon",
             "black pepper"
           ]
         },
         {
-          "text": "Butter one side of all eight slices of bread. That side goes down against the pan, so it is the side that crisps.",
+          "text": "Butter one side of all eight slices of bread, right out to the corners. That side goes down against the pan, so it is the side that crisps, and an unbuttered corner stays pale.",
           "ingredientRefs": [
             "butter",
             "sandwich bread"
@@ -7104,23 +7189,23 @@
           ]
         },
         {
-          "text": "If one of the children wants cheese and no tuna, build that one now. It cooks in the same pan for the same time and nobody has to discuss it.",
+          "text": "If one of the children wants cheese and no tuna, leave the tuna out of one of the four and give it extra cheese instead. It cooks in the same pan for the same time and nobody has to discuss it.",
           "ingredientRefs": [
             "cheddar",
             "sandwich bread"
           ]
         },
         {
-          "text": "Cook in a dry skillet over medium-low heat, pressing down now and then with a spatula, until the underside is deep gold, 4 to 5 minutes. Keep the heat low: hot and fast gives you a dark crust over cold cheese.",
+          "text": "Cook two at a time in a dry skillet over medium-low heat, covered, pressing down now and then with a spatula, until the underside is deep gold, 3 to 4 minutes. The lid melts the cheese through before the crust gets ahead of it, which is the whole problem with hot and fast.",
           "ingredientRefs": [],
-          "timerSeconds": 270
+          "timerSeconds": 210
         },
         {
-          "text": "Flip and cook until the second side matches and the cheese has run out to the edges, 3 to 4 minutes more.",
+          "text": "Flip and cook uncovered until the second side matches and the cheese has run out to the edges, 2 to 3 minutes. Move them to a board and cook the other two the same way.",
           "ingredientRefs": [
             "cheddar"
           ],
-          "timerSeconds": 210
+          "timerSeconds": 150
         },
         {
           "text": "Let them sit a minute so the inside settles, then cut each one on the diagonal and put the halves on the table for people to take.",
@@ -7134,8 +7219,8 @@
       "summary": "A component rather than a meal: a batch of farro or brown rice boiled, drained, and cooled so the week's bowls and plates have a base ready to go.",
       "sourceType": "builtIn",
       "prepMinutes": 5,
-      "cookMinutes": 30,
-      "totalMinutes": 35,
+      "cookMinutes": 40,
+      "totalMinutes": 45,
       "baseServings": 8,
       "tags": [
         "standby",
@@ -7173,7 +7258,7 @@
         {
           "name": "kosher salt",
           "canonicalItem": "kosher salt",
-          "quantity": 1,
+          "quantity": 2,
           "unit": "tbsp"
         },
         {
@@ -7199,7 +7284,7 @@
       ],
       "steps": [
         {
-          "text": "Bring the water to a boil in a large pot with the salt and the bay leaves. Cook the grain like pasta, in much more water than it can absorb, so it comes out in separate pieces instead of a block.",
+          "text": "Put the water, the salt and the bay leaves in a large pot, cover it, and bring it to a boil with the lid on so it gets there faster. The grain cooks like pasta here, in far more water than it can absorb, which is what makes it come out as separate grains instead of a block.",
           "ingredientRefs": [
             "water",
             "kosher salt",
@@ -7207,41 +7292,41 @@
           ]
         },
         {
-          "text": "Rinse the grain under cold water until it runs clear, then tip it into the boiling water and keep it at a steady simmer, uncovered.",
+          "text": "Give the grain a short rinse in the colander, a few seconds under cold water, then tip it into the boiling water. Keep it at a lively boil, uncovered, and stir it once or twice early on. There is no need to rinse until the water runs clear, which is a white rice habit and does nothing for farro.",
           "ingredientRefs": [
             "farro",
             "brown rice"
           ]
         },
         {
-          "text": "Simmer until tender with a little chew left in the center, about 25 minutes for farro and 35 for brown rice. Start tasting 5 minutes early, because a grain that goes soft now will be mush by Wednesday.",
+          "text": "Set a timer for 15 minutes and taste when it goes, because the time depends on what is in the bag. Pearled farro is usually done between 15 and 20 minutes, semi-pearled farro between 25 and 30, and brown rice between 25 and 30. Pull it while there is still a little chew in the middle, because a grain that is soft now will be mush by Wednesday.",
           "ingredientRefs": [
             "farro",
             "brown rice"
           ],
-          "timerSeconds": 1500
+          "timerSeconds": 900
         },
         {
-          "text": "Drain in a colander, pull out the bay leaves, and shake the colander hard to throw off the water sitting between the grains.",
+          "text": "Drain in the colander, fish out the bay leaves, and shake the colander hard to throw off the water sitting between the grains.",
           "ingredientRefs": [
             "bay leaves"
           ]
         },
         {
-          "text": "Spread the grain over a sheet pan in a thin layer and toss it with the olive oil. The thin layer is what lets the steam leave, and steam trapped in a warm covered bowl is what turns a good batch sour by Tuesday. Leave it 20 minutes, until it is no warmer than the room.",
+          "text": "Spread the grain over a sheet pan in a thin layer and toss it with the olive oil. The thin layer is what lets the steam leave, and steam trapped in a warm covered bowl is what turns a good batch sour by Tuesday. Give it 20 minutes, until it is no warmer than the room.",
           "ingredientRefs": [
             "olive oil"
           ],
           "timerSeconds": 1200
         },
         {
-          "text": "Squeeze over the lemon if the grain is headed for salads and cold bowls, and leave it plain if it is going under something saucy.",
+          "text": "Leave the batch itself plain and squeeze the lemon over the portion you are about to eat instead. Lemon fades over a few days in the fridge, and a plain batch is also the one a child can take with nothing on it.",
           "ingredientRefs": [
             "lemon"
           ]
         },
         {
-          "text": "Pack the cooled grain into a container, loosely rather than pressed down, and refrigerate within the hour. It keeps 5 days in the fridge and 3 months in the freezer, frozen flat in meal size bags. Cold from the fridge it goes straight into bowls and salads with no reheating at all. To serve it hot, put it in a pan with a splash of water, cover, and warm over medium heat for 3 or 4 minutes, or microwave it covered with a damp paper towel on top. Both work because the trick is steam, and grain reheated dry comes back hard.",
+          "text": "Pack the cooled grain into a container, loosely rather than pressed down, and refrigerate it within the hour. It keeps 4 days in the fridge and 3 months in the freezer, frozen flat in meal size bags. Cold from the fridge it goes straight into bowls and salads with no reheating at all. To serve it hot, put it in a pan with a splash of water, cover it, and warm it over medium heat for 3 or 4 minutes, or microwave it covered with a damp paper towel on top. Both work because the trick is steam, and grain reheated dry comes back hard.",
           "ingredientRefs": [
             "farro",
             "brown rice"
@@ -7255,8 +7340,8 @@
       "summary": "Six eggs boiled to a set yolk, chilled hard in ice water, and kept in the shell all week.",
       "sourceType": "builtIn",
       "prepMinutes": 3,
-      "cookMinutes": 11,
-      "totalMinutes": 14,
+      "cookMinutes": 19,
+      "totalMinutes": 22,
       "baseServings": 6,
       "tags": [
         "standby",
@@ -7287,15 +7372,15 @@
       ],
       "steps": [
         {
-          "text": "Put enough water in a saucepan to cover the eggs by an inch, leave the eggs out of it for now, and bring it to a full rolling boil. Starting them in boiling water rather than cold is what makes the timing repeatable, because the clock starts at a temperature you can see.",
+          "text": "Put enough water in a saucepan to cover the eggs by an inch, leave the eggs out of it for now, cover the pan, and bring it to a full rolling boil. The lid gets you there several minutes sooner. Starting the eggs in boiling water rather than cold is the one choice that matters most here: it makes the timing repeatable, because the clock starts at a temperature you can see, and it is also what makes them peel cleanly instead of tearing.",
           "ingredientRefs": []
         },
         {
-          "text": "While it heats, fill a mixing bowl with cold water and as much ice as it will hold. This is half the recipe, so do not skip it or make it lukewarm.",
+          "text": "While it heats, fill a mixing bowl with roughly equal amounts of cold water and ice. This is half the recipe, so do not skip it or make it lukewarm.",
           "ingredientRefs": []
         },
         {
-          "text": "Lower the eggs in one at a time on a spoon so they do not crack against the bottom. Add the baking soda if you are using it, which nudges the water alkaline and helps the shells let go later. Bring the heat back to a steady gentle boil.",
+          "text": "Lower the eggs in one at a time on a spoon so they do not crack against the bottom. Add the baking soda if you like, though tests of it are mixed and it does far less than the hot start and the ice bath do. Eggs that have sat in the fridge a week or more peel better than very fresh ones. Bring the heat back to a steady gentle boil.",
           "ingredientRefs": [
             "eggs",
             "baking soda"
@@ -7309,14 +7394,14 @@
           "timerSeconds": 660
         },
         {
-          "text": "Lift them straight into the ice bath and leave them 10 minutes, until they are cold all the way to the middle. Any time spent warm after the boil keeps cooking the yolk and sets the shell against the white.",
+          "text": "Lift them straight into the ice bath and leave them 15 minutes, until they are cold all the way to the middle. Ten is enough if you want to peel one right away, but a batch going into the fridge wants the full time, because any warmth left in the egg keeps cooking the yolk and sets the shell against the white.",
           "ingredientRefs": [
             "eggs"
           ],
-          "timerSeconds": 600
+          "timerSeconds": 900
         },
         {
-          "text": "Dry them and keep them in the fridge in the shell, where they hold a week. Peel one at a time as you want it, under cold running water if the shell fights you. Once peeled they are best within two days, so peel for the board or the plate, not for the week.",
+          "text": "Dry them and keep them in the fridge in the shell, where they hold a week. Peel one at a time as you want it, under cold running water if the shell fights you, and eat peeled ones within two or three days while the white is still good. They are meant to be eaten cold, so there is nothing to reheat, but for a warm one, sit it unpeeled in just boiled water off the heat for three minutes.",
           "ingredientRefs": [
             "eggs"
           ]
@@ -7345,9 +7430,9 @@
       ],
       "ingredients": [
         {
-          "name": "canned cannellini beans, rinsed",
+          "name": "canned cannellini beans",
           "canonicalItem": "canned cannellini beans",
-          "quantity": 3,
+          "quantity": 4,
           "unit": "can"
         },
         {
@@ -7363,9 +7448,9 @@
           "unit": "clove"
         },
         {
-          "name": "bay leaf",
+          "name": "bay leaves",
           "canonicalItem": "bay leaves",
-          "quantity": 1,
+          "quantity": 2,
           "unit": "count"
         },
         {
@@ -7377,13 +7462,13 @@
         {
           "name": "vegetable broth",
           "canonicalItem": "vegetable broth",
-          "quantity": 2,
+          "quantity": 1.5,
           "unit": "cup"
         },
         {
           "name": "kosher salt",
           "canonicalItem": "kosher salt",
-          "quantity": 1.5,
+          "quantity": 1,
           "unit": "tsp"
         },
         {
@@ -7416,7 +7501,7 @@
       ],
       "steps": [
         {
-          "text": "Warm the olive oil in a heavy pot over low heat with the garlic, the bay leaf and a wide strip of lemon peel cut off with a vegetable peeler. Hold it at a lazy sizzle for about 5 minutes, until the garlic smells sweet. It should not brown; if it starts to, pull the pot off the heat for a minute.",
+          "text": "Warm the olive oil in a heavy pot over low heat with the garlic, the bay leaves and a wide strip of lemon peel cut off with a vegetable peeler. Hold it at a lazy sizzle for about 5 minutes, until the garlic smells sweet. It should not brown; if it starts to, pull the pot off the heat for a minute.",
           "ingredientRefs": [
             "olive oil",
             "garlic",
@@ -7426,7 +7511,7 @@
           "timerSeconds": 300
         },
         {
-          "text": "Add the beans, the broth and the salt. The liquid should just cover the beans, so top it up with water if it does not. Starting from dried instead: soak a pound overnight, simmer them in plenty of unsalted water with the same garlic, bay and peel for an hour to an hour and a half until a bean crushes against the roof of your mouth, salt them in the last 20 minutes, and carry on here with their own cooking liquid in place of the broth.",
+          "text": "Rinse three of the cans and tip them in. Add the fourth without draining it, because that starchy liquid is what thickens the pot. Pour in the broth and half a teaspoon of the salt. The liquid should come most of the way up the beans, so add a splash of water if it does not. Starting from dried instead: brine a pound of beans overnight in 3 quarts of water with 2 tablespoons of kosher salt, which seasons them right through and keeps the skins whole, then drain them, rinse them, and simmer them with the same garlic, bay and peel for an hour to an hour and a half until one squashes easily against a spoon. Carry on here with their cooking liquid in place of the broth.",
           "ingredientRefs": [
             "canned cannellini beans",
             "vegetable broth",
@@ -7444,7 +7529,7 @@
           "timerSeconds": 1500
         },
         {
-          "text": "Fish out the bay leaf and the strip of peel. Crush a big spoonful of the beans against the side of the pot and stir them back in, which is what makes the liquid creamy without any cream. Then taste it properly: it wants more salt than you think, a squeeze of the lemon, a grind of pepper and a last pour of raw olive oil.",
+          "text": "Fish out the bay leaves and the strip of peel. Crush a big spoonful of the beans against the side of the pot and stir them back in, which is what makes the liquid creamy without any cream. Now season it: the canned beans and the broth both arrived salted, so add the rest of the salt a pinch at a time and taste as you go, then a squeeze of the lemon, a grind of pepper and a last pour of raw olive oil.",
           "ingredientRefs": [
             "bay leaves",
             "lemon",
@@ -7455,7 +7540,7 @@
           ]
         },
         {
-          "text": "Eat them warm, spooned onto thick toast with parsley and a pinch of chili flakes for whoever wants it, and put the bowl on the table so everyone takes their own. They keep 5 days covered in the fridge, sitting in their liquid, which is what stops them drying out, and they improve on day two. Reheat a portion gently in a small pan with a splash of water until just steaming; a hard boil breaks the skins. They also freeze in their liquid for up to 3 months.",
+          "text": "Eat them warm, spooned onto thick toast with parsley and a pinch of chili flakes for whoever wants it, and put the bowl on the table so everyone takes their own. They keep 5 days covered in the fridge, sitting in their liquid, which is what stops them drying out, and they are better on day two. Reheat a portion gently in a small pan with a splash of water until just steaming; a hard boil breaks the skins. They also freeze in their liquid for up to 3 months.",
           "ingredientRefs": [
             "sourdough loaf",
             "parsley",
@@ -7519,7 +7604,7 @@
         {
           "name": "kosher salt",
           "canonicalItem": "kosher salt",
-          "quantity": 1.5,
+          "quantity": 2,
           "unit": "tsp"
         },
         {
@@ -7545,7 +7630,7 @@
       ],
       "steps": [
         {
-          "text": "Heat the oven to 425F. That number matters more than anything else here: much lower and the vegetables give up their water and steam in it, much higher and thin edges are black before the middles are done. Put the rack in the upper third of the oven.",
+          "text": "Heat the oven to 425F with the empty sheet pan already inside it, rack in the middle. That temperature matters more than anything else here: much lower and the vegetables give up their water and steam in it, much higher and thin edges are black before the middles are done. The pan heats while you chop, which costs nothing and buys a lot, because vegetables that land on metal already at temperature start browning on contact instead of waiting for the pan to catch up.",
           "ingredientRefs": []
         },
         {
@@ -7576,22 +7661,22 @@
           ]
         },
         {
-          "text": "Spread everything on the pan in one layer with a little bare metal showing between the pieces, flat cut sides down against the pan. This is the whole trick. Vegetables touching each other trap steam and go grey and soft, and browning only happens where a cut face meets hot metal. If the pan is crowded, use two pans on two racks rather than one tall pile.",
+          "text": "Pull the hot pan out and spread the dense vegetables and the onion on it in one layer, flat cut sides down, with a little bare metal showing between the pieces. Hold the broccoli or cauliflower back for now. The spacing is the whole trick. Pieces touching each other trap steam and go grey and soft, and browning only happens where a cut face meets hot metal. Three pounds will not honestly fit on one half sheet, so use two pans on two racks rather than one tall pile.",
           "ingredientRefs": [
             "carrot",
             "sweet potato",
-            "broccoli",
-            "red onion"
+            "red onion",
+            "broccoli"
           ]
         },
         {
-          "text": "Roast 25 to 35 minutes and leave them alone for the first 20, which is when the undersides set their crust. Then turn the pieces once and look at the pan rather than the clock. They are done when the edges are deeply browned in patches and a knife tip slides into a root with no resistance at all. Tender but pale means they need longer; a little char on a floret is flavour, not a mistake. Soft, quick vegetables like zucchini or tomatoes only need the last 15 minutes, so add them late or give them their own pan.",
+          "text": "Roast 25 to 35 minutes in all. Give the roots the first 10 to 12 minutes on their own, then add the florets, turn everything once, and leave it alone after that; the undisturbed stretches are when the undersides set their crust. From there look at the pan rather than the clock. Broccoli and cauliflower want only about 20 minutes of the run, which is why putting them in at the start leaves them dusty and black by the time a carrot is ready, and soft quick things like zucchini or whole cherry tomatoes want only the last 15. They are done when the edges are deeply browned in patches and a knife tip slides into a root with no resistance at all. Tender but pale means they need longer; a little char on a floret is flavour, not a mistake.",
           "ingredientRefs": [
             "carrot",
             "sweet potato",
             "broccoli"
           ],
-          "timerSeconds": 1200
+          "timerSeconds": 600
         },
         {
           "text": "Taste one, add salt if it needs it, and squeeze the lemon over while the pan is still hot. Acid goes further into hot vegetables than cold ones.",
@@ -7601,7 +7686,7 @@
           ]
         },
         {
-          "text": "Cool them uncovered on the pan so the steam has somewhere to go, then refrigerate in a shallow container for up to 5 days. They are genuinely good cold, eaten straight from the box, piled into pita with hummus, or tipped over grains with a spoonful of sauce, so cold is a real answer and not a compromise. To bring them back hot, spread them on a hot pan at 425F for 6 to 8 minutes or crisp them in a dry skillet. The microwave works but makes them limp.",
+          "text": "Cool them uncovered on the pan so the steam has somewhere to go, then refrigerate in a shallow container for up to 4 days. They are genuinely good cold, eaten straight from the box, piled into pita with hummus, or tipped over grains with a spoonful of sauce, so cold is a real answer and not a compromise. To bring them back hot, spread them on a hot pan at 425F for 6 to 8 minutes or crisp them in a dry skillet. The microwave works but makes them limp.",
           "ingredientRefs": []
         }
       ]
@@ -7645,7 +7730,7 @@
         {
           "name": "garlic, grated",
           "canonicalItem": "garlic",
-          "quantity": 1,
+          "quantity": 2,
           "unit": "clove"
         },
         {

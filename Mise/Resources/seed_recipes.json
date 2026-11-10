@@ -5361,7 +5361,7 @@
           "unit": "cup"
         },
         {
-          "name": "parmesan, a rind if there is one and the rest grated for the table",
+          "name": "parmesan, grated",
           "canonicalItem": "parmesan",
           "quantity": 3,
           "unit": "oz"
@@ -5415,7 +5415,7 @@
           "unit": "count"
         },
         {
-          "name": "italian sausage, for whoever wants it",
+          "name": "italian sausage",
           "canonicalItem": "italian sausage",
           "quantity": 0.5,
           "unit": "lb",
@@ -5520,7 +5520,7 @@
       ],
       "ingredients": [
         {
-          "name": "ziti or penne",
+          "name": "penne",
           "canonicalItem": "penne",
           "quantity": 1,
           "unit": "lb"
@@ -7255,7 +7255,7 @@
       "sourceType": "builtIn",
       "prepMinutes": 3,
       "cookMinutes": 11,
-      "totalMinutes": 25,
+      "totalMinutes": 14,
       "baseServings": 6,
       "tags": [
         "standby",
@@ -7368,7 +7368,7 @@
           "unit": "count"
         },
         {
-          "name": "lemon, one wide strip of peel plus the juice",
+          "name": "lemon",
           "canonicalItem": "lemon",
           "quantity": 1,
           "unit": "count"
@@ -7392,7 +7392,7 @@
           "unit": "tsp"
         },
         {
-          "name": "sourdough loaf, for toast",
+          "name": "sourdough loaf",
           "canonicalItem": "sourdough loaf",
           "quantity": 1,
           "unit": "count",
@@ -7498,7 +7498,7 @@
           "unit": "lb"
         },
         {
-          "name": "broccoli, cut into florets, stems peeled and sliced",
+          "name": "broccoli, cut into florets",
           "canonicalItem": "broccoli",
           "quantity": 1,
           "unit": "bunch"
@@ -7535,7 +7535,7 @@
           "isOptional": true
         },
         {
-          "name": "lemon, for finishing",
+          "name": "lemon",
           "canonicalItem": "lemon",
           "quantity": 1,
           "unit": "count",

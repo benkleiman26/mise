@@ -271,17 +271,19 @@ struct RecipesView: View {
                     toggleRow("Cooked before", on: store.onlyCooked) { store.onlyCooked.toggle() }
                 }
 
-                Section("Time") {
+                Section {
                     ForEach(RecipesStore.TimeLimit.allCases) { limit in
                         toggleRow(limit.label, on: store.timeLimit == limit) {
                             store.timeLimit = store.timeLimit == limit ? nil : limit
                         }
                     }
+                } header: {
+                    Text("Time")
                 } footer: {
                     Text("A recipe with no time recorded is not known to be quick, so these leave it out rather than claim it.")
                 }
 
-                Section("Kind") {
+                Section {
                     ForEach(store.kinds, id: \.kind) { entry in
                         toggleRow(entry.kind.displayName, count: entry.count, on: store.selectedKinds.contains(entry.kind)) {
                             if store.selectedKinds.contains(entry.kind) {
@@ -291,11 +293,13 @@ struct RecipesView: View {
                             }
                         }
                     }
+                } header: {
+                    Text("Kind")
                 } footer: {
                     Text("Picking two means either one. A dish is rarely both.")
                 }
 
-                Section("Collections") {
+                Section {
                     ForEach(store.tags, id: \.name) { tag in
                         toggleRow(tag.name, count: tag.count, on: store.selectedTags.contains(tag.name)) {
                             if store.selectedTags.contains(tag.name) {
@@ -305,6 +309,8 @@ struct RecipesView: View {
                             }
                         }
                     }
+                } header: {
+                    Text("Collections")
                 } footer: {
                     Text("Picking two means both, which is how you narrow.")
                 }

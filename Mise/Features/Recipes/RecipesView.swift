@@ -70,11 +70,8 @@ struct RecipesView: View {
 
         List {
             Section {
-                kindRow(store)
-                    .listRowInsets(EdgeInsets(top: 4, leading: 0, bottom: 0, trailing: 0))
-                    .listRowBackground(Color.clear)
-                facets(store)
-                    .listRowInsets(EdgeInsets(top: 0, leading: 0, bottom: 4, trailing: 0))
+                filterRow(store)
+                    .listRowInsets(EdgeInsets(top: 4, leading: 0, bottom: 4, trailing: 0))
                     .listRowBackground(Color.clear)
             }
 
@@ -165,63 +162,109 @@ struct RecipesView: View {
 
     // MARK: - Narrowing down
 
+    /// One row, and it does not scroll.
+    ///
+    /// It used to be two horizontally scrolling rows: one chip per dish type,
+    /// which with a real library is twenty of them, and a second row holding
+    /// everything else. On a phone that puts the fourth chip past the edge of
+    /// the screen with nothing to say it is there, so the owner used the app
+    /// for days without knowing the filters existed and found them only by
+    /// scrolling to the far end, where Desserts and Snacks live.
+    ///
+    /// A menu holds all of its contents at once and says in its own label what
+    /// is chosen, which is the thing a row of chips cannot do.
     @ViewBuilder
-    private func facets(_ store: RecipesStore) -> some View {
-        ScrollView(.horizontal, showsIndicators: false) {
-            HStack(spacing: 8) {
-                chip("Favourites", systemImage: "heart", on: store.onlyFavourites) {
-                    store.onlyFavourites.toggle()
-                }
-                chip("Cooked", systemImage: "checkmark", on: store.onlyCooked) {
-                    store.onlyCooked.toggle()
-                }
-                ForEach(RecipesStore.TimeLimit.allCases) { limit in
-                    chip(limit.label, systemImage: "clock", on: store.timeLimit == limit) {
-                        store.timeLimit = store.timeLimit == limit ? nil : limit
+    private func filterRow(_ store: RecipesStore) -> some View {
+        HStack(spacing: 8) {
+            // Its own control rather than an item inside a list. This is the
+            // one to reach for when it is 6pm and the alternative is ordering
+            // in, and it can only do that job if it is in sight.
+            chip("Standbys", systemImage: "bolt.fill", on: store.onlyStandbys) {
+                store.onlyStandbys.toggle()
+            }
+            kindMenu(store)
+            moreMenu(store)
+            if store.hasFilters {
+                chip("Clear", systemImage: "xmark", on: false) { store.clearFilters() }
+            }
+            Spacer(minLength: 0)
+        }
+        .padding(.horizontal, 20)
+    }
+
+    private func kindMenu(_ store: RecipesStore) -> some View {
+        let kinds = store.kinds
+        let chosen = store.selectedKinds.count
+        return Menu {
+            if chosen > 0 {
+                Button("Any kind") { store.selectedKinds = [] }
+                Divider()
+            }
+            ForEach(kinds, id: \.kind) { entry in
+                Button {
+                    if store.selectedKinds.contains(entry.kind) {
+                        store.selectedKinds.remove(entry.kind)
+                    } else {
+                        store.selectedKinds.insert(entry.kind)
                     }
-                }
-                chip(
-                    store.selectedTags.isEmpty ? "Collections" : "\(store.selectedTags.count) collections",
-                    systemImage: "folder",
-                    on: !store.selectedTags.isEmpty
-                ) {
-                    isPickingTags = true
-                }
-                if store.hasFilters {
-                    chip("Clear", systemImage: "xmark", on: false) {
-                        store.clearFilters()
-                    }
+                } label: {
+                    Label(
+                        "\(entry.kind.displayName)  \(entry.count)",
+                        systemImage: store.selectedKinds.contains(entry.kind) ? "checkmark" : entry.kind.systemImage
+                    )
                 }
             }
-            .padding(.horizontal, 20)
+        } label: {
+            chipLabel(chosen == 0 ? "Kind" : "Kind \(chosen)", systemImage: "fork.knife", on: chosen > 0)
+        }
+        .disabled(kinds.isEmpty)
+    }
+
+    private func moreMenu(_ store: RecipesStore) -> some View {
+        let on = store.onlyFavourites || store.onlyCooked || store.timeLimit != nil || !store.selectedTags.isEmpty
+        return Menu {
+            Button {
+                store.onlyFavourites.toggle()
+            } label: {
+                Label("Favourites", systemImage: store.onlyFavourites ? "checkmark" : "heart")
+            }
+            Button {
+                store.onlyCooked.toggle()
+            } label: {
+                Label("Cooked before", systemImage: store.onlyCooked ? "checkmark" : "checkmark.circle")
+            }
+            Divider()
+            ForEach(RecipesStore.TimeLimit.allCases) { limit in
+                Button {
+                    store.timeLimit = store.timeLimit == limit ? nil : limit
+                } label: {
+                    Label(limit.label, systemImage: store.timeLimit == limit ? "checkmark" : "clock")
+                }
+            }
+            Divider()
+            Button {
+                isPickingTags = true
+            } label: {
+                Label(
+                    store.selectedTags.isEmpty ? "Collections" : "Collections (\(store.selectedTags.count))",
+                    systemImage: "folder"
+                )
+            }
+        } label: {
+            chipLabel("More", systemImage: "line.3.horizontal.decrease", on: on)
         }
     }
 
-    /// What kind of dish, which is the question people actually start from.
-    @ViewBuilder
-    private func kindRow(_ store: RecipesStore) -> some View {
-        let kinds = store.kinds
-        if !kinds.isEmpty {
-            ScrollView(.horizontal, showsIndicators: false) {
-                HStack(spacing: 8) {
-                    ForEach(kinds, id: \.kind) { entry in
-                        chip(
-                            "\(entry.kind.displayName) \(entry.count)",
-                            systemImage: entry.kind.systemImage,
-                            on: store.selectedKinds.contains(entry.kind)
-                        ) {
-                            if store.selectedKinds.contains(entry.kind) {
-                                store.selectedKinds.remove(entry.kind)
-                            } else {
-                                store.selectedKinds.insert(entry.kind)
-                            }
-                        }
-                    }
-                }
-                .padding(.horizontal, 20)
-            }
-        }
+    /// The chip without a button around it, so a `Menu` can wear it as a label.
+    private func chipLabel(_ title: String, systemImage: String, on: Bool) -> some View {
+        Label(title, systemImage: systemImage)
+            .font(.subheadline)
+            .padding(.horizontal, 12)
+            .padding(.vertical, 7)
+            .background(on ? AnyShapeStyle(Color.accentColor) : AnyShapeStyle(.quaternary), in: Capsule())
+            .foregroundStyle(on ? Color.white : Color.primary)
     }
+
 
     private func chip(_ title: String, systemImage: String, on: Bool, action: @escaping () -> Void) -> some View {
         Button(action: action) {

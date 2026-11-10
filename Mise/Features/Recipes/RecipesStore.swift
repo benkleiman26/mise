@@ -39,6 +39,12 @@ final class RecipesStore {
     var selectedKinds: Set<DishType> = []
     var onlyFavourites = false
     var onlyCooked = false
+    /// The standbys, as their own control rather than one collection among
+    /// forty. They answer a different question from the rest of the library:
+    /// not what kind of dish this is, but whether it is one of the handful
+    /// worth reaching for on a night that was going to end in a takeout
+    /// order. See STANDBYS.md.
+    var onlyStandbys = false
     var timeLimit: TimeLimit?
     var sort: Sort = .title
 
@@ -46,8 +52,11 @@ final class RecipesStore {
         self.recipes = recipes
     }
 
+    static let standbyTag = "standby"
+
     var hasFilters: Bool {
-        !selectedTags.isEmpty || !selectedKinds.isEmpty || onlyFavourites || onlyCooked || timeLimit != nil
+        !selectedTags.isEmpty || !selectedKinds.isEmpty || onlyFavourites || onlyCooked
+            || onlyStandbys || timeLimit != nil
     }
 
     func clearFilters() {
@@ -55,6 +64,7 @@ final class RecipesStore {
         selectedKinds = []
         onlyFavourites = false
         onlyCooked = false
+        onlyStandbys = false
         timeLimit = nil
     }
 
@@ -100,6 +110,9 @@ final class RecipesStore {
         let filtered = items.filter { recipe in
             if onlyFavourites, !recipe.isFavorite { return false }
             if onlyCooked, recipe.timesCooked == 0 { return false }
+            if onlyStandbys, !recipe.tags.contains(where: { $0.caseInsensitiveCompare(Self.standbyTag) == .orderedSame }) {
+                return false
+            }
             if let limit = timeLimit {
                 // A recipe with no time recorded is not known to be quick, and
                 // 159 of the owner's have none. Claiming them would make the

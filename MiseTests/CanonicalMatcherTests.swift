@@ -117,7 +117,7 @@ final class CanonicalMatcherTests: XCTestCase {
 
     /// Section 5.1 requires every seed recipe to have canonical item links set
     /// so the list generator works on first launch. This is that requirement as
-    /// a test, over all 379 lines.
+    /// a test, over every line in the library.
     func testEverySeedIngredientResolvesToTheItemTheSeedDataNames() {
         var checked = 0
         var failures: [String] = []
@@ -142,7 +142,12 @@ final class CanonicalMatcherTests: XCTestCase {
         }
 
         XCTAssertEqual(failures, [], "every seeded ingredient must resolve")
-        XCTAssertEqual(checked, 379, "the seed library should still have 379 ingredient lines")
+        // Against the library's own total rather than a number written down
+        // once. The point is that the loop saw every line, not that the library
+        // is a particular size, and a count carved into a test fails the next
+        // time somebody adds a recipe, which is not a bug worth reporting.
+        let lines = Self.seed.recipes.reduce(0) { $0 + $1.ingredients.count }
+        XCTAssertEqual(checked, lines, "every ingredient line should have been checked")
     }
 
     func testNoSeedIngredientNeedsReview() {

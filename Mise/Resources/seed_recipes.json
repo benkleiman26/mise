@@ -4981,13 +4981,13 @@
           "unit": "cup"
         },
         {
-          "name": "zucchini, sliced thin",
+          "name": "zucchini, thinly sliced",
           "canonicalItem": "zucchini",
           "quantity": 2,
           "unit": "count"
         },
         {
-          "name": "yellow onion, sliced thin",
+          "name": "yellow onion, thinly sliced",
           "canonicalItem": "yellow onion",
           "quantity": 1,
           "unit": "count"
@@ -5017,7 +5017,7 @@
           "unit": "cup"
         },
         {
-          "name": "salami, sliced thin",
+          "name": "salami, thinly sliced",
           "canonicalItem": "salami",
           "quantity": 4,
           "unit": "oz",
@@ -5114,7 +5114,7 @@
           "unit": "can"
         },
         {
-          "name": "yellow onion, finely diced",
+          "name": "yellow onion, diced",
           "canonicalItem": "yellow onion",
           "quantity": 2,
           "unit": "count"
@@ -5319,13 +5319,13 @@
       ],
       "ingredients": [
         {
-          "name": "canned cannellini beans, drained and rinsed",
+          "name": "canned cannellini beans, rinsed",
           "canonicalItem": "canned cannellini beans",
           "quantity": 3,
           "unit": "can"
         },
         {
-          "name": "kale, stems stripped and leaves torn",
+          "name": "kale, torn",
           "canonicalItem": "kale",
           "quantity": 1,
           "unit": "bunch"
@@ -5337,13 +5337,13 @@
           "unit": "count"
         },
         {
-          "name": "carrot, diced small",
+          "name": "carrot, diced",
           "canonicalItem": "carrot",
           "quantity": 2,
           "unit": "count"
         },
         {
-          "name": "celery, diced small",
+          "name": "celery, diced",
           "canonicalItem": "celery",
           "quantity": 2,
           "unit": "count"
@@ -5598,7 +5598,7 @@
           "unit": "tsp"
         },
         {
-          "name": "italian sausage, browned in its own pan",
+          "name": "italian sausage, browned",
           "canonicalItem": "italian sausage",
           "quantity": 0.5,
           "unit": "lb",
@@ -5880,13 +5880,13 @@
           "unit": "count"
         },
         {
-          "name": "butter, soft enough to spread",
+          "name": "butter, softened",
           "canonicalItem": "butter",
           "quantity": 4,
           "unit": "oz"
         },
         {
-          "name": "gouda, sliced thin",
+          "name": "gouda, thinly sliced",
           "canonicalItem": "gouda",
           "quantity": 8,
           "unit": "oz"
@@ -5898,25 +5898,25 @@
           "unit": "oz"
         },
         {
-          "name": "chives, snipped",
+          "name": "chives, chopped",
           "canonicalItem": "chives",
           "quantity": 1,
           "unit": "bunch"
         },
         {
-          "name": "cucumber, in coins",
+          "name": "cucumber, sliced",
           "canonicalItem": "cucumber",
           "quantity": 1,
           "unit": "count"
         },
         {
-          "name": "radishes, trimmed and halved",
+          "name": "radishes, trimmed",
           "canonicalItem": "radish",
           "quantity": 1,
           "unit": "bunch"
         },
         {
-          "name": "tomatoes, sliced thick",
+          "name": "tomatoes, sliced",
           "canonicalItem": "tomato",
           "quantity": 3,
           "unit": "count"
@@ -5928,7 +5928,7 @@
           "unit": "oz"
         },
         {
-          "name": "eggs, hard boiled",
+          "name": "eggs, boiled",
           "canonicalItem": "eggs",
           "quantity": 6,
           "unit": "count"
@@ -6059,7 +6059,7 @@
           "unit": "oz"
         },
         {
-          "name": "feta, left in a slab",
+          "name": "feta",
           "canonicalItem": "feta",
           "quantity": 6,
           "unit": "oz"
@@ -6114,7 +6114,7 @@
           "unit": "tsp"
         },
         {
-          "name": "parsley, roughly chopped",
+          "name": "parsley, chopped",
           "canonicalItem": "parsley",
           "quantity": 0.25,
           "unit": "cup"
@@ -6234,13 +6234,13 @@
           "unit": "cup"
         },
         {
-          "name": "sweet potato, roasted in cubes",
+          "name": "sweet potato, roasted",
           "canonicalItem": "sweet potato",
           "quantity": 2,
           "unit": "count"
         },
         {
-          "name": "broccoli, roasted in florets",
+          "name": "broccoli, roasted",
           "canonicalItem": "broccoli",
           "quantity": 1,
           "unit": "count"
@@ -6252,7 +6252,7 @@
           "unit": "can"
         },
         {
-          "name": "eggs, hard boiled",
+          "name": "eggs, boiled",
           "canonicalItem": "eggs",
           "quantity": 4,
           "unit": "count"
@@ -6603,13 +6603,13 @@
           "unit": "lb"
         },
         {
-          "name": "garlic, sliced as thin as you can",
+          "name": "garlic, thinly sliced",
           "canonicalItem": "garlic",
           "quantity": 8,
           "unit": "clove"
         },
         {
-          "name": "olive oil, the good one",
+          "name": "olive oil",
           "canonicalItem": "olive oil",
           "quantity": 0.5,
           "unit": "cup"
@@ -6621,7 +6621,7 @@
           "unit": "tsp"
         },
         {
-          "name": "parmesan, grated fine",
+          "name": "parmesan, grated",
           "canonicalItem": "parmesan",
           "quantity": 2,
           "unit": "oz"
@@ -6762,7 +6762,7 @@
           "unit": "tsp"
         },
         {
-          "name": "scallions, sliced thin",
+          "name": "scallions, thinly sliced",
           "canonicalItem": "scallions",
           "quantity": 2,
           "unit": "count",
@@ -7032,7 +7032,7 @@
           "unit": "tsp"
         },
         {
-          "name": "pickles, finely chopped",
+          "name": "pickles, chopped",
           "canonicalItem": "pickles",
           "quantity": 3,
           "unit": "tbsp"
@@ -7157,7 +7157,7 @@
           "unit": "cup"
         },
         {
-          "name": "brown rice, in place of the farro",
+          "name": "brown rice",
           "canonicalItem": "brown rice",
           "quantity": 2,
           "unit": "cup",
@@ -7277,7 +7277,7 @@
           "unit": "count"
         },
         {
-          "name": "baking soda, optional",
+          "name": "baking soda",
           "canonicalItem": "baking soda",
           "quantity": 0.5,
           "unit": "tsp",
@@ -7344,7 +7344,7 @@
       ],
       "ingredients": [
         {
-          "name": "canned cannellini beans, drained and rinsed",
+          "name": "canned cannellini beans, rinsed",
           "canonicalItem": "canned cannellini beans",
           "quantity": 3,
           "unit": "can"
@@ -7356,7 +7356,7 @@
           "unit": "cup"
         },
         {
-          "name": "garlic, peeled and crushed flat with the side of a knife",
+          "name": "garlic, peeled",
           "canonicalItem": "garlic",
           "quantity": 6,
           "unit": "clove"
@@ -7486,13 +7486,13 @@
       ],
       "ingredients": [
         {
-          "name": "carrots, cut into 1 inch pieces",
+          "name": "carrots, chopped",
           "canonicalItem": "carrot",
           "quantity": 1,
           "unit": "lb"
         },
         {
-          "name": "sweet potato, peeled and cut into 1 inch cubes",
+          "name": "sweet potato, cubed",
           "canonicalItem": "sweet potato",
           "quantity": 1,
           "unit": "lb"
@@ -7504,7 +7504,7 @@
           "unit": "bunch"
         },
         {
-          "name": "red onion, cut into thick wedges",
+          "name": "red onion, cut into wedges",
           "canonicalItem": "red onion",
           "quantity": 1,
           "unit": "count"
@@ -7528,7 +7528,7 @@
           "unit": "tsp"
         },
         {
-          "name": "garlic, whole cloves left in their skins",
+          "name": "garlic, whole",
           "canonicalItem": "garlic",
           "quantity": 6,
           "unit": "clove",
@@ -7642,7 +7642,7 @@
           "unit": "count"
         },
         {
-          "name": "garlic, finely grated",
+          "name": "garlic, grated",
           "canonicalItem": "garlic",
           "quantity": 1,
           "unit": "clove"

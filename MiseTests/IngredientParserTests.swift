@@ -11,7 +11,7 @@ import XCTest
 /// before any of this compiled.
 ///
 /// The seed round trip is the other half. Rendering a real ingredient and
-/// parsing it back must return what it started as, across all 379 lines, which
+/// parsing it back must return what it started as, across every line, which
 /// catches the cases nobody thought to write down.
 final class IngredientParserTests: XCTestCase {
 
@@ -140,7 +140,10 @@ final class IngredientParserTests: XCTestCase {
             }
         }
 
-        XCTAssertEqual(checked, 379, "the seed library should still have 379 ingredient lines")
+        // The library's own total, not a number written down once. See the
+        // same assertion in CanonicalMatcherTests.
+        let lines = Self.seed.recipes.reduce(0) { $0 + $1.ingredients.count }
+        XCTAssertEqual(checked, lines, "every ingredient line should have been checked")
     }
 
     /// Confidence is what decides whether a line interrupts the user, so a

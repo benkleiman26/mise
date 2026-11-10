@@ -56,6 +56,26 @@ every phone. Use `seed-` and a slug of the title.
 minced". `canonicalItem` is the shopping entry it adds up into, so four recipes
 wanting garlic produce one line on the list.
 
+`name` is a name and at most a short preparation. Not a clause. The parser has
+to read back what this file writes, so "parmesan, grated" is a name and
+"parmesan, a rind if there is one and the rest grated for the table" is a
+sentence that fails the round trip test. Two commas is almost always too many.
+"ziti or penne" is not an ingredient either: the matcher resolves on the head
+before the first comma, and a choice between two things has no head. Pick one
+and let the title say the other. Anything the line wanted to explain belongs in
+the method, which is where a cook reads it.
+
+Use a preparation the library already uses. The parser round trips the ones
+that shipped with the original recipes, because that round trip is what shipped
+them: beaten, chopped, crumbled, cubed, cut into florets, cut into strips,
+diced, drained, grated, halved, minced, peeled, rinsed, shredded, sliced,
+softened, thinly sliced, torn, trimmed, whole. "finely chopped" is just
+"chopped" here, and "soft enough to spread" is "softened". If a line wants to
+say more than one of those, it wants to be a step.
+
+`totalMinutes` must equal `prepMinutes` plus `cookMinutes`. Chilling, resting
+and soaking go in the steps, not in the arithmetic.
+
 `ingredientRefs` holds `canonicalItem` values used in that step, not `name`
 values. It drives the highlight in the cook view, so getting it wrong is
 cosmetic rather than fatal.

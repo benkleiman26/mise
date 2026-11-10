@@ -367,10 +367,14 @@ final class GroceryListStore {
 
     private func makeGenerator() throws -> ListGenerator {
         // Section 4: the generator excludes `have` and includes `low` and `out`.
-        let have = Set(try pantry.all().filter { $0.status == .have }.map(\.canonicalItemID))
+        // Both halves, read from one fetch so the two cannot disagree.
+        let entries = try pantry.all()
+        let have = Set(entries.filter { $0.status == .have }.map(\.canonicalItemID))
+        let restock = entries.filter { $0.status != .have }.map(\.canonicalItemID)
         return ListGenerator(
             matcher: try makeMatcher(),
             pantryHave: have,
+            pantryRestock: restock,
             aisleOrder: try aisleWalk()
         )
     }

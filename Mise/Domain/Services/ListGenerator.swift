@@ -123,11 +123,25 @@ struct ListGenerator {
     /// Canonical items whose pantry status is `have`. Section 4: the generator
     /// excludes `have` and includes `low` and `out`.
     let pantryHave: Set<UUID>
+    /// Canonical items the pantry says are `low` or `out`.
+    ///
+    /// The other half of section 4's sentence, which was never implemented. The
+    /// pantry could only ever take a row away, so a household that tracked its
+    /// bread and its tinned tuna watched them run out quietly: nothing adds a
+    /// staple to the list, and a staple nobody cooked with this week is exactly
+    /// the one about to be missing.
+    let pantryRestock: [UUID]
     let aisleOrder: [Aisle]
 
-    init(matcher: CanonicalMatcher, pantryHave: Set<UUID> = [], aisleOrder: [Aisle] = Aisle.allCases) {
+    init(
+        matcher: CanonicalMatcher,
+        pantryHave: Set<UUID> = [],
+        pantryRestock: [UUID] = [],
+        aisleOrder: [Aisle] = Aisle.allCases
+    ) {
         self.matcher = matcher
         self.pantryHave = pantryHave
+        self.pantryRestock = pantryRestock
         self.aisleOrder = aisleOrder
     }
 
@@ -167,6 +181,32 @@ struct ListGenerator {
                     isOptional: ingredient.isOptional
                 )
             }
+        }
+
+        // Rule 4, the half the pantry never got. A tracked item that is low or
+        // out joins the list whether or not anything this week asked for it,
+        // because the point of tracking something is that it gets replaced
+        // before it runs out.
+        //
+        // It carries no amount. The plan knows it needs 3 tbsp of olive oil;
+        // nobody knows how much olive oil a house needs, and a number invented
+        // here would be a worse answer than none. The row says buy some.
+        for id in pantryRestock {
+            let key = GroupKey.canonical(id)
+            // `have` wins, as it does in the meal loop above. The two sets are
+            // complementary where the store builds them, but this reads them as
+            // given and must not contradict rule 4 if they ever overlap.
+            guard !pantryHave.contains(id) else { continue }
+            // Already on the list because a meal called for it, with a real
+            // quantity attached. That row says more than this one would.
+            guard groups[key] == nil, let known = matcher.item(id: id) else { continue }
+            order.append(key)
+            groups[key] = Group(
+                canonicalItemID: id,
+                displayName: known.name,
+                aisle: known.aisle,
+                needsCategorising: false
+            )
         }
 
         // Section 4: manual items survive regeneration. When one names

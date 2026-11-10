@@ -361,4 +361,84 @@ final class ListGeneratorTests: XCTestCase {
         XCTAssertEqual(list.sections, [])
         XCTAssertEqual(list.items, [])
     }
+
+    // MARK: - Rule 4, the restocking half
+
+    private static func candidate(_ name: String) -> CanonicalCandidate {
+        candidates.first { $0.name == name }!
+    }
+
+    /// Section 4 says the generator includes `low` and `out`, and for a long
+    /// time it only excluded `have`. The pantry could take a row away and never
+    /// add one, so a staple nothing happened to call for this week ran out in
+    /// silence. That is the one the household notices.
+    func testALowStapleNoRecipeAskedForStillReachesTheList() {
+        let eggs = Self.candidate("eggs")
+        let list = ListGenerator(matcher: Self.matcher, pantryRestock: [eggs.id]).generate(plan: [])
+
+        XCTAssertEqual(list.items.count, 1, "the pantry asked for it, so it is on the list")
+        XCTAssertEqual(list.items.first?.displayName, "eggs")
+        XCTAssertEqual(list.items.first?.aisle, eggs.aisle, "it shops in its own aisle, not in other")
+        XCTAssertFalse(list.items.first?.isOptional == true, "running out is not optional")
+        XCTAssertFalse(list.items.first?.isManual == true, "the pantry produced it, not the shopper")
+    }
+
+    /// No quantity, on purpose. The plan knows it needs three tablespoons of
+    /// oil. Nobody knows how much oil a house needs, and a number invented here
+    /// would be a worse answer than none.
+    func testARestockedStapleCarriesNoQuantity() {
+        let oil = Self.candidate("olive oil")
+        let list = ListGenerator(matcher: Self.matcher, pantryRestock: [oil.id]).generate(plan: [])
+
+        XCTAssertEqual(list.items.first?.formatted, "", "buy some, not buy 1")
+        XCTAssertEqual(list.items.first?.quantities, [])
+    }
+
+    /// The recipe's row says more than the pantry's would, so the pantry does
+    /// not add a second one beside it.
+    func testARecipeAlreadyAskingForItWins() {
+        let eggs = Self.candidate("eggs")
+        let recipe = RecipeInput(id: UUID(), title: "Frittata", baseServings: 4, ingredients: [
+            IngredientInput(name: "eggs", quantity: 6, unit: .count, canonicalItemID: eggs.id),
+        ])
+        let list = ListGenerator(matcher: Self.matcher, pantryRestock: [eggs.id])
+            .generate(plan: [PlannedMealInput(recipe: recipe, servings: 4)])
+
+        XCTAssertEqual(list.items.count, 1, "one item, one line, however many things asked for it")
+        XCTAssertEqual(list.items.first?.formatted, "6", "the amount the cooking needs survives")
+    }
+
+    /// `pantryHave` and `pantryRestock` are complementary where the store builds
+    /// them, but the generator takes them as given and must not contradict
+    /// itself if they ever overlap.
+    func testHavingItBeatsRestockingIt() {
+        let eggs = Self.candidate("eggs")
+        let recipe = RecipeInput(id: UUID(), title: "Frittata", baseServings: 4, ingredients: [
+            IngredientInput(name: "eggs", quantity: 6, unit: .count, canonicalItemID: eggs.id),
+        ])
+        let list = ListGenerator(matcher: Self.matcher, pantryHave: [eggs.id], pantryRestock: [eggs.id])
+            .generate(plan: [PlannedMealInput(recipe: recipe, servings: 4)])
+
+        XCTAssertEqual(list.items, [], "we have them, so nothing to buy")
+    }
+
+    /// A pantry entry can outlive the canonical item it points at. That is a
+    /// blank row on the hero screen if it is not caught here.
+    func testAnUnknownRestockIDIsIgnored() {
+        let list = ListGenerator(matcher: Self.matcher, pantryRestock: [UUID()]).generate(plan: [])
+        XCTAssertEqual(list.items, [])
+    }
+
+    func testRestockedStaplesShopInTheWalkOrder() {
+        let order = Self.canonical.aisleOrder
+        let list = ListGenerator(
+            matcher: Self.matcher,
+            pantryRestock: [Self.candidate("eggs").id, Self.candidate("cucumber").id, Self.candidate("olive oil").id],
+            aisleOrder: order
+        ).generate(plan: [])
+
+        XCTAssertEqual(list.items.count, 3)
+        let positions = list.sections.map { order.firstIndex(of: $0.aisle) ?? -1 }
+        XCTAssertEqual(positions, positions.sorted(), "restocking walks the shop like everything else")
+    }
 }

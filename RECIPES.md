@@ -108,3 +108,9 @@ other phones in the household too.
 
 Seeded records claim `updatedAt` of epoch 0, the weakest possible claim, so
 anything anybody has actually edited always wins over a seeded default.
+
+Adding is the only thing that reaches an existing phone. `installRecipes` skips
+any recipe whose derived id is already in the store, so editing a recipe that
+has shipped changes nothing for anybody who already has it, and reusing its id
+for a different recipe does nothing at all. A changed recipe needs a new id,
+and a new id is a second recipe sitting beside the old one.

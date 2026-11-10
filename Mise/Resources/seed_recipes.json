@@ -4715,6 +4715,3004 @@
           ]
         }
       ]
+    },
+    {
+      "id": "seed-red-lentil-dal",
+      "title": "Red Lentil Dal",
+      "summary": "A pot of soft red lentils with warm spice that is better on day two and feeds a week of bowls.",
+      "sourceType": "builtIn",
+      "prepMinutes": 10,
+      "cookMinutes": 35,
+      "totalMinutes": 45,
+      "baseServings": 6,
+      "tags": [
+        "standby",
+        "make ahead",
+        "vegetarian",
+        "one pot",
+        "kid friendly",
+        "indian"
+      ],
+      "cookware": [
+        "large pot",
+        "saucepan"
+      ],
+      "ingredients": [
+        {
+          "name": "red lentils, rinsed",
+          "canonicalItem": "dried lentils",
+          "quantity": 2,
+          "unit": "cup"
+        },
+        {
+          "name": "yellow onion, diced",
+          "canonicalItem": "yellow onion",
+          "quantity": 1,
+          "unit": "count"
+        },
+        {
+          "name": "garlic, minced",
+          "canonicalItem": "garlic",
+          "quantity": 4,
+          "unit": "clove"
+        },
+        {
+          "name": "ginger, grated",
+          "canonicalItem": "ginger",
+          "quantity": 1,
+          "unit": "tbsp"
+        },
+        {
+          "name": "canned diced tomatoes",
+          "canonicalItem": "canned diced tomatoes",
+          "quantity": 1,
+          "unit": "can"
+        },
+        {
+          "name": "ground turmeric",
+          "canonicalItem": "turmeric",
+          "quantity": 1,
+          "unit": "tsp"
+        },
+        {
+          "name": "ground cumin",
+          "canonicalItem": "cumin",
+          "quantity": 2,
+          "unit": "tsp"
+        },
+        {
+          "name": "garam masala",
+          "canonicalItem": "garam masala",
+          "quantity": 1.5,
+          "unit": "tsp"
+        },
+        {
+          "name": "red pepper flakes",
+          "canonicalItem": "red pepper flakes",
+          "quantity": 0.25,
+          "unit": "tsp",
+          "isOptional": true
+        },
+        {
+          "name": "vegetable broth",
+          "canonicalItem": "vegetable broth",
+          "quantity": 6,
+          "unit": "cup"
+        },
+        {
+          "name": "kosher salt",
+          "canonicalItem": "kosher salt",
+          "quantity": 1.5,
+          "unit": "tsp"
+        },
+        {
+          "name": "olive oil",
+          "canonicalItem": "olive oil",
+          "quantity": 2,
+          "unit": "tbsp"
+        },
+        {
+          "name": "unsalted butter",
+          "canonicalItem": "butter",
+          "quantity": 2,
+          "unit": "tbsp"
+        },
+        {
+          "name": "lemon",
+          "canonicalItem": "lemon",
+          "quantity": 1,
+          "unit": "count"
+        },
+        {
+          "name": "basmati rice",
+          "canonicalItem": "basmati rice",
+          "quantity": 1.5,
+          "unit": "cup"
+        },
+        {
+          "name": "cilantro, chopped",
+          "canonicalItem": "cilantro",
+          "quantity": 0.25,
+          "unit": "cup",
+          "isOptional": true
+        },
+        {
+          "name": "scallions, sliced",
+          "canonicalItem": "scallions",
+          "quantity": 2,
+          "unit": "count",
+          "isOptional": true
+        },
+        {
+          "name": "plain yogurt",
+          "canonicalItem": "plain yogurt",
+          "quantity": 1,
+          "unit": "cup",
+          "isOptional": true
+        },
+        {
+          "name": "naan",
+          "canonicalItem": "naan",
+          "quantity": 1,
+          "unit": "package",
+          "isOptional": true
+        }
+      ],
+      "steps": [
+        {
+          "text": "Rinse the lentils in a few changes of cold water until the water stops going cloudy, then drain them. This is the difference between dal that tastes clean and dal that tastes dusty.",
+          "ingredientRefs": [
+            "dried lentils"
+          ]
+        },
+        {
+          "text": "Warm the oil in a large pot over medium heat and cook the onion until it is soft and starting to brown at the edges, about 8 minutes. Browning here is most of the flavor, so give it the time.",
+          "ingredientRefs": [
+            "olive oil",
+            "yellow onion"
+          ],
+          "timerSeconds": 480
+        },
+        {
+          "text": "Add the garlic and ginger and stir for a minute, until the raw edge is gone.",
+          "ingredientRefs": [
+            "garlic",
+            "ginger"
+          ],
+          "timerSeconds": 60
+        },
+        {
+          "text": "Add the turmeric, cumin, garam masala, and pepper flakes and stir them in the hot oil for about 30 seconds, until they smell toasted. Keep them moving so they do not catch and turn bitter.",
+          "ingredientRefs": [
+            "turmeric",
+            "cumin",
+            "garam masala",
+            "red pepper flakes"
+          ],
+          "timerSeconds": 30
+        },
+        {
+          "text": "Add the tomatoes and cook them down for 4 or 5 minutes, until the mixture is thick and jammy and no longer smells like a tin.",
+          "ingredientRefs": [
+            "canned diced tomatoes"
+          ],
+          "timerSeconds": 270
+        },
+        {
+          "text": "Add the lentils, the broth, and the salt. Bring it to a boil, then turn it down to a low simmer and leave it partly covered for 25 minutes, stirring now and then so nothing sticks to the bottom. It is done when the lentils have given up their shape entirely.",
+          "ingredientRefs": [
+            "dried lentils",
+            "vegetable broth",
+            "kosher salt"
+          ],
+          "timerSeconds": 1500
+        },
+        {
+          "text": "While it simmers, cook the rice however you usually do, in a saucepan with twice its volume of water.",
+          "ingredientRefs": [
+            "basmati rice"
+          ]
+        },
+        {
+          "text": "Stir the butter into the dal off the heat, then squeeze in half the lemon and taste for salt. Loosen it with a splash of water if it is thicker than you want, or simmer it uncovered a few minutes if it is thinner. A spoonful of olive oil in place of the butter keeps it vegan.",
+          "ingredientRefs": [
+            "butter",
+            "lemon",
+            "olive oil"
+          ]
+        },
+        {
+          "text": "Serve it as parts rather than as plates: rice and a ladle of dal in each bowl, and the yogurt, cilantro, scallions, remaining lemon in wedges, and warm naan set out for people to add themselves. Plain dal over plain rice is a complete dinner for whoever wants it that way.",
+          "ingredientRefs": [
+            "basmati rice",
+            "plain yogurt",
+            "cilantro",
+            "scallions",
+            "lemon",
+            "naan"
+          ]
+        },
+        {
+          "text": "It keeps 5 days covered in the fridge and is better on the second day, once the spices have settled. It sets thick when cold, so reheat it in a pot over low heat with a splash of water, stirring until it is loose again, and wake it up with fresh lemon. It also freezes for 3 months in meal-sized containers; thaw overnight in the fridge, or reheat straight from frozen over low heat with a little extra water and a lid.",
+          "ingredientRefs": [
+            "lemon"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "seed-everything-frittata",
+      "title": "Frittata",
+      "summary": "Eggs, whatever vegetable is going, and a cheese, set in a skillet and finished in the oven. As good cold as warm.",
+      "sourceType": "builtIn",
+      "prepMinutes": 8,
+      "cookMinutes": 20,
+      "totalMinutes": 28,
+      "baseServings": 4,
+      "tags": [
+        "standby",
+        "make ahead",
+        "vegetarian",
+        "under 30",
+        "one pan",
+        "kid friendly"
+      ],
+      "cookware": [
+        "large skillet",
+        "mixing bowl"
+      ],
+      "ingredients": [
+        {
+          "name": "eggs",
+          "canonicalItem": "eggs",
+          "quantity": 8,
+          "unit": "count"
+        },
+        {
+          "name": "milk",
+          "canonicalItem": "milk",
+          "quantity": 0.25,
+          "unit": "cup"
+        },
+        {
+          "name": "cheddar, grated",
+          "canonicalItem": "cheddar",
+          "quantity": 1,
+          "unit": "cup"
+        },
+        {
+          "name": "zucchini, sliced thin",
+          "canonicalItem": "zucchini",
+          "quantity": 2,
+          "unit": "count"
+        },
+        {
+          "name": "yellow onion, sliced thin",
+          "canonicalItem": "yellow onion",
+          "quantity": 1,
+          "unit": "count"
+        },
+        {
+          "name": "olive oil",
+          "canonicalItem": "olive oil",
+          "quantity": 2,
+          "unit": "tbsp"
+        },
+        {
+          "name": "kosher salt",
+          "canonicalItem": "kosher salt",
+          "quantity": 1,
+          "unit": "tsp"
+        },
+        {
+          "name": "black pepper",
+          "canonicalItem": "black pepper",
+          "quantity": 0.5,
+          "unit": "tsp"
+        },
+        {
+          "name": "parsley, chopped",
+          "canonicalItem": "parsley",
+          "quantity": 0.25,
+          "unit": "cup"
+        },
+        {
+          "name": "salami, sliced thin",
+          "canonicalItem": "salami",
+          "quantity": 4,
+          "unit": "oz",
+          "isOptional": true
+        }
+      ],
+      "steps": [
+        {
+          "text": "Heat the oven to 375F with a rack in the middle.",
+          "ingredientRefs": []
+        },
+        {
+          "text": "Beat the eggs with the milk, the salt, and plenty of pepper until the yolks and whites are one color, then stir in two thirds of the cheese. Any firm cheese that melts works here, and a hard grating cheese works too.",
+          "ingredientRefs": [
+            "eggs",
+            "milk",
+            "kosher salt",
+            "black pepper",
+            "cheddar"
+          ]
+        },
+        {
+          "text": "Warm the oil in a ten inch oven safe skillet over medium heat and cook the onion with a pinch of salt until soft and sweet, about 5 minutes.",
+          "ingredientRefs": [
+            "olive oil",
+            "yellow onion",
+            "kosher salt"
+          ],
+          "timerSeconds": 300
+        },
+        {
+          "text": "Add the zucchini and cook until it has given up its water and the pan looks dry again, about 6 minutes. Whatever vegetable is in the drawer goes here instead: spinach wilted and squeezed hard, leftover roasted vegetables, cooked potato in cubes, halved cherry tomatoes. The only rule is that it goes in cooked and dry, because raw wet vegetables make a weepy frittata.",
+          "ingredientRefs": [
+            "zucchini"
+          ],
+          "timerSeconds": 360
+        },
+        {
+          "text": "Spread the vegetables level, pour the eggs over, and leave the pan alone for two minutes, until the edge has begun to set.",
+          "ingredientRefs": [
+            "eggs",
+            "zucchini"
+          ],
+          "timerSeconds": 120
+        },
+        {
+          "text": "Scatter the rest of the cheese over the top and slide the skillet into the oven. Bake until the middle is just set and barely trembles when you nudge the handle, 10 to 14 minutes. Pull it while the center still looks a shade underdone; it firms up as it rests.",
+          "ingredientRefs": [
+            "cheddar"
+          ],
+          "timerSeconds": 720
+        },
+        {
+          "text": "Rest it 5 minutes, run a spatula around the edge, and slide it onto a board to cut into wedges. Scatter the parsley. Put the salami on its own plate so whoever wants it can lay it over their own slice.",
+          "ingredientRefs": [
+            "parsley",
+            "salami"
+          ],
+          "timerSeconds": 300
+        },
+        {
+          "text": "Cooled and wrapped, it keeps four days in the fridge and is genuinely good cold, straight from it, which is the whole reason to make a big one. To warm a wedge, give it 10 minutes in a 300F oven or two minutes in a dry covered skillet over low heat. The microwave turns it rubbery.",
+          "ingredientRefs": []
+        }
+      ]
+    },
+    {
+      "id": "seed-chana-masala",
+      "title": "Chana Masala",
+      "summary": "Chickpeas simmered down in a deeply cooked onion and tomato masala, better on day two and built to be spooned over rice at the table.",
+      "sourceType": "builtIn",
+      "prepMinutes": 10,
+      "cookMinutes": 40,
+      "totalMinutes": 50,
+      "baseServings": 6,
+      "tags": [
+        "standby",
+        "make ahead",
+        "vegetarian",
+        "under 60",
+        "one pot",
+        "kid friendly",
+        "indian"
+      ],
+      "cookware": [
+        "large pot",
+        "saucepan"
+      ],
+      "ingredients": [
+        {
+          "name": "canned chickpeas, rinsed",
+          "canonicalItem": "canned chickpeas",
+          "quantity": 3,
+          "unit": "can"
+        },
+        {
+          "name": "yellow onion, finely diced",
+          "canonicalItem": "yellow onion",
+          "quantity": 2,
+          "unit": "count"
+        },
+        {
+          "name": "garlic, minced",
+          "canonicalItem": "garlic",
+          "quantity": 4,
+          "unit": "clove"
+        },
+        {
+          "name": "ginger, grated",
+          "canonicalItem": "ginger",
+          "quantity": 1,
+          "unit": "tbsp"
+        },
+        {
+          "name": "canned diced tomatoes",
+          "canonicalItem": "canned diced tomatoes",
+          "quantity": 1,
+          "unit": "can"
+        },
+        {
+          "name": "tomato paste",
+          "canonicalItem": "tomato paste",
+          "quantity": 1,
+          "unit": "tbsp"
+        },
+        {
+          "name": "vegetable oil",
+          "canonicalItem": "vegetable oil",
+          "quantity": 3,
+          "unit": "tbsp"
+        },
+        {
+          "name": "cumin",
+          "canonicalItem": "cumin",
+          "quantity": 2,
+          "unit": "tsp"
+        },
+        {
+          "name": "coriander",
+          "canonicalItem": "coriander",
+          "quantity": 2,
+          "unit": "tsp"
+        },
+        {
+          "name": "turmeric",
+          "canonicalItem": "turmeric",
+          "quantity": 1,
+          "unit": "tsp"
+        },
+        {
+          "name": "garam masala",
+          "canonicalItem": "garam masala",
+          "quantity": 2,
+          "unit": "tsp"
+        },
+        {
+          "name": "cayenne",
+          "canonicalItem": "cayenne",
+          "quantity": 0.25,
+          "unit": "tsp",
+          "isOptional": true
+        },
+        {
+          "name": "kosher salt",
+          "canonicalItem": "kosher salt",
+          "quantity": 1.5,
+          "unit": "tsp"
+        },
+        {
+          "name": "basmati rice",
+          "canonicalItem": "basmati rice",
+          "quantity": 2,
+          "unit": "cup"
+        },
+        {
+          "name": "lemon, cut into wedges",
+          "canonicalItem": "lemon",
+          "quantity": 1,
+          "unit": "count"
+        },
+        {
+          "name": "cilantro, chopped",
+          "canonicalItem": "cilantro",
+          "quantity": 0.5,
+          "unit": "bunch",
+          "isOptional": true
+        },
+        {
+          "name": "plain yogurt",
+          "canonicalItem": "plain yogurt",
+          "quantity": 1,
+          "unit": "cup",
+          "isOptional": true
+        },
+        {
+          "name": "naan",
+          "canonicalItem": "naan",
+          "quantity": 1,
+          "unit": "package",
+          "isOptional": true
+        }
+      ],
+      "steps": [
+        {
+          "text": "Warm the oil in a large pot over medium heat and cook the onion with a pinch of the salt, stirring now and then, until it is soft and the edges have gone properly brown, 12 to 15 minutes. This browning is where most of the flavor comes from, so give it the time rather than rushing to the spices.",
+          "ingredientRefs": [
+            "vegetable oil",
+            "yellow onion",
+            "kosher salt"
+          ],
+          "timerSeconds": 840
+        },
+        {
+          "text": "Add the garlic and ginger and stir for a minute, until the raw smell is gone.",
+          "ingredientRefs": [
+            "garlic",
+            "ginger"
+          ],
+          "timerSeconds": 60
+        },
+        {
+          "text": "Add the cumin, coriander, turmeric, and the cayenne if you want heat. Stir them into the oil for about 30 seconds so they toast rather than steam.",
+          "ingredientRefs": [
+            "cumin",
+            "coriander",
+            "turmeric",
+            "cayenne"
+          ],
+          "timerSeconds": 30
+        },
+        {
+          "text": "Stir in the tomato paste, then the tomatoes and the rest of the salt. Cook at a lively simmer until the mixture darkens and pulls together and you can see the oil coming back out at the edges, 8 to 10 minutes.",
+          "ingredientRefs": [
+            "tomato paste",
+            "canned diced tomatoes",
+            "kosher salt"
+          ],
+          "timerSeconds": 540
+        },
+        {
+          "text": "Add the chickpeas and a cup of water. Simmer uncovered for 15 minutes, then crush a ladleful of the chickpeas against the side of the pot and stir them back in, which thickens the whole thing without any cream.",
+          "ingredientRefs": [
+            "canned chickpeas"
+          ],
+          "timerSeconds": 900
+        },
+        {
+          "text": "Cook the rice by the package directions while the chickpeas simmer.",
+          "ingredientRefs": [
+            "basmati rice"
+          ]
+        },
+        {
+          "text": "Off the heat, stir in the garam masala and a squeeze of lemon. Taste for salt, and add more lemon until it tastes bright rather than flat.",
+          "ingredientRefs": [
+            "garam masala",
+            "lemon"
+          ]
+        },
+        {
+          "text": "Put the pot, the rice, and the cilantro, yogurt, lemon wedges, and warmed naan out separately so everyone builds their own plate.",
+          "ingredientRefs": [
+            "basmati rice",
+            "cilantro",
+            "plain yogurt",
+            "lemon",
+            "naan"
+          ]
+        },
+        {
+          "text": "Cooled and covered, it keeps five days in the fridge and is better on day two. Reheat in a pot over low heat with a splash of water to loosen it, stirring until it is hot through, about 8 minutes, and finish with fresh lemon.",
+          "ingredientRefs": [
+            "lemon"
+          ],
+          "timerSeconds": 480
+        }
+      ]
+    },
+    {
+      "id": "seed-white-bean-kale-soup",
+      "title": "White Bean and Kale Soup",
+      "summary": "A pot of beans and greens that is better on day two and asks nothing of you on the night you eat it.",
+      "sourceType": "builtIn",
+      "prepMinutes": 15,
+      "cookMinutes": 35,
+      "totalMinutes": 50,
+      "baseServings": 6,
+      "tags": [
+        "standby",
+        "make ahead",
+        "vegetarian",
+        "soup",
+        "one pot",
+        "kid friendly"
+      ],
+      "cookware": [
+        "large pot",
+        "skillet"
+      ],
+      "ingredients": [
+        {
+          "name": "canned cannellini beans, drained and rinsed",
+          "canonicalItem": "canned cannellini beans",
+          "quantity": 3,
+          "unit": "can"
+        },
+        {
+          "name": "kale, stems stripped and leaves torn",
+          "canonicalItem": "kale",
+          "quantity": 1,
+          "unit": "bunch"
+        },
+        {
+          "name": "yellow onion, diced",
+          "canonicalItem": "yellow onion",
+          "quantity": 1,
+          "unit": "count"
+        },
+        {
+          "name": "carrot, diced small",
+          "canonicalItem": "carrot",
+          "quantity": 2,
+          "unit": "count"
+        },
+        {
+          "name": "celery, diced small",
+          "canonicalItem": "celery",
+          "quantity": 2,
+          "unit": "count"
+        },
+        {
+          "name": "garlic, thinly sliced",
+          "canonicalItem": "garlic",
+          "quantity": 4,
+          "unit": "clove"
+        },
+        {
+          "name": "vegetable broth",
+          "canonicalItem": "vegetable broth",
+          "quantity": 6,
+          "unit": "cup"
+        },
+        {
+          "name": "parmesan, a rind if there is one and the rest grated for the table",
+          "canonicalItem": "parmesan",
+          "quantity": 3,
+          "unit": "oz"
+        },
+        {
+          "name": "olive oil",
+          "canonicalItem": "olive oil",
+          "quantity": 3,
+          "unit": "tbsp"
+        },
+        {
+          "name": "bay leaves",
+          "canonicalItem": "bay leaves",
+          "quantity": 2,
+          "unit": "count"
+        },
+        {
+          "name": "dried thyme",
+          "canonicalItem": "dried thyme",
+          "quantity": 1,
+          "unit": "tsp"
+        },
+        {
+          "name": "red pepper flakes",
+          "canonicalItem": "red pepper flakes",
+          "quantity": 0.5,
+          "unit": "tsp"
+        },
+        {
+          "name": "kosher salt",
+          "canonicalItem": "kosher salt",
+          "quantity": 1.5,
+          "unit": "tsp"
+        },
+        {
+          "name": "black pepper",
+          "canonicalItem": "black pepper",
+          "quantity": 0.5,
+          "unit": "tsp"
+        },
+        {
+          "name": "lemon, cut into wedges",
+          "canonicalItem": "lemon",
+          "quantity": 1,
+          "unit": "count"
+        },
+        {
+          "name": "sourdough loaf",
+          "canonicalItem": "sourdough loaf",
+          "quantity": 1,
+          "unit": "count"
+        },
+        {
+          "name": "italian sausage, for whoever wants it",
+          "canonicalItem": "italian sausage",
+          "quantity": 0.5,
+          "unit": "lb",
+          "isOptional": true
+        }
+      ],
+      "steps": [
+        {
+          "text": "Warm the oil in a large pot over medium heat and cook the onion, carrot, and celery with a pinch of the salt until they are soft and sweet, about 10 minutes. This slow start is where the broth gets its body, so do not hurry it.",
+          "ingredientRefs": [
+            "olive oil",
+            "yellow onion",
+            "carrot",
+            "celery",
+            "kosher salt"
+          ],
+          "timerSeconds": 600
+        },
+        {
+          "text": "Add the garlic, thyme, and red pepper flakes and stir for a minute, until the garlic smells like something you want to eat but has taken no color.",
+          "ingredientRefs": [
+            "garlic",
+            "dried thyme",
+            "red pepper flakes"
+          ],
+          "timerSeconds": 60
+        },
+        {
+          "text": "Tip in the beans and the broth, drop in the bay leaves and the parmesan rind if you have one, and bring it to a gentle simmer. Cook 20 minutes, which is long enough for the rind to give up its salt and the beans to stop tasting of the tin.",
+          "ingredientRefs": [
+            "canned cannellini beans",
+            "vegetable broth",
+            "bay leaves",
+            "parmesan"
+          ],
+          "timerSeconds": 1200
+        },
+        {
+          "text": "Crush a ladleful of the beans against the side of the pot and stir them back in. That is the whole thickening trick, and it works better than flour or cream because it tastes of the soup.",
+          "ingredientRefs": [
+            "canned cannellini beans"
+          ]
+        },
+        {
+          "text": "Stir in the kale and simmer until it is tender but still dark green, about 5 minutes. Fish out the bay leaves and the rind, then taste and correct with the rest of the salt and the pepper.",
+          "ingredientRefs": [
+            "kale",
+            "bay leaves",
+            "parmesan",
+            "kosher salt",
+            "black pepper"
+          ],
+          "timerSeconds": 300
+        },
+        {
+          "text": "If anyone wants the sausage, brown it in a skillet while the soup finishes, break it up, and keep it in its own bowl so it never touches the pot.",
+          "ingredientRefs": [
+            "italian sausage"
+          ],
+          "timerSeconds": 480
+        },
+        {
+          "text": "Put the pot on the table with the grated parmesan, the lemon wedges, bread, and the sausage all in separate bowls, and let everybody finish their own. A child who wants beans and broth and nothing green can have exactly that, and the lemon is what makes an adult bowl taste bright rather than worthy.",
+          "ingredientRefs": [
+            "parmesan",
+            "lemon",
+            "sourdough loaf",
+            "italian sausage"
+          ]
+        },
+        {
+          "text": "It keeps five days in the fridge and is better on the second, once the starch has thickened the broth. Reheat it gently on the stove with a splash of water or broth, since it sets up overnight. It freezes for three months: freeze it before the kale goes in if you are planning ahead, or accept softer kale later.",
+          "ingredientRefs": [
+            "kale",
+            "vegetable broth"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "seed-baked-ziti",
+      "title": "Baked Ziti",
+      "summary": "Pasta, marinara, and three cheeses layered in a dish that can wait two days in the fridge before it ever sees the oven.",
+      "sourceType": "builtIn",
+      "prepMinutes": 20,
+      "cookMinutes": 50,
+      "totalMinutes": 70,
+      "baseServings": 6,
+      "tags": [
+        "standby",
+        "make ahead",
+        "vegetarian",
+        "pasta",
+        "baked",
+        "kid friendly"
+      ],
+      "cookware": [
+        "large pot",
+        "large skillet",
+        "mixing bowl",
+        "baking dish"
+      ],
+      "ingredients": [
+        {
+          "name": "ziti or penne",
+          "canonicalItem": "penne",
+          "quantity": 1,
+          "unit": "lb"
+        },
+        {
+          "name": "marinara sauce",
+          "canonicalItem": "marinara sauce",
+          "quantity": 32,
+          "unit": "oz"
+        },
+        {
+          "name": "ricotta",
+          "canonicalItem": "ricotta",
+          "quantity": 15,
+          "unit": "oz"
+        },
+        {
+          "name": "mozzarella, shredded",
+          "canonicalItem": "shredded mozzarella",
+          "quantity": 12,
+          "unit": "oz"
+        },
+        {
+          "name": "parmesan, grated",
+          "canonicalItem": "parmesan",
+          "quantity": 0.75,
+          "unit": "cup"
+        },
+        {
+          "name": "egg",
+          "canonicalItem": "eggs",
+          "quantity": 1,
+          "unit": "count"
+        },
+        {
+          "name": "garlic, minced",
+          "canonicalItem": "garlic",
+          "quantity": 3,
+          "unit": "clove"
+        },
+        {
+          "name": "olive oil",
+          "canonicalItem": "olive oil",
+          "quantity": 2,
+          "unit": "tbsp"
+        },
+        {
+          "name": "dried oregano",
+          "canonicalItem": "dried oregano",
+          "quantity": 1,
+          "unit": "tsp"
+        },
+        {
+          "name": "red pepper flakes",
+          "canonicalItem": "red pepper flakes",
+          "quantity": 1,
+          "unit": "pinch"
+        },
+        {
+          "name": "basil, torn",
+          "canonicalItem": "basil",
+          "quantity": 0.5,
+          "unit": "cup"
+        },
+        {
+          "name": "kosher salt",
+          "canonicalItem": "kosher salt",
+          "quantity": 1.5,
+          "unit": "tsp"
+        },
+        {
+          "name": "black pepper",
+          "canonicalItem": "black pepper",
+          "quantity": 0.5,
+          "unit": "tsp"
+        },
+        {
+          "name": "italian sausage, browned in its own pan",
+          "canonicalItem": "italian sausage",
+          "quantity": 0.5,
+          "unit": "lb",
+          "isOptional": true
+        }
+      ],
+      "steps": [
+        {
+          "text": "Boil the pasta in well salted water, but pull it two minutes before it is tender. It finishes cooking in the sauce in the oven, and pasta boiled all the way goes soft there. Drain it and toss it with a spoonful of the oil so it does not set into a block.",
+          "ingredientRefs": [
+            "penne",
+            "kosher salt",
+            "olive oil"
+          ],
+          "timerSeconds": 420
+        },
+        {
+          "text": "Warm the rest of the oil in a skillet with the garlic and the red pepper flakes until the garlic smells sweet, about a minute, then pour in the marinara with the oregano and let it bubble gently for five minutes. This is what makes a jar of sauce taste like someone cooked it.",
+          "ingredientRefs": [
+            "olive oil",
+            "garlic",
+            "red pepper flakes",
+            "marinara sauce",
+            "dried oregano"
+          ],
+          "timerSeconds": 300
+        },
+        {
+          "text": "In a bowl, beat the ricotta with the egg, half the parmesan, the salt, the pepper, and half the basil. The egg is what keeps the ricotta in soft pockets instead of letting it run out into the sauce.",
+          "ingredientRefs": [
+            "ricotta",
+            "eggs",
+            "parmesan",
+            "kosher salt",
+            "black pepper",
+            "basil"
+          ]
+        },
+        {
+          "text": "Stir most of the sauce through the drained pasta, keeping about a cup back.",
+          "ingredientRefs": [
+            "marinara sauce",
+            "penne"
+          ]
+        },
+        {
+          "text": "Spread a thin layer of the reserved sauce in the baking dish. Add half the pasta, drop half the ricotta over it in spoonfuls, and scatter on a third of the mozzarella. Repeat with the rest of the pasta and ricotta, then spread the last of the sauce on top and finish with the remaining mozzarella and parmesan.",
+          "ingredientRefs": [
+            "marinara sauce",
+            "penne",
+            "ricotta",
+            "shredded mozzarella",
+            "parmesan"
+          ]
+        },
+        {
+          "text": "For the one who wants meat, brown the sausage in its own pan, break it up, and keep it in a bowl on the table to spoon over a plate. Leaving it out of the dish means everyone can eat the same pan.",
+          "ingredientRefs": [
+            "italian sausage"
+          ]
+        },
+        {
+          "text": "Cover the dish with foil and bake at 375F for 25 minutes, then uncover and bake another 15 until the edges bubble and the top has brown spots. Let it sit for 10 minutes before cutting or the first serving slides apart. Scatter the rest of the basil over the top.",
+          "ingredientRefs": [
+            "basil"
+          ],
+          "timerSeconds": 1500
+        },
+        {
+          "text": "To make it ahead, stop after the layering: covered tightly, the unbaked dish keeps two days in the fridge, and goes into the oven straight from cold with 15 minutes added to the covered time. Baked, it keeps four days covered in the fridge and three months frozen. Reheat a portion covered at 350F for about 20 minutes, or in the microwave with a spoonful of water over it to bring the steam back.",
+          "ingredientRefs": []
+        }
+      ]
+    },
+    {
+      "id": "seed-shakshuka-make-ahead",
+      "title": "Make-Ahead Shakshuka",
+      "summary": "A pepper and tomato base that keeps a week in the fridge, so dinner is eight minutes of poaching eggs.",
+      "sourceType": "builtIn",
+      "prepMinutes": 10,
+      "cookMinutes": 35,
+      "totalMinutes": 45,
+      "baseServings": 4,
+      "tags": [
+        "standby",
+        "make ahead",
+        "vegetarian",
+        "one pan",
+        "kid friendly"
+      ],
+      "cookware": [
+        "large skillet",
+        "skillet"
+      ],
+      "ingredients": [
+        {
+          "name": "olive oil",
+          "canonicalItem": "olive oil",
+          "quantity": 3,
+          "unit": "tbsp"
+        },
+        {
+          "name": "yellow onion, diced",
+          "canonicalItem": "yellow onion",
+          "quantity": 1,
+          "unit": "count"
+        },
+        {
+          "name": "red bell peppers, diced",
+          "canonicalItem": "bell pepper",
+          "quantity": 2,
+          "unit": "count"
+        },
+        {
+          "name": "garlic, thinly sliced",
+          "canonicalItem": "garlic",
+          "quantity": 4,
+          "unit": "clove"
+        },
+        {
+          "name": "cumin",
+          "canonicalItem": "cumin",
+          "quantity": 2,
+          "unit": "tsp"
+        },
+        {
+          "name": "smoked paprika",
+          "canonicalItem": "smoked paprika",
+          "quantity": 1.5,
+          "unit": "tsp"
+        },
+        {
+          "name": "red pepper flakes",
+          "canonicalItem": "red pepper flakes",
+          "quantity": 0.25,
+          "unit": "tsp"
+        },
+        {
+          "name": "tomato paste",
+          "canonicalItem": "tomato paste",
+          "quantity": 2,
+          "unit": "tbsp"
+        },
+        {
+          "name": "canned crushed tomatoes",
+          "canonicalItem": "canned crushed tomatoes",
+          "quantity": 1,
+          "unit": "can"
+        },
+        {
+          "name": "kosher salt",
+          "canonicalItem": "kosher salt",
+          "quantity": 1.5,
+          "unit": "tsp"
+        },
+        {
+          "name": "black pepper",
+          "canonicalItem": "black pepper",
+          "quantity": 0.5,
+          "unit": "tsp"
+        },
+        {
+          "name": "eggs",
+          "canonicalItem": "eggs",
+          "quantity": 8,
+          "unit": "count"
+        },
+        {
+          "name": "feta, crumbled",
+          "canonicalItem": "feta",
+          "quantity": 4,
+          "unit": "oz"
+        },
+        {
+          "name": "parsley, chopped",
+          "canonicalItem": "parsley",
+          "quantity": 0.25,
+          "unit": "bunch"
+        },
+        {
+          "name": "baguette",
+          "canonicalItem": "baguette",
+          "quantity": 1,
+          "unit": "count"
+        },
+        {
+          "name": "chorizo, sliced",
+          "canonicalItem": "chorizo",
+          "quantity": 4,
+          "unit": "oz",
+          "isOptional": true
+        }
+      ],
+      "steps": [
+        {
+          "text": "Cook the onion and peppers in the olive oil in a large skillet over medium heat until they slump and pick up a little color, 12 to 15 minutes. The slow start is the whole difference between this and a jar of tomato sauce, so give it the time.",
+          "ingredientRefs": [
+            "yellow onion",
+            "bell pepper",
+            "olive oil"
+          ],
+          "timerSeconds": 840
+        },
+        {
+          "text": "Stir in the garlic, cumin, smoked paprika, and pepper flakes and cook for a minute, until they smell toasted rather than dusty. Add the tomato paste and keep stirring until it darkens a shade.",
+          "ingredientRefs": [
+            "garlic",
+            "cumin",
+            "smoked paprika",
+            "red pepper flakes",
+            "tomato paste"
+          ],
+          "timerSeconds": 120
+        },
+        {
+          "text": "Add the crushed tomatoes, the salt, and the pepper. Simmer until the sauce holds its shape on a spoon instead of running off it, 15 to 20 minutes, then taste it and salt it again if it needs it.",
+          "ingredientRefs": [
+            "canned crushed tomatoes",
+            "kosher salt",
+            "black pepper"
+          ],
+          "timerSeconds": 1020
+        },
+        {
+          "text": "This is where the recipe is meant to stop. Cool the base and put it in a jar in the fridge, and a busy night later this week is eight minutes of work instead of forty. Doubling the base costs nothing but a bigger pan, so do that while the board is already dirty.",
+          "ingredientRefs": []
+        },
+        {
+          "text": "To eat: bring the base back to a lively simmer in a wide skillet, loosening it with a splash of water if the fridge has stiffened it. It should be bubbling before the eggs go anywhere near it.",
+          "ingredientRefs": []
+        },
+        {
+          "text": "Make eight shallow wells with the back of a spoon and crack an egg into each. Salt the tops, cover the pan, and cook over low heat until the whites set and the yolks still wobble, about 8 minutes. Pull them a shade early, because the hot sauce keeps cooking them at the table.",
+          "ingredientRefs": [
+            "eggs",
+            "kosher salt"
+          ],
+          "timerSeconds": 480
+        },
+        {
+          "text": "Brown the chorizo in a small dry skillet and tip it into its own bowl, for whoever wants it on their plate.",
+          "ingredientRefs": [
+            "chorizo"
+          ]
+        },
+        {
+          "text": "Take the pan to the table with the feta, the parsley, and torn bread in separate bowls, so everyone lifts out their own egg and adds only what they want. The base keeps a week in the fridge and three months frozen, and it is better on day two than day one. Reheat it covered over medium heat with a splash of water until it bubbles, then poach fresh eggs into it. Poached eggs do not keep, so only crack as many as the table will eat.",
+          "ingredientRefs": [
+            "feta",
+            "parsley",
+            "baguette"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "seed-abendbrot",
+      "title": "Abendbrot",
+      "summary": "Bread, cheese, eggs and cold vegetables, all of it on the table at once so everyone builds their own supper. Five minutes of arranging and no heat at all.",
+      "sourceType": "builtIn",
+      "prepMinutes": 5,
+      "cookMinutes": 0,
+      "totalMinutes": 5,
+      "baseServings": 4,
+      "tags": [
+        "standby",
+        "assemble",
+        "vegetarian",
+        "no cook",
+        "under 20",
+        "kid friendly"
+      ],
+      "cookware": [],
+      "ingredients": [
+        {
+          "name": "sourdough loaf",
+          "canonicalItem": "sourdough loaf",
+          "quantity": 1,
+          "unit": "count"
+        },
+        {
+          "name": "butter, soft enough to spread",
+          "canonicalItem": "butter",
+          "quantity": 4,
+          "unit": "oz"
+        },
+        {
+          "name": "gouda, sliced thin",
+          "canonicalItem": "gouda",
+          "quantity": 8,
+          "unit": "oz"
+        },
+        {
+          "name": "cream cheese",
+          "canonicalItem": "cream cheese",
+          "quantity": 8,
+          "unit": "oz"
+        },
+        {
+          "name": "chives, snipped",
+          "canonicalItem": "chives",
+          "quantity": 1,
+          "unit": "bunch"
+        },
+        {
+          "name": "cucumber, in coins",
+          "canonicalItem": "cucumber",
+          "quantity": 1,
+          "unit": "count"
+        },
+        {
+          "name": "radishes, trimmed and halved",
+          "canonicalItem": "radish",
+          "quantity": 1,
+          "unit": "bunch"
+        },
+        {
+          "name": "tomatoes, sliced thick",
+          "canonicalItem": "tomato",
+          "quantity": 3,
+          "unit": "count"
+        },
+        {
+          "name": "pickles",
+          "canonicalItem": "pickles",
+          "quantity": 8,
+          "unit": "oz"
+        },
+        {
+          "name": "eggs, hard boiled",
+          "canonicalItem": "eggs",
+          "quantity": 6,
+          "unit": "count"
+        },
+        {
+          "name": "whole grain mustard",
+          "canonicalItem": "whole grain mustard",
+          "quantity": 2,
+          "unit": "tbsp"
+        },
+        {
+          "name": "kosher salt",
+          "canonicalItem": "kosher salt",
+          "quantity": 1,
+          "unit": "tsp"
+        },
+        {
+          "name": "black pepper",
+          "canonicalItem": "black pepper",
+          "quantity": 0.5,
+          "unit": "tsp"
+        },
+        {
+          "name": "salami, sliced",
+          "canonicalItem": "salami",
+          "quantity": 4,
+          "unit": "oz",
+          "isOptional": true
+        },
+        {
+          "name": "deli ham, sliced",
+          "canonicalItem": "deli ham",
+          "quantity": 4,
+          "unit": "oz",
+          "isOptional": true
+        }
+      ],
+      "steps": [
+        {
+          "text": "Take the butter out of the fridge before anything else so it is spreadable by the time you sit down. Cold butter tears the bread, and the bread is the floor the whole meal stands on.",
+          "ingredientRefs": [
+            "butter",
+            "sourdough loaf"
+          ]
+        },
+        {
+          "text": "Slice the bread thicker than you would for a sandwich, six or eight slices, and leave the rest of the loaf out with the knife beside it so a second round does not mean a trip back to the kitchen.",
+          "ingredientRefs": [
+            "sourdough loaf"
+          ]
+        },
+        {
+          "text": "Stir the chives into the cream cheese and put it in a small dish with its own knife. Slice the gouda thin and lay the slices overlapping rather than stacked, so taking one does not knock over the pile.",
+          "ingredientRefs": [
+            "cream cheese",
+            "chives",
+            "gouda"
+          ]
+        },
+        {
+          "text": "Cut the cucumber into coins, halve the radishes so the cut sides show, and slice the tomatoes thick. Salt the tomatoes on their own plate and leave them for five minutes, which is the whole difference between a tomato and a garnish.",
+          "ingredientRefs": [
+            "cucumber",
+            "radish",
+            "tomato",
+            "kosher salt"
+          ],
+          "timerSeconds": 300
+        },
+        {
+          "text": "Peel the eggs, halve them lengthwise, and set them yolk side up with salt and plenty of pepper over them. Halved eggs get eaten; whole ones sit there all evening.",
+          "ingredientRefs": [
+            "eggs",
+            "kosher salt",
+            "black pepper"
+          ]
+        },
+        {
+          "text": "Give the pickles one small dish and the mustard another, each with its own spoon. Wet things sitting straight on the board soak the bread and are what makes a table look like leftovers instead of dinner.",
+          "ingredientRefs": [
+            "pickles",
+            "whole grain mustard"
+          ]
+        },
+        {
+          "text": "Put the cold cuts on their own plate at one end of the table, not tucked in among the cheese, so whoever wants them can reach them and nobody else has to think about it.",
+          "ingredientRefs": [
+            "salami",
+            "deli ham"
+          ]
+        },
+        {
+          "text": "Carry everything out in one go and spread it into small plates with space between them, nothing crowded and nothing stacked, then set a plate and a knife at every seat. No part of this is a course, so what makes it dinner is only that the table was laid on purpose.",
+          "ingredientRefs": []
+        }
+      ]
+    },
+    {
+      "id": "seed-meze-plate",
+      "title": "Meze Plate",
+      "summary": "Hummus, labneh, feta and cut vegetables on the table at once, with warm pita and nothing on the stove.",
+      "sourceType": "builtIn",
+      "prepMinutes": 15,
+      "cookMinutes": 0,
+      "totalMinutes": 15,
+      "baseServings": 4,
+      "tags": [
+        "standby",
+        "assemble",
+        "vegetarian",
+        "no cook",
+        "under 20",
+        "kid friendly",
+        "mediterranean"
+      ],
+      "cookware": [],
+      "ingredients": [
+        {
+          "name": "hummus",
+          "canonicalItem": "hummus",
+          "quantity": 16,
+          "unit": "oz"
+        },
+        {
+          "name": "labneh",
+          "canonicalItem": "labneh",
+          "quantity": 8,
+          "unit": "oz"
+        },
+        {
+          "name": "feta, left in a slab",
+          "canonicalItem": "feta",
+          "quantity": 6,
+          "unit": "oz"
+        },
+        {
+          "name": "olives",
+          "canonicalItem": "olives",
+          "quantity": 6,
+          "unit": "oz"
+        },
+        {
+          "name": "cucumbers, cut into spears",
+          "canonicalItem": "cucumber",
+          "quantity": 2,
+          "unit": "count"
+        },
+        {
+          "name": "cherry tomatoes, halved",
+          "canonicalItem": "cherry tomatoes",
+          "quantity": 1,
+          "unit": "package"
+        },
+        {
+          "name": "radishes, halved",
+          "canonicalItem": "radish",
+          "quantity": 1,
+          "unit": "bunch",
+          "isOptional": true
+        },
+        {
+          "name": "pita bread",
+          "canonicalItem": "pita bread",
+          "quantity": 6,
+          "unit": "count"
+        },
+        {
+          "name": "olive oil",
+          "canonicalItem": "olive oil",
+          "quantity": 3,
+          "unit": "tbsp"
+        },
+        {
+          "name": "lemon, cut into wedges",
+          "canonicalItem": "lemon",
+          "quantity": 1,
+          "unit": "count"
+        },
+        {
+          "name": "za'atar",
+          "canonicalItem": "za'atar",
+          "quantity": 2,
+          "unit": "tsp"
+        },
+        {
+          "name": "parsley, roughly chopped",
+          "canonicalItem": "parsley",
+          "quantity": 0.25,
+          "unit": "cup"
+        },
+        {
+          "name": "kosher salt",
+          "canonicalItem": "kosher salt",
+          "quantity": 0.5,
+          "unit": "tsp"
+        },
+        {
+          "name": "red pepper flakes",
+          "canonicalItem": "red pepper flakes",
+          "quantity": 0.25,
+          "unit": "tsp",
+          "isOptional": true
+        },
+        {
+          "name": "sardines, drained",
+          "canonicalItem": "sardines",
+          "quantity": 1,
+          "unit": "can",
+          "isOptional": true
+        },
+        {
+          "name": "salami, thinly sliced",
+          "canonicalItem": "salami",
+          "quantity": 4,
+          "unit": "oz",
+          "isOptional": true
+        }
+      ],
+      "steps": [
+        {
+          "text": "Spread the hummus across a wide shallow bowl or plate, pushing it out to the rim with the back of a spoon and leaving a shallow well in the middle. Pour a tablespoon of the olive oil into the well and scatter the za'atar over the top.",
+          "ingredientRefs": [
+            "hummus",
+            "olive oil",
+            "za'atar"
+          ]
+        },
+        {
+          "text": "Spoon the labneh into its own small bowl, smooth the top, and finish it with another tablespoon of olive oil and a pinch of the salt. Keeping it separate matters more than it sounds like it should, because anyone who only wants bread and labneh can have exactly that.",
+          "ingredientRefs": [
+            "labneh",
+            "olive oil",
+            "kosher salt"
+          ]
+        },
+        {
+          "text": "Put the feta on the board in one piece with the last of the olive oil over it, the red pepper flakes if you want them, and a knife alongside. A slab people break pieces off travels better than crumbles do.",
+          "ingredientRefs": [
+            "feta",
+            "olive oil",
+            "red pepper flakes"
+          ]
+        },
+        {
+          "text": "Cut the cucumbers into spears rather than coins so they can be dipped, halve the tomatoes and the radishes, and set each one out in its own small dish or in its own stripe on the board. Salt the cucumbers and tomatoes lightly and tuck the lemon wedges in somewhere.",
+          "ingredientRefs": [
+            "cucumber",
+            "cherry tomatoes",
+            "radish",
+            "kosher salt",
+            "lemon"
+          ]
+        },
+        {
+          "text": "Add the olives in a bowl small enough that the pits have somewhere to go, and shower the parsley over the hummus and the vegetables.",
+          "ingredientRefs": [
+            "olives",
+            "parsley",
+            "hummus"
+          ]
+        },
+        {
+          "text": "Warm the pita for a minute or two in a dry pan, a toaster or the oven until it puffs and smells like bread again, then cut it into wedges and bring it to the table in a towel so it stays soft.",
+          "ingredientRefs": [
+            "pita bread"
+          ],
+          "timerSeconds": 120
+        },
+        {
+          "text": "If anyone wants fish or meat, lay the sardines out in one small dish and the salami in another, each with its own fork, and put them on the table alongside everything else rather than on the board. That way the plate stays something all four people can eat from and whoever wants them takes them onto their own plate.",
+          "ingredientRefs": [
+            "sardines",
+            "salami"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "seed-grain-bowl",
+      "title": "Grain Bowl",
+      "summary": "The Sunday prep, assembled: grains, something roasted, something legume, a sauce, something sharp on top.",
+      "sourceType": "builtIn",
+      "prepMinutes": 15,
+      "cookMinutes": 5,
+      "totalMinutes": 20,
+      "baseServings": 4,
+      "tags": [
+        "standby",
+        "assemble",
+        "vegetarian",
+        "under 20",
+        "kid friendly"
+      ],
+      "cookware": [
+        "skillet",
+        "mixing bowl"
+      ],
+      "ingredients": [
+        {
+          "name": "farro, cooked",
+          "canonicalItem": "farro",
+          "quantity": 3,
+          "unit": "cup"
+        },
+        {
+          "name": "sweet potato, roasted in cubes",
+          "canonicalItem": "sweet potato",
+          "quantity": 2,
+          "unit": "count"
+        },
+        {
+          "name": "broccoli, roasted in florets",
+          "canonicalItem": "broccoli",
+          "quantity": 1,
+          "unit": "count"
+        },
+        {
+          "name": "canned chickpeas, drained",
+          "canonicalItem": "canned chickpeas",
+          "quantity": 1,
+          "unit": "can"
+        },
+        {
+          "name": "eggs, hard boiled",
+          "canonicalItem": "eggs",
+          "quantity": 4,
+          "unit": "count"
+        },
+        {
+          "name": "tahini",
+          "canonicalItem": "tahini",
+          "quantity": 0.33,
+          "unit": "cup"
+        },
+        {
+          "name": "lemon",
+          "canonicalItem": "lemon",
+          "quantity": 1,
+          "unit": "count"
+        },
+        {
+          "name": "garlic, grated",
+          "canonicalItem": "garlic",
+          "quantity": 1,
+          "unit": "clove"
+        },
+        {
+          "name": "kosher salt",
+          "canonicalItem": "kosher salt",
+          "quantity": 1,
+          "unit": "tsp"
+        },
+        {
+          "name": "red onion, thinly sliced",
+          "canonicalItem": "red onion",
+          "quantity": 0.5,
+          "unit": "count"
+        },
+        {
+          "name": "red wine vinegar",
+          "canonicalItem": "red wine vinegar",
+          "quantity": 3,
+          "unit": "tbsp"
+        },
+        {
+          "name": "feta, crumbled",
+          "canonicalItem": "feta",
+          "quantity": 4,
+          "unit": "oz"
+        },
+        {
+          "name": "parsley, chopped",
+          "canonicalItem": "parsley",
+          "quantity": 0.5,
+          "unit": "cup"
+        },
+        {
+          "name": "olive oil",
+          "canonicalItem": "olive oil",
+          "quantity": 2,
+          "unit": "tbsp"
+        },
+        {
+          "name": "rotisserie chicken, shredded",
+          "canonicalItem": "rotisserie chicken",
+          "quantity": 1,
+          "unit": "cup",
+          "isOptional": true
+        }
+      ],
+      "steps": [
+        {
+          "text": "Take stock of the fridge before you start. This is a formula rather than a list: a grain, something roasted, something legume, a sauce, and something sharp. Any one of the five can be whatever is actually in there, so read the quantities below as the shape of a bowl and not as a shopping trip.",
+          "ingredientRefs": []
+        },
+        {
+          "text": "Whisk the tahini with the juice of the lemon, the garlic, and a good pinch of the salt. It will seize up and go pale and stiff, which is correct. Add cold water a spoonful at a time, whisking, until it loosens and falls off the whisk in a ribbon.",
+          "ingredientRefs": [
+            "tahini",
+            "lemon",
+            "garlic",
+            "kosher salt"
+          ]
+        },
+        {
+          "text": "Cover the sliced onion with the vinegar and a pinch of salt in a small bowl and leave it alone while you do everything else. Twenty minutes turns it pink and takes the raw bite out of it.",
+          "ingredientRefs": [
+            "red onion",
+            "red wine vinegar",
+            "kosher salt"
+          ],
+          "timerSeconds": 1200
+        },
+        {
+          "text": "Warm the roasted vegetables in a dry skillet over medium heat for a few minutes, until they stop being fridge cold. One warm component in an otherwise cool bowl is most of what makes this read as dinner rather than as leftovers.",
+          "ingredientRefs": [
+            "sweet potato",
+            "broccoli"
+          ],
+          "timerSeconds": 240
+        },
+        {
+          "text": "Toss the chickpeas with the olive oil and a pinch of salt so they are seasoned on their own. Halve the eggs. Crumble the feta. Chop the parsley.",
+          "ingredientRefs": [
+            "canned chickpeas",
+            "olive oil",
+            "eggs",
+            "feta",
+            "parsley",
+            "kosher salt"
+          ]
+        },
+        {
+          "text": "Put every component on the table in its own bowl, with the grains and the sauce at one end and the pickled onion, feta, and parsley at the other. Nobody gets a plate someone else composed. The chicken, if you are using it, goes in its own bowl for whoever wants it.",
+          "ingredientRefs": [
+            "farro",
+            "rotisserie chicken"
+          ]
+        },
+        {
+          "text": "Build in order so it works: grains first, then the warm vegetables, then the legume, then the sauce over all of it, then the sharp things last so they stay sharp. Dress only what you are about to eat, because a dressed bowl goes soft in the fridge and the undressed components keep for days.",
+          "ingredientRefs": [
+            "farro",
+            "sweet potato",
+            "canned chickpeas",
+            "tahini",
+            "red onion",
+            "feta",
+            "parsley"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "seed-nicoise-plate",
+      "title": "Nicoise Plate",
+      "summary": "Potatoes, green beans, boiled eggs, tomatoes, olives, and a bowl of tuna, all put out at once so everyone builds their own plate.",
+      "sourceType": "builtIn",
+      "prepMinutes": 10,
+      "cookMinutes": 18,
+      "totalMinutes": 28,
+      "baseServings": 4,
+      "tags": [
+        "standby",
+        "assemble",
+        "pescetarian",
+        "under 30",
+        "one pot",
+        "kid friendly"
+      ],
+      "cookware": [
+        "large pot",
+        "mixing bowl"
+      ],
+      "ingredients": [
+        {
+          "name": "yukon gold potatoes, halved",
+          "canonicalItem": "potato",
+          "quantity": 1.5,
+          "unit": "lb"
+        },
+        {
+          "name": "green beans, trimmed",
+          "canonicalItem": "green beans",
+          "quantity": 0.75,
+          "unit": "lb"
+        },
+        {
+          "name": "eggs",
+          "canonicalItem": "eggs",
+          "quantity": 6,
+          "unit": "count"
+        },
+        {
+          "name": "canned tuna, drained",
+          "canonicalItem": "canned tuna",
+          "quantity": 2,
+          "unit": "can"
+        },
+        {
+          "name": "cherry tomatoes, halved",
+          "canonicalItem": "cherry tomatoes",
+          "quantity": 1,
+          "unit": "package"
+        },
+        {
+          "name": "kalamata olives",
+          "canonicalItem": "olives",
+          "quantity": 1,
+          "unit": "cup"
+        },
+        {
+          "name": "shallot, minced",
+          "canonicalItem": "shallot",
+          "quantity": 1,
+          "unit": "count"
+        },
+        {
+          "name": "dijon mustard",
+          "canonicalItem": "dijon mustard",
+          "quantity": 2,
+          "unit": "tsp"
+        },
+        {
+          "name": "red wine vinegar",
+          "canonicalItem": "red wine vinegar",
+          "quantity": 3,
+          "unit": "tbsp"
+        },
+        {
+          "name": "olive oil",
+          "canonicalItem": "olive oil",
+          "quantity": 6,
+          "unit": "tbsp"
+        },
+        {
+          "name": "lemon",
+          "canonicalItem": "lemon",
+          "quantity": 1,
+          "unit": "count"
+        },
+        {
+          "name": "kosher salt",
+          "canonicalItem": "kosher salt",
+          "quantity": 1,
+          "unit": "tsp"
+        },
+        {
+          "name": "black pepper",
+          "canonicalItem": "black pepper",
+          "quantity": 0.5,
+          "unit": "tsp"
+        },
+        {
+          "name": "romaine lettuce, torn",
+          "canonicalItem": "romaine lettuce",
+          "quantity": 1,
+          "unit": "count",
+          "isOptional": true
+        },
+        {
+          "name": "capers, drained",
+          "canonicalItem": "capers",
+          "quantity": 2,
+          "unit": "tbsp",
+          "isOptional": true
+        },
+        {
+          "name": "parsley, chopped",
+          "canonicalItem": "parsley",
+          "quantity": 0.25,
+          "unit": "cup",
+          "isOptional": true
+        }
+      ],
+      "steps": [
+        {
+          "text": "Fill a large pot with water, salt it like pasta water, and bring it to a boil. One pot does the potatoes, then the eggs, then the beans, in that order.",
+          "ingredientRefs": [
+            "kosher salt"
+          ]
+        },
+        {
+          "text": "Boil the potatoes until a knife slides into one with no resistance, 12 to 14 minutes. Lift them out with a slotted spoon and leave the water on the heat.",
+          "ingredientRefs": [
+            "potato"
+          ],
+          "timerSeconds": 780
+        },
+        {
+          "text": "Lower the eggs into the same water and cook them 9 minutes for a yolk that is set at the edge and still bright in the middle. Move them straight into cold water.",
+          "ingredientRefs": [
+            "eggs"
+          ],
+          "timerSeconds": 540
+        },
+        {
+          "text": "Drop the green beans into the pot and cook 3 to 4 minutes, until they are bright and still squeak when you bite one. Drain and run them under cold water so they hold their color.",
+          "ingredientRefs": [
+            "green beans"
+          ],
+          "timerSeconds": 210
+        },
+        {
+          "text": "While the pot works, whisk the mustard, vinegar, shallot, salt, and pepper in a bowl, then pour in the olive oil slowly, whisking, until it thickens. Make it sharper than tastes right on a spoon, because potatoes and eggs flatten a dressing.",
+          "ingredientRefs": [
+            "dijon mustard",
+            "red wine vinegar",
+            "shallot",
+            "kosher salt",
+            "black pepper",
+            "olive oil"
+          ]
+        },
+        {
+          "text": "Spoon a third of the vinaigrette over the potatoes while they are still warm, when they drink it in instead of shedding it.",
+          "ingredientRefs": [
+            "potato"
+          ]
+        },
+        {
+          "text": "Peel and halve the eggs. Break the tuna into a bowl and loosen it with a spoonful of vinaigrette and a squeeze of lemon.",
+          "ingredientRefs": [
+            "eggs",
+            "canned tuna",
+            "lemon"
+          ]
+        },
+        {
+          "text": "Put everything on the table in its own bowl: potatoes, beans, eggs, tuna, tomatoes, olives, with the lettuce, capers, parsley, and the rest of the vinaigrette alongside. Everyone builds their own plate, so the tuna is one choice among six rather than the dinner. Boiled potatoes, eggs, and beans keep three days covered in the fridge, which makes the leftovers tomorrow's lunch.",
+          "ingredientRefs": [
+            "potato",
+            "green beans",
+            "eggs",
+            "canned tuna",
+            "cherry tomatoes",
+            "olives",
+            "romaine lettuce",
+            "capers",
+            "parsley"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "seed-aglio-e-olio",
+      "title": "Pasta Aglio e Olio",
+      "summary": "Spaghetti, a head of garlic, and good oil. Nothing fresh required, and the tossing is the whole recipe.",
+      "sourceType": "builtIn",
+      "prepMinutes": 5,
+      "cookMinutes": 10,
+      "totalMinutes": 15,
+      "baseServings": 4,
+      "tags": [
+        "standby",
+        "pantry",
+        "pasta",
+        "vegetarian",
+        "under 30",
+        "kid friendly"
+      ],
+      "cookware": [
+        "large pot",
+        "large skillet",
+        "colander"
+      ],
+      "ingredients": [
+        {
+          "name": "spaghetti",
+          "canonicalItem": "spaghetti",
+          "quantity": 1,
+          "unit": "lb"
+        },
+        {
+          "name": "garlic, sliced as thin as you can",
+          "canonicalItem": "garlic",
+          "quantity": 8,
+          "unit": "clove"
+        },
+        {
+          "name": "olive oil, the good one",
+          "canonicalItem": "olive oil",
+          "quantity": 0.5,
+          "unit": "cup"
+        },
+        {
+          "name": "red pepper flakes",
+          "canonicalItem": "red pepper flakes",
+          "quantity": 0.5,
+          "unit": "tsp"
+        },
+        {
+          "name": "parmesan, grated fine",
+          "canonicalItem": "parmesan",
+          "quantity": 2,
+          "unit": "oz"
+        },
+        {
+          "name": "parsley, chopped",
+          "canonicalItem": "parsley",
+          "quantity": 0.25,
+          "unit": "bunch",
+          "isOptional": true
+        },
+        {
+          "name": "kosher salt",
+          "canonicalItem": "kosher salt",
+          "quantity": 1,
+          "unit": "tbsp"
+        }
+      ],
+      "steps": [
+        {
+          "text": "Boil water in the large pot and salt it well. Use a bit less water than usual, about four quarts for a pound, so it ends up starchier. That starch is the only thickener in this dish.",
+          "ingredientRefs": [
+            "kosher salt"
+          ]
+        },
+        {
+          "text": "Slice the garlic as thin as your knife allows. Thin coins toast evenly and sweeten; minced garlic scorches in spots before the rest is ready, and scorched garlic is bitter in a way nothing later fixes.",
+          "ingredientRefs": [
+            "garlic"
+          ]
+        },
+        {
+          "text": "Put the garlic and the oil in the cold skillet together, then set it over low heat. Let it come up slowly until the slices are barely pale gold at the edges and the oil smells sweet, three or four minutes. Stop there and slide the pan off the burner.",
+          "ingredientRefs": [
+            "garlic",
+            "olive oil"
+          ],
+          "timerSeconds": 240
+        },
+        {
+          "text": "Stir the pepper flakes into the warm oil off the heat. If someone at the table wants no heat at all, spoon a little plain garlic oil into a bowl first and dress that portion with it at the end.",
+          "ingredientRefs": [
+            "red pepper flakes",
+            "olive oil"
+          ]
+        },
+        {
+          "text": "Boil the spaghetti one minute short of the time on the box, so it still has some spine. Dip out two cups of the water before you drain it, and do not skip this, because the sauce is made of it.",
+          "ingredientRefs": [
+            "spaghetti"
+          ],
+          "timerSeconds": 480
+        },
+        {
+          "text": "Set the skillet over medium heat, add the drained pasta and half a cup of the pasta water, and toss hard and without stopping for about a minute. The oil and water start out separate and thin, then turn into one glossy sauce that coats every strand. Splash in more water if it looks oily; keep tossing if it looks watery.",
+          "ingredientRefs": [
+            "spaghetti"
+          ]
+        },
+        {
+          "text": "Off the heat, add the parmesan in two handfuls with a good toss between them. Off the heat matters here: in a hot pan the cheese tightens into strings instead of melting into the sauce.",
+          "ingredientRefs": [
+            "parmesan"
+          ]
+        },
+        {
+          "text": "Add the parsley if there is any in the house, taste for salt, and bring the pan to the table so everyone takes their own. Put the cheese and the parsley out alongside it too, for whoever wants more and whoever wants none.",
+          "ingredientRefs": [
+            "parsley",
+            "parmesan"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "seed-rice-fried-egg",
+      "title": "Rice with a Fried Egg",
+      "summary": "Hot rice, a crisp edged fried egg, and a shower of furikake, built from a shelf with nothing fresh on it.",
+      "sourceType": "builtIn",
+      "prepMinutes": 3,
+      "cookMinutes": 25,
+      "totalMinutes": 28,
+      "baseServings": 4,
+      "tags": [
+        "standby",
+        "pantry",
+        "pescetarian",
+        "under 30",
+        "stovetop",
+        "kid friendly",
+        "japanese"
+      ],
+      "cookware": [
+        "saucepan",
+        "large skillet"
+      ],
+      "ingredients": [
+        {
+          "name": "white rice",
+          "canonicalItem": "white rice",
+          "quantity": 1.5,
+          "unit": "cup"
+        },
+        {
+          "name": "eggs",
+          "canonicalItem": "eggs",
+          "quantity": 4,
+          "unit": "count"
+        },
+        {
+          "name": "furikake",
+          "canonicalItem": "furikake",
+          "quantity": 2,
+          "unit": "tbsp"
+        },
+        {
+          "name": "soy sauce",
+          "canonicalItem": "soy sauce",
+          "quantity": 2,
+          "unit": "tbsp"
+        },
+        {
+          "name": "sesame oil",
+          "canonicalItem": "sesame oil",
+          "quantity": 1,
+          "unit": "tsp"
+        },
+        {
+          "name": "vegetable oil",
+          "canonicalItem": "vegetable oil",
+          "quantity": 3,
+          "unit": "tbsp"
+        },
+        {
+          "name": "kosher salt",
+          "canonicalItem": "kosher salt",
+          "quantity": 1,
+          "unit": "tsp"
+        },
+        {
+          "name": "scallions, sliced thin",
+          "canonicalItem": "scallions",
+          "quantity": 2,
+          "unit": "count",
+          "isOptional": true
+        }
+      ],
+      "steps": [
+        {
+          "text": "Rinse the rice in a few changes of cold water until the water runs nearly clear, then drain it well.",
+          "ingredientRefs": [
+            "white rice"
+          ]
+        },
+        {
+          "text": "Put the rice in a saucepan with 2 and a quarter cups water and a big pinch of salt. Bring it to a boil, cover it, and turn the heat to low.",
+          "ingredientRefs": [
+            "white rice",
+            "kosher salt"
+          ]
+        },
+        {
+          "text": "Cook undisturbed for 15 minutes, then pull the pan off the heat and leave the lid on for 10 minutes more. The resting does real work, so do not peek.",
+          "ingredientRefs": [],
+          "timerSeconds": 900
+        },
+        {
+          "text": "While the rice rests, put the furikake, the soy sauce, the sesame oil, and the scallions on the table in small bowls so everyone seasons their own.",
+          "ingredientRefs": [
+            "furikake",
+            "soy sauce",
+            "sesame oil",
+            "scallions"
+          ]
+        },
+        {
+          "text": "Heat the vegetable oil in a large skillet over medium high heat until it thins out and shimmers. There should be enough to pool, not just slick the pan.",
+          "ingredientRefs": [
+            "vegetable oil"
+          ]
+        },
+        {
+          "text": "Crack in as many eggs as fit without touching and leave them alone. The whites bubble, set, and go brown and lacy at the rim in about 2 minutes. Tilt the pan and spoon the hot oil over the whites until they are firm and the yolks still move.",
+          "ingredientRefs": [
+            "eggs"
+          ],
+          "timerSeconds": 120
+        },
+        {
+          "text": "Fluff the rice, bowl it up, and slide an egg onto each one. Everyone adds their own furikake, a few drops of soy sauce, a little sesame oil, and scallions, and it gets eaten while the edges are still crisp.",
+          "ingredientRefs": [
+            "white rice",
+            "eggs",
+            "furikake",
+            "soy sauce",
+            "sesame oil",
+            "scallions"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "seed-tuna-tomato-pasta",
+      "title": "Pasta with Tomato and Tuna",
+      "summary": "The tin never reaches the table. A garlicky tomato sauce gets the tuna folded in off the heat, in big flakes, and the sharp things stay in bowls on the side.",
+      "sourceType": "builtIn",
+      "prepMinutes": 8,
+      "cookMinutes": 20,
+      "totalMinutes": 28,
+      "baseServings": 4,
+      "tags": [
+        "standby",
+        "pantry",
+        "pescetarian",
+        "under 30",
+        "pasta",
+        "kid friendly"
+      ],
+      "cookware": [
+        "large pot",
+        "colander",
+        "large skillet",
+        "small skillet"
+      ],
+      "ingredients": [
+        {
+          "name": "spaghetti",
+          "canonicalItem": "spaghetti",
+          "quantity": 1,
+          "unit": "lb"
+        },
+        {
+          "name": "olive oil",
+          "canonicalItem": "olive oil",
+          "quantity": 4,
+          "unit": "tbsp"
+        },
+        {
+          "name": "garlic, thinly sliced",
+          "canonicalItem": "garlic",
+          "quantity": 4,
+          "unit": "clove"
+        },
+        {
+          "name": "red pepper flakes",
+          "canonicalItem": "red pepper flakes",
+          "quantity": 0.5,
+          "unit": "tsp"
+        },
+        {
+          "name": "canned crushed tomatoes",
+          "canonicalItem": "canned crushed tomatoes",
+          "quantity": 1,
+          "unit": "can"
+        },
+        {
+          "name": "canned tuna, drained",
+          "canonicalItem": "canned tuna",
+          "quantity": 2,
+          "unit": "can"
+        },
+        {
+          "name": "capers, drained",
+          "canonicalItem": "capers",
+          "quantity": 1,
+          "unit": "tbsp"
+        },
+        {
+          "name": "kosher salt",
+          "canonicalItem": "kosher salt",
+          "quantity": 1,
+          "unit": "tsp"
+        },
+        {
+          "name": "lemon",
+          "canonicalItem": "lemon",
+          "quantity": 1,
+          "unit": "count"
+        },
+        {
+          "name": "black pepper",
+          "canonicalItem": "black pepper",
+          "quantity": 0.25,
+          "unit": "tsp"
+        },
+        {
+          "name": "breadcrumbs",
+          "canonicalItem": "breadcrumbs",
+          "quantity": 0.5,
+          "unit": "cup",
+          "isOptional": true
+        },
+        {
+          "name": "olives, torn",
+          "canonicalItem": "olives",
+          "quantity": 0.5,
+          "unit": "cup",
+          "isOptional": true
+        },
+        {
+          "name": "parsley, chopped",
+          "canonicalItem": "parsley",
+          "quantity": 0.5,
+          "unit": "cup",
+          "isOptional": true
+        }
+      ],
+      "steps": [
+        {
+          "text": "Put a large pot of well salted water on to boil.",
+          "ingredientRefs": []
+        },
+        {
+          "text": "Toast the breadcrumbs in a dry small skillet over medium heat, shaking often, until they smell nutty and turn the color of sand. Tip them into a bowl for the table.",
+          "ingredientRefs": [
+            "breadcrumbs"
+          ],
+          "timerSeconds": 180
+        },
+        {
+          "text": "Warm the olive oil in a wide skillet over low heat with the garlic and the pepper flakes. Keep the heat low enough that the garlic never colors, about 3 minutes. You want it soft and sweet, not toasted.",
+          "ingredientRefs": [
+            "olive oil",
+            "garlic",
+            "red pepper flakes"
+          ],
+          "timerSeconds": 180
+        },
+        {
+          "text": "Add the tomatoes and the salt, bring it up to a lively simmer, and cook until a spoon dragged through the pan leaves a track that fills in slowly, 10 to 12 minutes. A jar of marinara stands in here; give it 5 minutes to thicken instead.",
+          "ingredientRefs": [
+            "canned crushed tomatoes",
+            "kosher salt"
+          ],
+          "timerSeconds": 660
+        },
+        {
+          "text": "Boil the spaghetti until just short of tender. Save a mug of the water before you drain it.",
+          "ingredientRefs": [
+            "spaghetti"
+          ],
+          "timerSeconds": 540
+        },
+        {
+          "text": "Turn the heat off under the sauce. Add the tuna and the capers and fold them through in large flakes rather than stirring them smooth. The tuna is already cooked and only needs to warm, and the flakes are what keep this tasting like dinner rather than like a tin.",
+          "ingredientRefs": [
+            "canned tuna",
+            "capers"
+          ]
+        },
+        {
+          "text": "Add the drained pasta and a splash of the saved water and toss until the sauce coats every strand. Finish with the juice of half the lemon and the black pepper, then taste and add more lemon if it needs lifting.",
+          "ingredientRefs": [
+            "spaghetti",
+            "lemon",
+            "black pepper"
+          ]
+        },
+        {
+          "text": "Bring the parsley, the olives, and the toasted breadcrumbs to the table in their own small bowls instead of scattering them over the pan. That way one plate can be plain tomato pasta and the next can have all three, and nobody has to pick anything out.",
+          "ingredientRefs": [
+            "parsley",
+            "olives",
+            "breadcrumbs"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "seed-tuna-melt",
+      "title": "Tuna Melt",
+      "summary": "A grilled cheese that happens to have tuna in it. Everything comes off the pantry shelf.",
+      "sourceType": "builtIn",
+      "prepMinutes": 8,
+      "cookMinutes": 10,
+      "totalMinutes": 18,
+      "baseServings": 4,
+      "tags": [
+        "standby",
+        "pantry",
+        "pescetarian",
+        "seafood",
+        "under 30",
+        "one pan",
+        "kid friendly"
+      ],
+      "cookware": [
+        "skillet",
+        "mixing bowl"
+      ],
+      "ingredients": [
+        {
+          "name": "canned tuna, drained",
+          "canonicalItem": "canned tuna",
+          "quantity": 2,
+          "unit": "can"
+        },
+        {
+          "name": "mayonnaise",
+          "canonicalItem": "mayonnaise",
+          "quantity": 4,
+          "unit": "tbsp"
+        },
+        {
+          "name": "dijon mustard",
+          "canonicalItem": "dijon mustard",
+          "quantity": 2,
+          "unit": "tsp"
+        },
+        {
+          "name": "pickles, finely chopped",
+          "canonicalItem": "pickles",
+          "quantity": 3,
+          "unit": "tbsp"
+        },
+        {
+          "name": "scallions, thinly sliced",
+          "canonicalItem": "scallions",
+          "quantity": 2,
+          "unit": "count",
+          "isOptional": true
+        },
+        {
+          "name": "black pepper",
+          "canonicalItem": "black pepper",
+          "quantity": 0.25,
+          "unit": "tsp"
+        },
+        {
+          "name": "sandwich bread",
+          "canonicalItem": "sandwich bread",
+          "quantity": 8,
+          "unit": "count"
+        },
+        {
+          "name": "cheddar, grated",
+          "canonicalItem": "cheddar",
+          "quantity": 6,
+          "unit": "oz"
+        },
+        {
+          "name": "butter, softened",
+          "canonicalItem": "butter",
+          "quantity": 3,
+          "unit": "tbsp"
+        }
+      ],
+      "steps": [
+        {
+          "text": "Drain the tuna hard, pressing it against the lid of the tin to get the last of the water out. Wet tuna steams the bread from the inside.",
+          "ingredientRefs": [
+            "canned tuna"
+          ]
+        },
+        {
+          "text": "Flake it into a bowl with the mayonnaise, mustard, pickles, scallions, and pepper. You want it to hold together in a spoon, not slump.",
+          "ingredientRefs": [
+            "canned tuna",
+            "mayonnaise",
+            "dijon mustard",
+            "pickles",
+            "scallions",
+            "black pepper"
+          ]
+        },
+        {
+          "text": "Butter one side of all eight slices of bread. That side goes down against the pan, so it is the side that crisps.",
+          "ingredientRefs": [
+            "butter",
+            "sandwich bread"
+          ]
+        },
+        {
+          "text": "Lay four slices buttered side down on a board. On each one put cheese, then tuna, then more cheese, and close it with a second slice, buttered side up. Cheese against both slices is what holds the sandwich shut.",
+          "ingredientRefs": [
+            "sandwich bread",
+            "cheddar",
+            "canned tuna"
+          ]
+        },
+        {
+          "text": "If one of the children wants cheese and no tuna, build that one now. It cooks in the same pan for the same time and nobody has to discuss it.",
+          "ingredientRefs": [
+            "cheddar",
+            "sandwich bread"
+          ]
+        },
+        {
+          "text": "Cook in a dry skillet over medium-low heat, pressing down now and then with a spatula, until the underside is deep gold, 4 to 5 minutes. Keep the heat low: hot and fast gives you a dark crust over cold cheese.",
+          "ingredientRefs": [],
+          "timerSeconds": 270
+        },
+        {
+          "text": "Flip and cook until the second side matches and the cheese has run out to the edges, 3 to 4 minutes more.",
+          "ingredientRefs": [
+            "cheddar"
+          ],
+          "timerSeconds": 210
+        },
+        {
+          "text": "Let them sit a minute so the inside settles, then cut each one on the diagonal and put the halves on the table for people to take.",
+          "ingredientRefs": []
+        }
+      ]
+    },
+    {
+      "id": "seed-prep-grains",
+      "title": "A Pot of Grains",
+      "summary": "A component rather than a meal: a batch of farro or brown rice boiled, drained, and cooled so the week's bowls and plates have a base ready to go.",
+      "sourceType": "builtIn",
+      "prepMinutes": 5,
+      "cookMinutes": 30,
+      "totalMinutes": 35,
+      "baseServings": 8,
+      "tags": [
+        "standby",
+        "prep",
+        "vegetarian",
+        "vegan",
+        "one pot",
+        "kid friendly"
+      ],
+      "cookware": [
+        "large pot",
+        "colander",
+        "sheet pan"
+      ],
+      "ingredients": [
+        {
+          "name": "farro",
+          "canonicalItem": "farro",
+          "quantity": 2,
+          "unit": "cup"
+        },
+        {
+          "name": "brown rice, in place of the farro",
+          "canonicalItem": "brown rice",
+          "quantity": 2,
+          "unit": "cup",
+          "isOptional": true
+        },
+        {
+          "name": "water",
+          "canonicalItem": "water",
+          "quantity": 4,
+          "unit": "l"
+        },
+        {
+          "name": "kosher salt",
+          "canonicalItem": "kosher salt",
+          "quantity": 1,
+          "unit": "tbsp"
+        },
+        {
+          "name": "bay leaves",
+          "canonicalItem": "bay leaves",
+          "quantity": 2,
+          "unit": "count",
+          "isOptional": true
+        },
+        {
+          "name": "olive oil",
+          "canonicalItem": "olive oil",
+          "quantity": 2,
+          "unit": "tbsp"
+        },
+        {
+          "name": "lemon",
+          "canonicalItem": "lemon",
+          "quantity": 1,
+          "unit": "count",
+          "isOptional": true
+        }
+      ],
+      "steps": [
+        {
+          "text": "Bring the water to a boil in a large pot with the salt and the bay leaves. Cook the grain like pasta, in much more water than it can absorb, so it comes out in separate pieces instead of a block.",
+          "ingredientRefs": [
+            "water",
+            "kosher salt",
+            "bay leaves"
+          ]
+        },
+        {
+          "text": "Rinse the grain under cold water until it runs clear, then tip it into the boiling water and keep it at a steady simmer, uncovered.",
+          "ingredientRefs": [
+            "farro",
+            "brown rice"
+          ]
+        },
+        {
+          "text": "Simmer until tender with a little chew left in the center, about 25 minutes for farro and 35 for brown rice. Start tasting 5 minutes early, because a grain that goes soft now will be mush by Wednesday.",
+          "ingredientRefs": [
+            "farro",
+            "brown rice"
+          ],
+          "timerSeconds": 1500
+        },
+        {
+          "text": "Drain in a colander, pull out the bay leaves, and shake the colander hard to throw off the water sitting between the grains.",
+          "ingredientRefs": [
+            "bay leaves"
+          ]
+        },
+        {
+          "text": "Spread the grain over a sheet pan in a thin layer and toss it with the olive oil. The thin layer is what lets the steam leave, and steam trapped in a warm covered bowl is what turns a good batch sour by Tuesday. Leave it 20 minutes, until it is no warmer than the room.",
+          "ingredientRefs": [
+            "olive oil"
+          ],
+          "timerSeconds": 1200
+        },
+        {
+          "text": "Squeeze over the lemon if the grain is headed for salads and cold bowls, and leave it plain if it is going under something saucy.",
+          "ingredientRefs": [
+            "lemon"
+          ]
+        },
+        {
+          "text": "Pack the cooled grain into a container, loosely rather than pressed down, and refrigerate within the hour. It keeps 5 days in the fridge and 3 months in the freezer, frozen flat in meal size bags. Cold from the fridge it goes straight into bowls and salads with no reheating at all. To serve it hot, put it in a pan with a splash of water, cover, and warm over medium heat for 3 or 4 minutes, or microwave it covered with a damp paper towel on top. Both work because the trick is steam, and grain reheated dry comes back hard.",
+          "ingredientRefs": [
+            "farro",
+            "brown rice"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "seed-prep-boiled-eggs",
+      "title": "Hard Boiled Eggs",
+      "summary": "Six eggs boiled to a set yolk, chilled hard in ice water, and kept in the shell all week.",
+      "sourceType": "builtIn",
+      "prepMinutes": 3,
+      "cookMinutes": 11,
+      "totalMinutes": 25,
+      "baseServings": 6,
+      "tags": [
+        "standby",
+        "prep",
+        "vegetarian",
+        "under 30",
+        "one pot",
+        "kid friendly"
+      ],
+      "cookware": [
+        "saucepan",
+        "mixing bowl"
+      ],
+      "ingredients": [
+        {
+          "name": "large eggs",
+          "canonicalItem": "eggs",
+          "quantity": 6,
+          "unit": "count"
+        },
+        {
+          "name": "baking soda, optional",
+          "canonicalItem": "baking soda",
+          "quantity": 0.5,
+          "unit": "tsp",
+          "isOptional": true
+        }
+      ],
+      "steps": [
+        {
+          "text": "Put enough water in a saucepan to cover the eggs by an inch, leave the eggs out of it for now, and bring it to a full rolling boil. Starting them in boiling water rather than cold is what makes the timing repeatable, because the clock starts at a temperature you can see.",
+          "ingredientRefs": []
+        },
+        {
+          "text": "While it heats, fill a mixing bowl with cold water and as much ice as it will hold. This is half the recipe, so do not skip it or make it lukewarm.",
+          "ingredientRefs": []
+        },
+        {
+          "text": "Lower the eggs in one at a time on a spoon so they do not crack against the bottom. Add the baking soda if you are using it, which nudges the water alkaline and helps the shells let go later. Bring the heat back to a steady gentle boil.",
+          "ingredientRefs": [
+            "eggs",
+            "baking soda"
+          ]
+        },
+        {
+          "text": "Boil 11 minutes for a yolk that is set through and still yellow rather than grey. For other yolks: 7 minutes jammy in the middle, 9 minutes set at the edge and soft in the center, 13 minutes firm and crumbly.",
+          "ingredientRefs": [
+            "eggs"
+          ],
+          "timerSeconds": 660
+        },
+        {
+          "text": "Lift them straight into the ice bath and leave them 10 minutes, until they are cold all the way to the middle. Any time spent warm after the boil keeps cooking the yolk and sets the shell against the white.",
+          "ingredientRefs": [
+            "eggs"
+          ],
+          "timerSeconds": 600
+        },
+        {
+          "text": "Dry them and keep them in the fridge in the shell, where they hold a week. Peel one at a time as you want it, under cold running water if the shell fights you. Once peeled they are best within two days, so peel for the board or the plate, not for the week.",
+          "ingredientRefs": [
+            "eggs"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "seed-prep-white-beans",
+      "title": "A Pot of White Beans",
+      "summary": "Cannellini braised soft in olive oil, garlic, bay and lemon peel, good enough to eat on toast on their own and the base for half the week besides.",
+      "sourceType": "builtIn",
+      "prepMinutes": 5,
+      "cookMinutes": 35,
+      "totalMinutes": 40,
+      "baseServings": 8,
+      "tags": [
+        "standby",
+        "prep",
+        "vegetarian",
+        "vegan",
+        "one pot",
+        "kid friendly"
+      ],
+      "cookware": [
+        "large pot"
+      ],
+      "ingredients": [
+        {
+          "name": "canned cannellini beans, drained and rinsed",
+          "canonicalItem": "canned cannellini beans",
+          "quantity": 3,
+          "unit": "can"
+        },
+        {
+          "name": "olive oil",
+          "canonicalItem": "olive oil",
+          "quantity": 0.5,
+          "unit": "cup"
+        },
+        {
+          "name": "garlic, peeled and crushed flat with the side of a knife",
+          "canonicalItem": "garlic",
+          "quantity": 6,
+          "unit": "clove"
+        },
+        {
+          "name": "bay leaf",
+          "canonicalItem": "bay leaves",
+          "quantity": 1,
+          "unit": "count"
+        },
+        {
+          "name": "lemon, one wide strip of peel plus the juice",
+          "canonicalItem": "lemon",
+          "quantity": 1,
+          "unit": "count"
+        },
+        {
+          "name": "vegetable broth",
+          "canonicalItem": "vegetable broth",
+          "quantity": 2,
+          "unit": "cup"
+        },
+        {
+          "name": "kosher salt",
+          "canonicalItem": "kosher salt",
+          "quantity": 1.5,
+          "unit": "tsp"
+        },
+        {
+          "name": "black pepper",
+          "canonicalItem": "black pepper",
+          "quantity": 0.5,
+          "unit": "tsp"
+        },
+        {
+          "name": "sourdough loaf, for toast",
+          "canonicalItem": "sourdough loaf",
+          "quantity": 1,
+          "unit": "count",
+          "isOptional": true
+        },
+        {
+          "name": "parsley, chopped",
+          "canonicalItem": "parsley",
+          "quantity": 0.25,
+          "unit": "cup",
+          "isOptional": true
+        },
+        {
+          "name": "red pepper flakes",
+          "canonicalItem": "red pepper flakes",
+          "quantity": 0.25,
+          "unit": "tsp",
+          "isOptional": true
+        }
+      ],
+      "steps": [
+        {
+          "text": "Warm the olive oil in a heavy pot over low heat with the garlic, the bay leaf and a wide strip of lemon peel cut off with a vegetable peeler. Hold it at a lazy sizzle for about 5 minutes, until the garlic smells sweet. It should not brown; if it starts to, pull the pot off the heat for a minute.",
+          "ingredientRefs": [
+            "olive oil",
+            "garlic",
+            "bay leaves",
+            "lemon"
+          ],
+          "timerSeconds": 300
+        },
+        {
+          "text": "Add the beans, the broth and the salt. The liquid should just cover the beans, so top it up with water if it does not. Starting from dried instead: soak a pound overnight, simmer them in plenty of unsalted water with the same garlic, bay and peel for an hour to an hour and a half until a bean crushes against the roof of your mouth, salt them in the last 20 minutes, and carry on here with their own cooking liquid in place of the broth.",
+          "ingredientRefs": [
+            "canned cannellini beans",
+            "vegetable broth",
+            "kosher salt",
+            "garlic",
+            "bay leaves",
+            "lemon"
+          ]
+        },
+        {
+          "text": "Bring it up to the barest simmer, one bubble at a time, and leave it uncovered for 25 minutes with a gentle stir once or twice. The beans drink up the garlic and lemon and the liquid thickens into something between a broth and a sauce.",
+          "ingredientRefs": [
+            "canned cannellini beans"
+          ],
+          "timerSeconds": 1500
+        },
+        {
+          "text": "Fish out the bay leaf and the strip of peel. Crush a big spoonful of the beans against the side of the pot and stir them back in, which is what makes the liquid creamy without any cream. Then taste it properly: it wants more salt than you think, a squeeze of the lemon, a grind of pepper and a last pour of raw olive oil.",
+          "ingredientRefs": [
+            "bay leaves",
+            "lemon",
+            "canned cannellini beans",
+            "kosher salt",
+            "black pepper",
+            "olive oil"
+          ]
+        },
+        {
+          "text": "Eat them warm, spooned onto thick toast with parsley and a pinch of chili flakes for whoever wants it, and put the bowl on the table so everyone takes their own. They keep 5 days covered in the fridge, sitting in their liquid, which is what stops them drying out, and they improve on day two. Reheat a portion gently in a small pan with a splash of water until just steaming; a hard boil breaks the skins. They also freeze in their liquid for up to 3 months.",
+          "ingredientRefs": [
+            "sourdough loaf",
+            "parsley",
+            "red pepper flakes"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "seed-prep-roasted-vegetables",
+      "title": "A Sheet Pan of Roasted Vegetables",
+      "summary": "The Sunday pan that feeds the rest of the week. A method rather than a fixed list, so it works on whatever the shop had.",
+      "sourceType": "builtIn",
+      "prepMinutes": 15,
+      "cookMinutes": 30,
+      "totalMinutes": 45,
+      "baseServings": 8,
+      "tags": [
+        "standby",
+        "prep",
+        "vegetarian",
+        "vegan",
+        "sheet pan",
+        "kid friendly"
+      ],
+      "cookware": [
+        "sheet pan",
+        "mixing bowl"
+      ],
+      "ingredients": [
+        {
+          "name": "carrots, cut into 1 inch pieces",
+          "canonicalItem": "carrot",
+          "quantity": 1,
+          "unit": "lb"
+        },
+        {
+          "name": "sweet potato, peeled and cut into 1 inch cubes",
+          "canonicalItem": "sweet potato",
+          "quantity": 1,
+          "unit": "lb"
+        },
+        {
+          "name": "broccoli, cut into florets, stems peeled and sliced",
+          "canonicalItem": "broccoli",
+          "quantity": 1,
+          "unit": "bunch"
+        },
+        {
+          "name": "red onion, cut into thick wedges",
+          "canonicalItem": "red onion",
+          "quantity": 1,
+          "unit": "count"
+        },
+        {
+          "name": "olive oil",
+          "canonicalItem": "olive oil",
+          "quantity": 4,
+          "unit": "tbsp"
+        },
+        {
+          "name": "kosher salt",
+          "canonicalItem": "kosher salt",
+          "quantity": 1.5,
+          "unit": "tsp"
+        },
+        {
+          "name": "black pepper",
+          "canonicalItem": "black pepper",
+          "quantity": 0.5,
+          "unit": "tsp"
+        },
+        {
+          "name": "garlic, whole cloves left in their skins",
+          "canonicalItem": "garlic",
+          "quantity": 6,
+          "unit": "clove",
+          "isOptional": true
+        },
+        {
+          "name": "lemon, for finishing",
+          "canonicalItem": "lemon",
+          "quantity": 1,
+          "unit": "count",
+          "isOptional": true
+        }
+      ],
+      "steps": [
+        {
+          "text": "Heat the oven to 425F. That number matters more than anything else here: much lower and the vegetables give up their water and steam in it, much higher and thin edges are black before the middles are done. Put the rack in the upper third of the oven.",
+          "ingredientRefs": []
+        },
+        {
+          "text": "Treat the ingredient list as a suggestion and use what is in the house. Autumn and winter: carrots, sweet potato, squash, potato, fennel, cauliflower, brussels sprouts halved through the root. Spring and summer: zucchini, peppers, broccoli, green beans, whole cherry tomatoes. Aim for about three pounds, which is one full pan, and no more than three or four kinds, or it turns into a medley nobody picks from.",
+          "ingredientRefs": [
+            "carrot",
+            "sweet potato",
+            "broccoli",
+            "red onion"
+          ]
+        },
+        {
+          "text": "Cut each vegetable so that its own pieces match, not so that all the vegetables match. Dense roots want 1 inch pieces, broccoli and cauliflower want florets about the same size, onion wants wedges thick enough to hold together. Peel the broccoli stems and slice them; they are the best part of the pan and get thrown away more often than not.",
+          "ingredientRefs": [
+            "carrot",
+            "sweet potato",
+            "broccoli",
+            "red onion"
+          ]
+        },
+        {
+          "text": "Toss in a bowl with the oil, salt, and pepper until every surface is glossy, about a tablespoon of oil per pound. Dry patches will scorch rather than brown. Salt now, not after; it has thirty minutes to get somewhere. Tuck in the garlic cloves if you want them, skins on, so they steam into something spreadable instead of burning.",
+          "ingredientRefs": [
+            "olive oil",
+            "kosher salt",
+            "black pepper",
+            "garlic"
+          ]
+        },
+        {
+          "text": "Spread everything on the pan in one layer with a little bare metal showing between the pieces, flat cut sides down against the pan. This is the whole trick. Vegetables touching each other trap steam and go grey and soft, and browning only happens where a cut face meets hot metal. If the pan is crowded, use two pans on two racks rather than one tall pile.",
+          "ingredientRefs": [
+            "carrot",
+            "sweet potato",
+            "broccoli",
+            "red onion"
+          ]
+        },
+        {
+          "text": "Roast 25 to 35 minutes and leave them alone for the first 20, which is when the undersides set their crust. Then turn the pieces once and look at the pan rather than the clock. They are done when the edges are deeply browned in patches and a knife tip slides into a root with no resistance at all. Tender but pale means they need longer; a little char on a floret is flavour, not a mistake. Soft, quick vegetables like zucchini or tomatoes only need the last 15 minutes, so add them late or give them their own pan.",
+          "ingredientRefs": [
+            "carrot",
+            "sweet potato",
+            "broccoli"
+          ],
+          "timerSeconds": 1200
+        },
+        {
+          "text": "Taste one, add salt if it needs it, and squeeze the lemon over while the pan is still hot. Acid goes further into hot vegetables than cold ones.",
+          "ingredientRefs": [
+            "lemon",
+            "kosher salt"
+          ]
+        },
+        {
+          "text": "Cool them uncovered on the pan so the steam has somewhere to go, then refrigerate in a shallow container for up to 5 days. They are genuinely good cold, eaten straight from the box, piled into pita with hummus, or tipped over grains with a spoonful of sauce, so cold is a real answer and not a compromise. To bring them back hot, spread them on a hot pan at 425F for 6 to 8 minutes or crisp them in a dry skillet. The microwave works but makes them limp.",
+          "ingredientRefs": []
+        }
+      ]
+    },
+    {
+      "id": "seed-prep-tahini-sauce",
+      "title": "Tahini Lemon Sauce",
+      "summary": "A jar of this turns three cold things in the fridge into dinner. Makes about a cup and a half.",
+      "sourceType": "builtIn",
+      "prepMinutes": 10,
+      "cookMinutes": 0,
+      "totalMinutes": 10,
+      "baseServings": 8,
+      "tags": [
+        "standby",
+        "prep",
+        "vegan",
+        "vegetarian",
+        "no cook",
+        "under 30",
+        "kid friendly"
+      ],
+      "cookware": [
+        "mixing bowl",
+        "whisk",
+        "jar"
+      ],
+      "ingredients": [
+        {
+          "name": "tahini",
+          "canonicalItem": "tahini",
+          "quantity": 0.75,
+          "unit": "cup"
+        },
+        {
+          "name": "lemons",
+          "canonicalItem": "lemon",
+          "quantity": 2,
+          "unit": "count"
+        },
+        {
+          "name": "garlic, finely grated",
+          "canonicalItem": "garlic",
+          "quantity": 1,
+          "unit": "clove"
+        },
+        {
+          "name": "ice water",
+          "canonicalItem": "water",
+          "quantity": 0.5,
+          "unit": "cup"
+        },
+        {
+          "name": "kosher salt",
+          "canonicalItem": "kosher salt",
+          "quantity": 0.75,
+          "unit": "tsp"
+        },
+        {
+          "name": "cumin",
+          "canonicalItem": "cumin",
+          "quantity": 0.25,
+          "unit": "tsp",
+          "isOptional": true
+        }
+      ],
+      "steps": [
+        {
+          "text": "Grate the garlic into a small bowl and squeeze both lemons over it. Leave it while you find the jar. Ten minutes in the juice takes the raw edge off the garlic.",
+          "ingredientRefs": [
+            "garlic",
+            "lemon"
+          ],
+          "timerSeconds": 600
+        },
+        {
+          "text": "Put the tahini in a bowl with the salt and the cumin if you are using it, then pour the lemon and garlic in. For a milder jar, pour it through a small strainer and leave the garlic behind.",
+          "ingredientRefs": [
+            "tahini",
+            "kosher salt",
+            "cumin",
+            "lemon",
+            "garlic"
+          ]
+        },
+        {
+          "text": "Whisk, and watch it seize into a stiff pale paste that looks broken. It is not broken. That is what tahini does the moment it meets acid, and it means you are where you should be.",
+          "ingredientRefs": [
+            "tahini"
+          ]
+        },
+        {
+          "text": "Add the ice water a tablespoon at a time, whisking hard after each one. The paste slackens, goes the color of cream, and turns glossy. Stop when it runs off the whisk in a slow ribbon, somewhere near half a cup of water, though every tahini drinks a different amount.",
+          "ingredientRefs": [
+            "water"
+          ]
+        },
+        {
+          "text": "Taste it and push it where it needs to go: salt if it reads flat, lemon if it reads heavy, another spoon of water if it is stiffer than you want.",
+          "ingredientRefs": [
+            "kosher salt",
+            "lemon",
+            "water"
+          ]
+        },
+        {
+          "text": "Scrape it into the jar. It keeps a week in the fridge and stiffens as it sits, so whisk in a spoonful of cold water to bring it back before it goes on anything.",
+          "ingredientRefs": [
+            "water"
+          ]
+        }
+      ]
     }
   ]
 }

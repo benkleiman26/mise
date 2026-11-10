@@ -73,8 +73,14 @@ def run(path):
             if prep in old_vocab or prep in PROVEN_EXTRA: continue
             if prep in MAP:
                 want = MAP[prep]
-                i['name'] = head if want is None else f"{head}, {want}"
-                changed += 1
+                rewritten = head if want is None else f"{head}, {want}"
+                # Some entries map to themselves, so that the vocabulary is
+                # stated in one place rather than split between a map and a
+                # list. Counting those as work makes a no-op run report six
+                # rewrites, which reads as a change that did not happen.
+                if rewritten != i['name']:
+                    i['name'] = rewritten
+                    changed += 1
             else:
                 untouched.add(prep)
 

@@ -107,7 +107,8 @@
       "aliases": [
         "tortillas"
       ],
-      "defaultUnit": "package"
+      "defaultUnit": "package",
+      "isStaple": true
     },
     {
       "name": "milk bread",
@@ -140,7 +141,8 @@
         "pitas",
         "whole grain pitas"
       ],
-      "defaultUnit": "package"
+      "defaultUnit": "package",
+      "isStaple": true
     },
     {
       "name": "pizza dough",
@@ -157,7 +159,8 @@
         "bread",
         "sliced bread"
       ],
-      "defaultUnit": "package"
+      "defaultUnit": "package",
+      "isStaple": true
     },
     {
       "name": "sourdough loaf",
@@ -778,7 +781,8 @@
       "aliases": [
         "anchovy fillets"
       ],
-      "defaultUnit": "can"
+      "defaultUnit": "can",
+      "isStaple": true
     },
     {
       "name": "artichoke hearts",
@@ -877,7 +881,8 @@
       "aliases": [
         "tuna"
       ],
-      "defaultUnit": "can"
+      "defaultUnit": "can",
+      "isStaple": true
     },
     {
       "name": "canned whole tomatoes",
@@ -930,6 +935,15 @@
       "isStaple": true
     },
     {
+      "name": "cornichons",
+      "aisle": "cannedAndJarred",
+      "aliases": [
+        "gherkins"
+      ],
+      "defaultUnit": "package",
+      "isStaple": true
+    },
+    {
       "name": "diced green chiles",
       "aisle": "cannedAndJarred",
       "aliases": [
@@ -945,7 +959,8 @@
         "kalamata olives",
         "green olives"
       ],
-      "defaultUnit": "oz"
+      "defaultUnit": "oz",
+      "isStaple": true
     },
     {
       "name": "pickles",
@@ -956,7 +971,8 @@
         "pickle brine",
         "caper brine"
       ],
-      "defaultUnit": "oz"
+      "defaultUnit": "oz",
+      "isStaple": true
     },
     {
       "name": "pumpkin puree",
@@ -972,6 +988,17 @@
       "name": "salsa",
       "aisle": "cannedAndJarred",
       "defaultUnit": "oz"
+    },
+    {
+      "name": "sardines",
+      "aisle": "cannedAndJarred",
+      "aliases": [
+        "tinned sardines",
+        "sardine",
+        "canned sardines"
+      ],
+      "defaultUnit": "can",
+      "isStaple": true
     },
     {
       "name": "sun-dried tomatoes",
@@ -1022,7 +1049,8 @@
         "shredded cheddar",
         "block cheddar cheese"
       ],
-      "defaultUnit": "oz"
+      "defaultUnit": "oz",
+      "isStaple": true
     },
     {
       "name": "cottage cheese",
@@ -1067,7 +1095,8 @@
       "aliases": [
         "plain greek yogurt"
       ],
-      "defaultUnit": "oz"
+      "defaultUnit": "oz",
+      "isStaple": true
     },
     {
       "name": "half and half",
@@ -1086,7 +1115,8 @@
     {
       "name": "labneh",
       "aisle": "dairyAndEggs",
-      "aliases": []
+      "aliases": [],
+      "isStaple": true
     },
     {
       "name": "milk",
@@ -1188,7 +1218,8 @@
         "crumbled feta cheese",
         "blocks of feta"
       ],
-      "defaultUnit": "oz"
+      "defaultUnit": "oz",
+      "isStaple": true
     },
     {
       "name": "fresh mozzarella",
@@ -1232,6 +1263,16 @@
         "block halloumi"
       ],
       "defaultUnit": "package"
+    },
+    {
+      "name": "hummus",
+      "aisle": "deliAndCheese",
+      "aliases": [
+        "houmous",
+        "hommus"
+      ],
+      "defaultUnit": "package",
+      "isStaple": true
     },
     {
       "name": "low-moisture mozzarella",
@@ -1307,7 +1348,8 @@
     {
       "name": "salami",
       "aisle": "deliAndCheese",
-      "defaultUnit": "oz"
+      "defaultUnit": "oz",
+      "isStaple": true
     },
     {
       "name": "sliced turkey",
@@ -1316,6 +1358,17 @@
         "deli turkey"
       ],
       "defaultUnit": "oz"
+    },
+    {
+      "name": "dumplings",
+      "aisle": "frozen",
+      "aliases": [
+        "gyoza",
+        "potstickers",
+        "frozen dumplings"
+      ],
+      "defaultUnit": "package",
+      "isStaple": true
     },
     {
       "name": "frozen berries",
@@ -1328,7 +1381,8 @@
     {
       "name": "frozen corn",
       "aisle": "frozen",
-      "defaultUnit": "package"
+      "defaultUnit": "package",
+      "isStaple": true
     },
     {
       "name": "frozen edamame",
@@ -1336,7 +1390,8 @@
       "aliases": [
         "edamame"
       ],
-      "defaultUnit": "package"
+      "defaultUnit": "package",
+      "isStaple": true
     },
     {
       "name": "frozen peas",
@@ -1357,7 +1412,8 @@
     {
       "name": "frozen spinach",
       "aisle": "frozen",
-      "defaultUnit": "package"
+      "defaultUnit": "package",
+      "isStaple": true
     },
     {
       "name": "ice cream",
@@ -1494,7 +1550,17 @@
     {
       "name": "fish sauce",
       "aisle": "international",
-      "defaultUnit": "floz"
+      "defaultUnit": "floz",
+      "isStaple": true
+    },
+    {
+      "name": "furikake",
+      "aisle": "international",
+      "aliases": [
+        "rice seasoning"
+      ],
+      "defaultUnit": "package",
+      "isStaple": true
     },
     {
       "name": "gochujang",
@@ -1515,7 +1581,8 @@
     {
       "name": "harissa",
       "aisle": "international",
-      "defaultUnit": "oz"
+      "defaultUnit": "oz",
+      "isStaple": true
     },
     {
       "name": "hoisin sauce",
@@ -1555,7 +1622,8 @@
       "aliases": [
         "seaweed sheets"
       ],
-      "defaultUnit": "package"
+      "defaultUnit": "package",
+      "isStaple": true
     },
     {
       "name": "nuoc cham",
@@ -1868,7 +1936,8 @@
       "aliases": [
         "sesame paste"
       ],
-      "defaultUnit": "oz"
+      "defaultUnit": "oz",
+      "isStaple": true
     },
     {
       "name": "apple cider vinegar",
@@ -2174,12 +2243,14 @@
         "pasta sauce",
         "tomato sauce"
       ],
-      "defaultUnit": "oz"
+      "defaultUnit": "oz",
+      "isStaple": true
     },
     {
       "name": "orzo",
       "aisle": "pastaAndSauces",
-      "defaultUnit": "lb"
+      "defaultUnit": "lb",
+      "isStaple": true
     },
     {
       "name": "penne",
@@ -2389,7 +2460,8 @@
       "aliases": [
         "carrots"
       ],
-      "defaultUnit": "count"
+      "defaultUnit": "count",
+      "isStaple": true
     },
     {
       "name": "cauliflower",
@@ -2416,7 +2488,8 @@
         "cherry tomato",
         "pint cherry tomatoes"
       ],
-      "defaultUnit": "package"
+      "defaultUnit": "package",
+      "isStaple": true
     },
     {
       "name": "chives",
@@ -2463,7 +2536,8 @@
         "persian cucumbers",
         "persian cucumber"
       ],
-      "defaultUnit": "count"
+      "defaultUnit": "count",
+      "isStaple": true
     },
     {
       "name": "dill",
@@ -2584,7 +2658,8 @@
         "freshly grated lemon zest",
         "unwaxed lemon"
       ],
-      "defaultUnit": "count"
+      "defaultUnit": "count",
+      "isStaple": true
     },
     {
       "name": "lemongrass",
@@ -2675,7 +2750,8 @@
         "flat-leaf parsley leaves",
         "parsley leaves and stems"
       ],
-      "defaultUnit": "bunch"
+      "defaultUnit": "bunch",
+      "isStaple": true
     },
     {
       "name": "poblano pepper",
@@ -2709,7 +2785,8 @@
       "aliases": [
         "radishes"
       ],
-      "defaultUnit": "bunch"
+      "defaultUnit": "bunch",
+      "isStaple": true
     },
     {
       "name": "red onion",
@@ -2931,7 +3008,8 @@
     {
       "name": "basmati rice",
       "aisle": "riceGrainsBeans",
-      "defaultUnit": "lb"
+      "defaultUnit": "lb",
+      "isStaple": true
     },
     {
       "name": "breadcrumbs",
@@ -2986,12 +3064,14 @@
         "cooked lentils",
         "french lentils"
       ],
-      "defaultUnit": "lb"
+      "defaultUnit": "lb",
+      "isStaple": true
     },
     {
       "name": "farro",
       "aisle": "riceGrainsBeans",
-      "defaultUnit": "lb"
+      "defaultUnit": "lb",
+      "isStaple": true
     },
     {
       "name": "jasmine rice",

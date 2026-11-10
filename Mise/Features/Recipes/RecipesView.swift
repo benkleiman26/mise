@@ -184,9 +184,6 @@ struct RecipesView: View {
             }
             kindMenu(store)
             moreMenu(store)
-            if store.hasFilters {
-                chip("Clear", systemImage: "xmark", on: false) { store.clearFilters() }
-            }
             Spacer(minLength: 0)
         }
         .padding(.horizontal, 20)
@@ -223,6 +220,12 @@ struct RecipesView: View {
     private func moreMenu(_ store: RecipesStore) -> some View {
         let on = store.onlyFavourites || store.onlyCooked || store.timeLimit != nil || !store.selectedTags.isEmpty
         return Menu {
+            if store.hasFilters {
+                Button(role: .destructive) { store.clearFilters() } label: {
+                    Label("Clear the filters", systemImage: "xmark")
+                }
+                Divider()
+            }
             Button {
                 store.onlyFavourites.toggle()
             } label: {
@@ -259,6 +262,8 @@ struct RecipesView: View {
     private func chipLabel(_ title: String, systemImage: String, on: Bool) -> some View {
         Label(title, systemImage: systemImage)
             .font(.subheadline)
+            .lineLimit(1)
+            .fixedSize(horizontal: true, vertical: false)
             .padding(.horizontal, 12)
             .padding(.vertical, 7)
             .background(on ? AnyShapeStyle(Color.accentColor) : AnyShapeStyle(.quaternary), in: Capsule())
@@ -270,6 +275,8 @@ struct RecipesView: View {
         Button(action: action) {
             Label(title, systemImage: systemImage)
                 .font(.subheadline)
+                .lineLimit(1)
+                .fixedSize(horizontal: true, vertical: false)
                 .padding(.horizontal, 12)
                 .padding(.vertical, 7)
                 .background(on ? AnyShapeStyle(Color.accentColor) : AnyShapeStyle(.quaternary), in: Capsule())

@@ -70,12 +70,6 @@ struct RecipesView: View {
 
         List {
             Section {
-                filterRow(store)
-                    .listRowInsets(EdgeInsets(top: 4, leading: 0, bottom: 4, trailing: 0))
-                    .listRowBackground(Color.clear)
-            }
-
-            Section {
                 if let problem = store.loadProblem {
                     Text(problem).font(.footnote).foregroundStyle(.secondary)
                 }
@@ -107,9 +101,17 @@ struct RecipesView: View {
                         .tint(.pink)
                     }
                 }
-            } header: {
-                Text(count(shown.count, of: store.items.count))
             }
+        }
+        // Pinned above the list rather than scrolling as a row inside it.
+        //
+        // As its own section it cost the gap between two sections plus the
+        // second one's header, which came to most of a thumbnail of empty
+        // screen between the controls and the first recipe. Here it costs what
+        // it occupies, and it stays put while four hundred recipes scroll
+        // past, which is what a control bar is for.
+        .safeAreaInset(edge: .top, spacing: 0) {
+            filterBar(store, showing: shown.count, of: store.items.count)
         }
         .searchable(
             text: Binding(get: { store.query }, set: { store.query = $0 }),
@@ -132,6 +134,7 @@ struct RecipesView: View {
         }
         .animation(.default, value: justAdded)
     }
+
 
     private func row(_ recipe: Recipe) -> some View {
         HStack(alignment: .top, spacing: 12) {
@@ -162,32 +165,31 @@ struct RecipesView: View {
 
     // MARK: - Narrowing down
 
-    /// Two controls on one line, and a line of words underneath when anything
-    /// is on.
+    /// The control bar: two pills, and one line that says what you are looking
+    /// at and why.
     ///
-    /// This started as two horizontally scrolling rows of chips, one per dish
-    /// type, which put the fourth chip off the edge of a phone with nothing to
-    /// say it was there. Then it was four chips that did not fit, so every
-    /// label was squeezed to one character a line. Then three chips whose
-    /// labels disappeared entirely, because a `Label` short of room drops its
-    /// title and keeps the icon, which leaves three unexplained symbols.
+    /// This began as two horizontally scrolling rows of chips, one per dish
+    /// type, which put the fourth off the edge of the phone with nothing to
+    /// say it was there. Then four chips that did not fit, so every label was
+    /// squeezed to one character a line. Then three that fit and lost their
+    /// words, because a Label short of room gives up its title and keeps the
+    /// icon.
     ///
-    /// The lesson of all three is the same: a row of controls does not survive
-    /// a list of filters that grows. Twenty one dish types and forty
-    /// collections were never going to fit on a line, and every attempt to
-    /// make them fit cost the words that say what they are.
+    /// All three were the same mistake. Twenty one dish types and forty
+    /// collections do not go on a line, and every way of making them fit
+    /// spends the words that say what they are.
     ///
-    /// So the controls live in a sheet, which has room to label everything and
-    /// room to grow, and the line holds only the two things worth a tap
-    /// without opening anything: the standbys, and a way in. What the sheet
-    /// hides, the summary underneath says back in words.
+    /// So the line holds the two things worth a tap without opening anything,
+    /// and the rest is a sheet. The count and the reason for it share a line,
+    /// because they are one fact: "19 of 447" answers how many and says
+    /// nothing about why, and the why was previously three controls away.
     @ViewBuilder
-    private func filterRow(_ store: RecipesStore) -> some View {
-        VStack(alignment: .leading, spacing: 8) {
+    private func filterBar(_ store: RecipesStore, showing: Int, of total: Int) -> some View {
+        VStack(alignment: .leading, spacing: 10) {
             HStack(spacing: 8) {
-                // The one shortcut that earns a place on the screen. It is
-                // what gets tapped at 6pm when the alternative is ordering in,
-                // and a shortcut inside a sheet is not a shortcut.
+                // The one shortcut that earns a place on the screen. It is what
+                // gets tapped at 6pm when the alternative is ordering in, and a
+                // shortcut inside a sheet is not a shortcut.
                 pill("Standbys", systemImage: "bolt.fill", on: store.onlyStandbys) {
                     store.onlyStandbys.toggle()
                 }
@@ -200,27 +202,29 @@ struct RecipesView: View {
                 }
                 Spacer(minLength: 0)
             }
-            if store.hasFilters {
-                HStack(spacing: 8) {
+
+            HStack(spacing: 6) {
+                Text(count(showing, of: total))
+                    .foregroundStyle(.secondary)
+                if store.hasFilters {
                     Text(store.filterSummary)
-                        .font(.footnote)
                         .foregroundStyle(.secondary)
                         .lineLimit(1)
+                        .truncationMode(.tail)
+                    Spacer(minLength: 8)
                     Button("Clear") { store.clearFilters() }
-                        .font(.footnote)
                 }
             }
+            .font(.footnote)
         }
+        .frame(maxWidth: .infinity, alignment: .leading)
         .padding(.horizontal, 20)
+        .padding(.top, 6)
+        .padding(.bottom, 10)
+        .background(.bar)
     }
 
-    /// Composed out of an image and a text rather than built from `Label`.
-    ///
-    /// A `Label` decides for itself how much of itself to show when space is
-    /// tight, and what it gives up first is the words. On this row that turned
-    /// three filters into three unlabelled symbols. Spelling it out means the
-    /// title is not negotiable: it keeps its width and the row runs out of
-    /// space honestly if it ever has to.
+
     private func pill(_ title: String, systemImage: String, on: Bool, action: @escaping () -> Void) -> some View {
         Button(action: action) {
             HStack(spacing: 6) {
@@ -252,7 +256,6 @@ struct RecipesView: View {
         }
     }
 
-    @ViewBuilder
     /// Everything that narrows the list, in one sheet.
     ///
     /// Sections rather than a row, because a section has room for a heading

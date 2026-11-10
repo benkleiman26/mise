@@ -4722,8 +4722,8 @@
       "summary": "A pot of soft red lentils with warm spice that is better on day two and feeds a week of bowls.",
       "sourceType": "builtIn",
       "prepMinutes": 10,
-      "cookMinutes": 35,
-      "totalMinutes": 45,
+      "cookMinutes": 40,
+      "totalMinutes": 50,
       "baseServings": 6,
       "tags": [
         "standby",
@@ -4796,7 +4796,7 @@
         {
           "name": "vegetable broth",
           "canonicalItem": "vegetable broth",
-          "quantity": 6,
+          "quantity": 5,
           "unit": "cup"
         },
         {
@@ -4820,7 +4820,7 @@
         {
           "name": "lemon",
           "canonicalItem": "lemon",
-          "quantity": 1,
+          "quantity": 2,
           "unit": "count"
         },
         {
@@ -4882,11 +4882,10 @@
           "timerSeconds": 60
         },
         {
-          "text": "Add the turmeric, cumin, garam masala, and pepper flakes and stir them in the hot oil for about 30 seconds, until they smell toasted. Keep them moving so they do not catch and turn bitter.",
+          "text": "Add the turmeric, cumin, and pepper flakes and stir them in the hot oil for about 30 seconds, until they smell toasted. Keep them moving so they do not catch and turn bitter. The garam masala is held back until the end.",
           "ingredientRefs": [
             "turmeric",
             "cumin",
-            "garam masala",
             "red pepper flakes"
           ],
           "timerSeconds": 30
@@ -4899,30 +4898,32 @@
           "timerSeconds": 270
         },
         {
-          "text": "Add the lentils, the broth, and the salt. Bring it to a boil, then turn it down to a low simmer and leave it partly covered for 25 minutes, stirring now and then so nothing sticks to the bottom. It is done when the lentils have given up their shape entirely.",
+          "text": "Add the lentils, the broth, and the salt. Bring it to a boil, then turn it down to a low simmer and leave it partly covered for about 20 minutes, stirring now and then so nothing sticks to the bottom. It is done when the lentils have given up their shape entirely, which can take 5 minutes longer if the lentils have been in the cupboard a while.",
           "ingredientRefs": [
             "dried lentils",
             "vegetable broth",
             "kosher salt"
           ],
-          "timerSeconds": 1500
+          "timerSeconds": 1200
         },
         {
-          "text": "While it simmers, cook the rice however you usually do, in a saucepan with twice its volume of water.",
+          "text": "While it simmers, rinse the rice and cook it in a saucepan with one and a half times its volume of water, so about 2 and a quarter cups here. Twice the water, which is the habit most of us have from other rice, leaves basmati soggy. Take it off the heat and leave it covered for 10 minutes before you fluff it.",
           "ingredientRefs": [
             "basmati rice"
           ]
         },
         {
-          "text": "Stir the butter into the dal off the heat, then squeeze in half the lemon and taste for salt. Loosen it with a splash of water if it is thicker than you want, or simmer it uncovered a few minutes if it is thinner. A spoonful of olive oil in place of the butter keeps it vegan.",
+          "text": "Stir the butter and the garam masala into the dal over low heat for a minute, then take the pot off the heat, squeeze in the juice of a whole lemon, and taste for salt. The garam masala goes in now rather than at the start because its aroma cooks off over a long simmer. Loosen the dal with a splash of water if it is thicker than you want, or simmer it uncovered a few minutes if it is thinner, aiming a little looser than you mean to serve it because it firms up as it stands. A spoonful of olive oil in place of the butter keeps it vegan, and low sodium broth will want another half teaspoon of salt.",
           "ingredientRefs": [
             "butter",
+            "garam masala",
             "lemon",
-            "olive oil"
+            "olive oil",
+            "kosher salt"
           ]
         },
         {
-          "text": "Serve it as parts rather than as plates: rice and a ladle of dal in each bowl, and the yogurt, cilantro, scallions, remaining lemon in wedges, and warm naan set out for people to add themselves. Plain dal over plain rice is a complete dinner for whoever wants it that way.",
+          "text": "Serve it as parts rather than as plates: rice and a ladle of dal in each bowl, and the yogurt, cilantro, scallions, the second lemon in wedges, and warm naan set out for people to add themselves. Plain dal over plain rice is a complete dinner for whoever wants it that way.",
           "ingredientRefs": [
             "basmati rice",
             "plain yogurt",
@@ -4946,8 +4947,8 @@
       "summary": "Eggs, whatever vegetable is going, and a cheese, set in a skillet and finished in the oven. As good cold as warm.",
       "sourceType": "builtIn",
       "prepMinutes": 8,
-      "cookMinutes": 20,
-      "totalMinutes": 28,
+      "cookMinutes": 22,
+      "totalMinutes": 30,
       "baseServings": 4,
       "tags": [
         "standby",
@@ -4958,7 +4959,7 @@
         "kid friendly"
       ],
       "cookware": [
-        "large skillet",
+        "oven safe skillet",
         "mixing bowl"
       ],
       "ingredients": [
@@ -5001,7 +5002,7 @@
         {
           "name": "kosher salt",
           "canonicalItem": "kosher salt",
-          "quantity": 1,
+          "quantity": 1.25,
           "unit": "tsp"
         },
         {
@@ -5030,7 +5031,7 @@
           "ingredientRefs": []
         },
         {
-          "text": "Beat the eggs with the milk, the salt, and plenty of pepper until the yolks and whites are one color, then stir in two thirds of the cheese. Any firm cheese that melts works here, and a hard grating cheese works too.",
+          "text": "Beat the eggs with the milk, 1 teaspoon of the salt, and plenty of pepper until the yolks and whites are one color, then stir in two thirds of the cheese. Any firm cheese that melts works here, and a hard grating cheese works too.",
           "ingredientRefs": [
             "eggs",
             "milk",
@@ -5040,18 +5041,18 @@
           ]
         },
         {
-          "text": "Warm the oil in a ten inch oven safe skillet over medium heat and cook the onion with a pinch of salt until soft and sweet, about 5 minutes.",
+          "text": "Warm the oil in a ten inch oven safe skillet over medium high heat and cook the onion until it is limp and translucent, about 4 minutes. It will not be sweet and caramelized in that time and does not need to be.",
           "ingredientRefs": [
             "olive oil",
-            "yellow onion",
-            "kosher salt"
+            "yellow onion"
           ],
-          "timerSeconds": 300
+          "timerSeconds": 240
         },
         {
-          "text": "Add the zucchini and cook until it has given up its water and the pan looks dry again, about 6 minutes. Whatever vegetable is in the drawer goes here instead: spinach wilted and squeezed hard, leftover roasted vegetables, cooked potato in cubes, halved cherry tomatoes. The only rule is that it goes in cooked and dry, because raw wet vegetables make a weepy frittata.",
+          "text": "Add the zucchini and the last quarter teaspoon of salt, spread it in one layer, and cook with little stirring until the water it throws off has boiled away and some slices have browned edges, 6 to 8 minutes. The pan should look dry before the eggs go anywhere near it. Whatever vegetable is in the drawer goes here instead: spinach wilted and squeezed hard, leftover roasted vegetables, cooked potato in cubes, halved cherry tomatoes. The only rule is that it goes in cooked and dry, because raw wet vegetables make a weepy frittata.",
           "ingredientRefs": [
-            "zucchini"
+            "zucchini",
+            "kosher salt"
           ],
           "timerSeconds": 360
         },
@@ -5068,7 +5069,7 @@
           "ingredientRefs": [
             "cheddar"
           ],
-          "timerSeconds": 720
+          "timerSeconds": 600
         },
         {
           "text": "Rest it 5 minutes, run a spatula around the edge, and slide it onto a board to cut into wedges. Scatter the parsley. Put the salami on its own plate so whoever wants it can lay it over their own slice.",

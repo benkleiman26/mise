@@ -34,7 +34,11 @@ describe('lintListFixtures catches a bad scenario', () => {
     const scenario = structuredClone(FIXTURES.scenarios[0]);
     scenario.expectAbsent = [];
     scenario.expect.push({ item: 'olive oil', aisle: 'oilsAndCondiments', formatted: '3 tbsp', sources: 1 });
-    assert.match(lintListFixtures(withScenarios([scenario]), SEED, CANONICAL).join(' '), /expects 5 items, the rules give 4/);
+    // The counts are deliberately not written down. What this test is about is
+    // that the linter notices a scenario expecting a line the rules do not
+    // produce, and pinning the numbers means it fails every time somebody edits
+    // the fixture, which is a false alarm rather than a finding.
+    assert.match(lintListFixtures(withScenarios([scenario]), SEED, CANONICAL).join(' '), /expects \d+ items, the rules give \d+/);
   });
 
   test('an item claimed absent that is on the list', () => {

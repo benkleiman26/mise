@@ -5904,12 +5904,6 @@
           "unit": "oz"
         },
         {
-          "name": "milk",
-          "canonicalItem": "milk",
-          "quantity": 2,
-          "unit": "tbsp"
-        },
-        {
           "name": "chives, chopped",
           "canonicalItem": "chives",
           "quantity": 1,
@@ -6002,11 +5996,10 @@
           ]
         },
         {
-          "text": "Beat the cream cheese with the milk, a pinch of the salt and some pepper until it spreads without dragging at the bread, and put it in a small dish with its own knife. The chives go in a bowl of their own rather than into the cheese. Anybody who wants them stirs them through their own slice, and anybody who does not never has to meet them, which is the whole arrangement this meal runs on.",
+          "text": "Put the cream cheese in a small dish with its own knife. It came out of the fridge first thing, so it will spread. The chives go in a bowl of their own rather than into the cheese. Anybody who wants them stirs them through their own slice, and anybody who does not never has to meet them, which is the whole arrangement this meal runs on.",
           "ingredientRefs": [
             "cream cheese",
             "chives",
-            "milk",
             "kosher salt",
             "black pepper"
           ]

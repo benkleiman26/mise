@@ -54,6 +54,33 @@ final class RecipesStore {
 
     static let standbyTag = "standby"
 
+    /// What is currently narrowing the list, in words.
+    ///
+    /// A sheet holds the controls, which keeps the top of the screen calm and
+    /// hides the state. So the state comes back out here, under the row, where
+    /// "19 of 447" on its own would not say why.
+    var filterSummary: String {
+        var parts: [String] = []
+        if onlyStandbys { parts.append("Standbys") }
+        if onlyFavourites { parts.append("Favourites") }
+        if onlyCooked { parts.append("Cooked before") }
+        if let limit = timeLimit { parts.append(limit.label.lowercased()) }
+        parts.append(contentsOf: selectedKinds
+            .map(\.displayName)
+            .sorted())
+        parts.append(contentsOf: selectedTags.sorted())
+        return parts.joined(separator: " · ")
+    }
+
+    /// How many separate choices are on, for the badge on the button.
+    var filterCount: Int {
+        var n = selectedKinds.count + selectedTags.count
+        if onlyFavourites { n += 1 }
+        if onlyCooked { n += 1 }
+        if timeLimit != nil { n += 1 }
+        return n
+    }
+
     var hasFilters: Bool {
         !selectedTags.isEmpty || !selectedKinds.isEmpty || onlyFavourites || onlyCooked
             || onlyStandbys || timeLimit != nil

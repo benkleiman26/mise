@@ -62,7 +62,7 @@ final class RecipesStore {
     var filterSummary: String {
         var parts: [String] = []
         if onlyStandbys { parts.append("Standbys") }
-        if onlyFavourites { parts.append("Favourites") }
+        if onlyFavourites { parts.append("Favorites") }
         if onlyCooked { parts.append("Cooked before") }
         if let limit = timeLimit { parts.append(limit.label.lowercased()) }
         parts.append(contentsOf: selectedKinds
@@ -159,12 +159,63 @@ final class RecipesStore {
                 let own = Set(recipe.tags.map { $0.lowercased() })
                 guard selectedTags.allSatisfy({ own.contains($0.lowercased()) }) else { return false }
             }
-            guard !terms.isEmpty else { return true }
-            let haystack = Self.searchText(for: recipe)
-            return terms.allSatisfy { haystack.contains($0) }
+            return true
         }
 
-        return filtered.sorted(by: order)
+        guard !terms.isEmpty else { return filtered.sorted(by: order) }
+
+        // Ranked, not filtered alphabetically.
+        //
+        // Searching used to join the title, the summary, the tags and every
+        // ingredient name into one string and ask whether it contained the
+        // word. So "chicken" returned every recipe holding chicken broth, and
+        // the four hundred results came back A to Z, with no way to tell a
+        // recipe called Chicken Soup from one that happens to use a stock
+        // cube. The answer was in there and so was everything else.
+        let scored = filtered.compactMap { recipe -> (Recipe, Int)? in
+            let score = Self.relevance(of: recipe, to: terms)
+            return score > 0 ? (recipe, score) : nil
+        }
+        return scored
+            .sorted { left, right in
+                if left.1 != right.1 { return left.1 > right.1 }
+                return order(left.0, right.0)
+            }
+            .map(\.0)
+    }
+
+    /// How well a recipe answers the query, or zero if it does not.
+    ///
+    /// Every term still has to appear somewhere, which is what makes a second
+    /// word narrow rather than widen. What changed is that where it appears
+    /// decides the order: the title is what the dish is called, a tag is what
+    /// somebody filed it under, and an ingredient is a thing it happens to
+    /// contain, which is the weakest claim of the three and was previously
+    /// worth exactly as much as the first.
+    private static func relevance(of recipe: Recipe, to terms: [String]) -> Int {
+        let title = tokens(recipe.title)
+        let tags = recipe.tags.flatMap(tokens)
+        let summary = tokens(recipe.summary)
+        let ingredients = recipe.ingredients.flatMap { tokens($0.name) }
+
+        var total = 0
+        for term in terms {
+            let here: Int
+            if title.contains(term) { here = 10 }
+            else if title.contains(where: { $0.hasPrefix(term) }) { here = 7 }
+            else if tags.contains(where: { $0.hasPrefix(term) }) { here = 4 }
+            else if summary.contains(where: { $0.hasPrefix(term) }) { here = 2 }
+            else if ingredients.contains(where: { $0.hasPrefix(term) }) { here = 1 }
+            else { return 0 }
+            total += here
+        }
+        return total
+    }
+
+    /// Words, so a term matches the start of one rather than any run of
+    /// letters anywhere. Searching for "pan" used to find "Japanese".
+    private static func tokens(_ text: String) -> [String] {
+        text.lowercased().split { !$0.isLetter && !$0.isNumber }.map(String.init)
     }
 
     private var order: (Recipe, Recipe) -> Bool {
@@ -199,12 +250,7 @@ final class RecipesStore {
             .map(String.init)
     }
 
-    private static func searchText(for recipe: Recipe) -> String {
-        var parts = [recipe.title, recipe.summary]
-        parts.append(contentsOf: recipe.tags)
-        parts.append(contentsOf: recipe.ingredients.map(\.name))
-        return parts.joined(separator: " ").lowercased()
-    }
+
 
     func load() {
         do {

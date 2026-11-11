@@ -96,7 +96,7 @@ struct RecipesView: View {
                         Button {
                             store.toggleFavourite(recipe)
                         } label: {
-                            Label("Favourite", systemImage: recipe.isFavorite ? "heart.slash" : "heart")
+                            Label("Favorite", systemImage: recipe.isFavorite ? "heart.slash" : "heart")
                         }
                         .tint(.pink)
                     }
@@ -267,7 +267,7 @@ struct RecipesView: View {
         NavigationStack {
             List {
                 Section {
-                    toggleRow("Favourites", on: store.onlyFavourites) { store.onlyFavourites.toggle() }
+                    toggleRow("Favorites", on: store.onlyFavourites) { store.onlyFavourites.toggle() }
                     toggleRow("Cooked before", on: store.onlyCooked) { store.onlyCooked.toggle() }
                 }
 

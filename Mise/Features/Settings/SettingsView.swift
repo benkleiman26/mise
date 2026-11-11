@@ -64,7 +64,7 @@ struct SettingsView: View {
                     NavigationLink {
                         CategoriseView()
                     } label: {
-                        Label("Categorise ingredients", systemImage: "tag")
+                        Label("Categorize ingredients", systemImage: "tag")
                     }
                 } footer: {
                     Text("Ingredients that match no grocery item sit in the Other aisle and never merge. Telling Mise what one is teaches it for good.")
@@ -178,7 +178,7 @@ struct SettingsView: View {
                     NavigationLink {
                         CategoriseView()
                     } label: {
-                        LabeledContent("Not yet categorised", value: "\(report.unmatchedIngredients.count)")
+                        LabeledContent("Not yet categorized", value: "\(report.unmatchedIngredients.count)")
                     }
                 }
             }

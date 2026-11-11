@@ -197,6 +197,24 @@ struct GroceryListView: View {
                     .font(.caption)
                     .foregroundStyle(.tertiary)
             }
+
+            // Something to aim at.
+            //
+            // Ticking off is what a shopper does fifty times in a shop, so it
+            // keeps the whole row. Asking what a line is for is rarer, and it
+            // was on a long press, which is a gesture with nothing on the
+            // screen to say it exists: the answer to "which recipe needs
+            // this" was already in the app and nobody could find it. A child
+            // view's tap wins over its parent's, so this takes its own taps
+            // without stopping the row taking the rest.
+            Image(systemName: "chevron.right")
+                .font(.footnote.weight(.semibold))
+                .foregroundStyle(.tertiary)
+                .padding(.vertical, 6)
+                .padding(.leading, 10)
+                .contentShape(Rectangle())
+                .onTapGesture { showing = item }
+                .accessibilityLabel("What needs \(item.displayName)")
         }
         .contentShape(Rectangle())
         .onTapGesture {
@@ -204,9 +222,7 @@ struct GroceryListView: View {
             // that vanishes without moving reads as a glitch.
             withAnimation { store.toggle(item) }
         }
-        // Ticking off is the thing a shopper does fifty times in a shop, so it
-        // keeps the tap. Asking what a row is for is rarer and gets the longer
-        // press.
+        // Kept, because it is in the fingers of anybody who learned it.
         .onLongPressGesture(minimumDuration: 0.35) {
             showing = item
         }

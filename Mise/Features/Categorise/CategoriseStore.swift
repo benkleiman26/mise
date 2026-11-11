@@ -73,7 +73,7 @@ final class CategoriseStore {
             problem = nil
         } catch {
             pending = []
-            problem = "The uncategorised ingredients could not be read. \(error)"
+            problem = "The uncategorized ingredients could not be read. \(error)"
         }
     }
 

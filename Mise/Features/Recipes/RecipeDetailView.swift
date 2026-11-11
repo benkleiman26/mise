@@ -106,6 +106,19 @@ struct RecipeDetailView: View {
             }
         }
         .navigationTitle(recipe.title)
+        .toolbar {
+            ToolbarItem(placement: .topBarTrailing) {
+                Button {
+                    store?.toggleFavourite(recipe)
+                } label: {
+                    Label(
+                        recipe.isFavorite ? "Remove from favorites" : "Add to favorites",
+                        systemImage: recipe.isFavorite ? "heart.fill" : "heart"
+                    )
+                }
+                .tint(.pink)
+            }
+        }
         .navigationBarTitleDisplayMode(.inline)
         .safeAreaInset(edge: .bottom) { addButton }
         .task {

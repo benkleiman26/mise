@@ -18,6 +18,23 @@ final class RecipeDetailStore {
         self.recipes = recipes
     }
 
+    /// Hearts a recipe, from the screen that is open when somebody decides.
+    ///
+    /// The list has had a swipe for this since the beginning and the detail
+    /// screen has had nothing, so the only way to mark a favourite was a
+    /// gesture with no sign it exists, performed on a row rather than on the
+    /// recipe you are actually reading.
+    func toggleFavourite(_ recipe: Recipe) {
+        do {
+            recipe.isFavorite.toggle()
+            recipe.updatedAt = .now
+            try recipes.save()
+            problem = nil
+        } catch {
+            problem = "That could not be saved. \(error)"
+        }
+    }
+
     /// Says what the written amounts are for, without touching the amounts.
     ///
     /// This is a correction, not a conversion: "these quantities feed two, not

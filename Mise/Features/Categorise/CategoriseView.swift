@@ -13,13 +13,13 @@ struct CategoriseView: View {
                 waiting(store)
             } else {
                 ContentUnavailableView {
-                    Label("Everything is categorised", systemImage: "checkmark.circle")
+                    Label("Everything is categorized", systemImage: "checkmark.circle")
                 } description: {
                     Text("Every ingredient in your recipes matches a grocery item, so the list can merge them properly.")
                 }
             }
         }
-        .navigationTitle("Not yet categorised")
+        .navigationTitle("Not yet categorized")
         .navigationBarTitleDisplayMode(.inline)
         .task {
             if store == nil {

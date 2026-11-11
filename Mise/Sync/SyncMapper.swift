@@ -22,6 +22,24 @@ struct SyncMapper {
 
     // MARK: - Out
 
+    /// What this device holds, for the tables that should not drift.
+    ///
+    /// The library only: recipes with their ingredients and steps, the grocery
+    /// table and the pantry. Those change rarely, so this device holding more
+    /// than the server does means something was refused rather than something
+    /// being in flight. The week and the list are left out on purpose: they
+    /// change constantly and a difference between two phones mid-shop is
+    /// ordinary rather than a fault.
+    func libraryCounts() throws -> [String: Int] {
+        [
+            SyncEntity.canonicalItem.rawValue: try canonicalItems.count(),
+            SyncEntity.recipe.rawValue: try recipes.count(),
+            SyncEntity.ingredient.rawValue: try recipes.allIngredients().count,
+            SyncEntity.recipeStep.rawValue: try recipes.allSteps().count,
+            SyncEntity.pantryEntry.rawValue: try pantry.count(),
+        ]
+    }
+
     func records(changedSince cursor: Date?) throws -> [SyncRecord] {
         var out: [SyncRecord] = []
         let after = cursor ?? .distantPast

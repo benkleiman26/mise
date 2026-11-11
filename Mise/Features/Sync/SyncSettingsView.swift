@@ -118,6 +118,13 @@ struct SyncSettingsView: View {
             }
         }
 
+        if let store, let shortfall = store.shortfall {
+            Section {
+                Label(shortfall, systemImage: "exclamationmark.triangle")
+                    .font(.footnote)
+            }
+        }
+
         if let store, let problem = store.problem {
             Section {
                 Text(problem)

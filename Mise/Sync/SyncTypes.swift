@@ -110,6 +110,20 @@ protocol SyncClient: Sendable {
     /// Sends local changes. Returns the server's clock, which becomes the next
     /// cursor.
     func push(_ batch: SyncBatch, householdID: UUID, deviceID: UUID) async throws -> Date
+
+    /// How many records the server holds, per entity.
+    ///
+    /// Not part of syncing. It is how a device finds out that something it
+    /// sent was refused, which the push itself cannot say: the server returns
+    /// a timestamp, and a push of two hundred records the tombstone guard
+    /// throws away looks exactly like a push of two hundred it kept.
+    func counts(householdID: UUID) async throws -> [String: Int]
+}
+
+extension SyncClient {
+    /// Defaulted, so a stand-in need not answer. A client that cannot count
+    /// simply never reports a difference, which is the old behaviour.
+    func counts(householdID: UUID) async throws -> [String: Int] { [:] }
 }
 
 enum SyncError: LocalizedError {

@@ -121,6 +121,20 @@ struct SupabaseSyncClient: SyncClient {
         return (try? JSONSerialization.jsonObject(with: data) as? [[String: Any]]) ?? []
     }
 
+    func counts(householdID: UUID) async throws -> [String: Int] {
+        var request = URLRequest(url: config.url.appending(path: "/rest/v1/rpc/mise_household_counts"))
+        request.httpMethod = "POST"
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        try await sign(&request)
+        request.httpBody = try JSONSerialization.data(
+            withJSONObject: ["target": householdID.uuidString.lowercased()]
+        )
+
+        let data = try await send(request)
+        let object = (try? JSONSerialization.jsonObject(with: data)) as? [String: Any] ?? [:]
+        return object.compactMapValues { ($0 as? NSNumber)?.intValue }
+    }
+
     private func call(_ function: String, payload: [[String: Any]]) async throws -> Date? {
         var request = URLRequest(url: config.url.appending(path: "/rest/v1/rpc/\(function)"))
         request.httpMethod = "POST"

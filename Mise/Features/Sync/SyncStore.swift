@@ -81,6 +81,15 @@ final class SyncStore {
     var isSharing: Bool { SyncGroup.current != nil }
     var lastSyncedAt: Date? { engine?.lastSyncedAt }
 
+    /// Said out loud, because the whole point is that it was never said.
+    var shortfall: String? {
+        guard let missing = engine?.missingFromServer, !missing.isEmpty else { return nil }
+        let total = missing.reduce(0) { $0 + $1.missing }
+        let worst = missing.prefix(3).map { "\($0.missing) \($0.entity)" }.joined(separator: ", ")
+        return "The server is behind by \(total) records this phone holds (\(worst)). "
+            + "They are being refused rather than failing, so syncing again will not fix it."
+    }
+
     var statusText: String {
         switch engine?.status {
         case .working: "Syncing"
@@ -388,6 +397,11 @@ final class SyncStore {
         out.append(("Last sent", "\(engine?.lastSent ?? 0)"))
         out.append(("Last received", "\(engine?.lastReceived ?? 0)"))
         out.append(("Changes waiting", "\(pendingCount)"))
+        let missing = engine?.missingFromServer ?? []
+        out.append((
+            "Server behind by",
+            missing.isEmpty ? "nothing" : missing.map { "\($0.entity) \($0.missing)" }.joined(separator: ", ")
+        ))
         return out
     }
 

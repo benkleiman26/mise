@@ -28,6 +28,18 @@ final class SyncEngine {
     private(set) var lastSent = 0
     private(set) var lastReceived = 0
 
+    /// One table where this device holds records the server does not.
+    struct Shortfall: Equatable, Sendable {
+        let entity: String
+        let local: Int
+        let server: Int
+        var missing: Int { local - server }
+    }
+
+    /// Tables the server is behind on, after the last full round. Empty is the
+    /// answer you want and the answer you get when the server cannot be asked.
+    private(set) var missingFromServer: [Shortfall] = []
+
     // A new key, because what it holds is no longer a date. A device carrying
     // the old one starts from the beginning, reads everything once and settles,
     // which costs a slow first sync and nothing else.
@@ -187,10 +199,44 @@ final class SyncEngine {
 
             lastSyncedAt = Date()
             UserDefaults.standard.set(lastSyncedAt, forKey: Self.syncedKey)
+
+            // Only on a full round, which is the button rather than the timer.
+            // It is one extra request and nobody is waiting on the automatic
+            // rounds, which take four pages and leave the rest.
+            if pages >= Self.maximumPages {
+                await compareWithServer(group: group)
+            }
+
             status = .idle
         } catch {
             status = .failed((error as? LocalizedError)?.errorDescription ?? "\(error)")
         }
+    }
+
+    /// Asks what the server holds and notices if this device holds more.
+    ///
+    /// Added after 190 recipes sat on a phone for a week. They had been
+    /// refused, every time, by the guard that stops a record a tombstone
+    /// covers from coming back, and nothing noticed, because a push of two
+    /// hundred records the server throws away returns the same timestamp as a
+    /// push of two hundred it keeps. Every sync reported success and the
+    /// library quietly stayed behind.
+    ///
+    /// Failing to ask is not a sync failure. An older server has no such
+    /// function and this is only a report, so the round stands either way.
+    private func compareWithServer(group: UUID) async {
+        guard let mine = try? mapper.libraryCounts() else { return }
+        guard let theirs = try? await client.counts(householdID: group), !theirs.isEmpty else {
+            missingFromServer = []
+            return
+        }
+        missingFromServer = mine
+            .compactMap { entity, local -> Shortfall? in
+                let server = theirs[entity] ?? 0
+                guard local > server else { return nil }
+                return Shortfall(entity: entity, local: local, server: server)
+            }
+            .sorted { $0.missing > $1.missing }
     }
 
     /// Pulls until there is nothing left, not one page and done.

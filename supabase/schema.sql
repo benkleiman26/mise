@@ -347,3 +347,30 @@ as $$
 $$;
 
 grant execute on function mise_whoami() to anon, authenticated;
+
+-- What the server actually holds, per table, for one household.
+--
+-- Added after 190 recipes sat on a phone for a week while every sync reported
+-- success. They had been refused by the tombstone guard above, and nothing
+-- anywhere compared what a device holds with what the server took, so the only
+-- way it surfaced was somebody noticing a recipe listed twice.
+--
+-- The push function returns a timestamp and changing that would break every
+-- client expecting one, so the comparison gets its own call. Read only,
+-- security invoker, so a member sees their own household and nobody else's.
+create or replace function mise_household_counts(target uuid)
+returns jsonb
+language sql
+security invoker
+stable
+as $$
+  select coalesce(jsonb_object_agg(entity, n), '{}'::jsonb)
+  from (
+    select entity, count(*) as n
+    from mise_records
+    where household_id = target
+    group by entity
+  ) counted;
+$$;
+
+grant execute on function mise_household_counts(uuid) to authenticated;

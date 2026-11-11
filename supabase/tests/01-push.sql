@@ -67,3 +67,31 @@ select check_that('adding it again on purpose beats the tombstone',
 select mise_push_records('[]'::jsonb);
 select mise_push_deletions('[]'::jsonb);
 select check_that('an empty payload does nothing quietly', true);
+
+-- 8. Counting what the household holds, which is how a phone finds out that
+--    something it pushed was refused.
+select mise_push_records('[
+ {"household_id":"aaaaaaaa-0000-0000-0000-000000000001","entity":"recipe","id":"bbbbbbbb-0000-0000-0000-000000000002",
+  "fields":{"title":"one"},"updated_at":"2026-06-01T00:00:00Z","device_id":"cccccccc-0000-0000-0000-000000000003"},
+ {"household_id":"aaaaaaaa-0000-0000-0000-000000000001","entity":"recipe","id":"bbbbbbbb-0000-0000-0000-000000000003",
+  "fields":{"title":"two"},"updated_at":"2026-06-01T00:00:00Z","device_id":"cccccccc-0000-0000-0000-000000000003"}
+]'::jsonb);
+select check_that('counts report each table separately',
+  (select mise_household_counts('aaaaaaaa-0000-0000-0000-000000000001')
+          = '{"recipe": 2, "groceryItem": 1}'::jsonb));
+
+-- A refused push is exactly the case this exists to make visible: the count
+-- does not move, while the push itself reports nothing wrong.
+select mise_push_deletions('[
+ {"household_id":"aaaaaaaa-0000-0000-0000-000000000001","entity":"recipe","record_id":"bbbbbbbb-0000-0000-0000-000000000003",
+  "deleted_at":"2026-07-01T00:00:00Z","device_id":"cccccccc-0000-0000-0000-000000000003"}
+]'::jsonb);
+select mise_push_records('[
+ {"household_id":"aaaaaaaa-0000-0000-0000-000000000001","entity":"recipe","id":"bbbbbbbb-0000-0000-0000-000000000003",
+  "fields":{"title":"two"},"updated_at":"2026-06-01T00:00:00Z","device_id":"cccccccc-0000-0000-0000-000000000003"}
+]'::jsonb);
+select check_that('a refused push leaves the count where it was',
+  (select (mise_household_counts('aaaaaaaa-0000-0000-0000-000000000001')->>'recipe')::int = 1));
+
+select check_that('counting a household with nothing in it is an empty object, not null',
+  (select mise_household_counts('aaaaaaaa-0000-0000-0000-00000000ffff') = '{}'::jsonb));

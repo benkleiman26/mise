@@ -50,7 +50,7 @@ final class SyncEngine {
     /// every row in it is older than the watermark. Bumping the number makes
     /// the next round start from the beginning once, and the server's upsert
     /// makes that cost nothing but time.
-    private static let sharedSetVersion = 3
+    private static let sharedSetVersion = 4
 
     /// How many records go in one request, out or in. A multi-megabyte body
     /// times out and takes the whole round with it.

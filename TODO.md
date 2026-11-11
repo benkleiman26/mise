@@ -11,6 +11,14 @@ Build 3 is with Apple for the other household.
 
 Open, in the order I would take them:
 
+- [ ] **The duplicate recipes are local only.** "Crunchy Roll Bowls" appears
+      twice on the owner's phone and not once on the server. Both copies are
+      among the 190 recipes the tombstones were blocking, so neither has ever
+      synced. Once the library is whole again, find out whether the second
+      copy is a Mealime import of a recipe the NYT export also brought in, and
+      decide whether anything should merge them. `DuplicateReconciler` covers
+      planned meals and grocery items and does not look at recipes at all.
+
 - [ ] **Integer fields whose value is 0 or 1 do not survive a sync.**
       `value(from:)` at `Mise/Sync/SupabaseSyncClient.swift:221` tests `Bool`
       before `Int`, and `JSONSerialization` hands back an `NSNumber` that

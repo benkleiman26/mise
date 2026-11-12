@@ -7791,6 +7791,167 @@
           ]
         }
       ]
+    },
+    {
+      "id": "seed-strawberry-pb-chia-oats",
+      "title": "Strawberry Peanut Butter Chia Overnight Oats",
+      "summary": "A jar built the night before, so breakfast is already made when you get to it.",
+      "sourceType": "builtIn",
+      "prepMinutes": 8,
+      "cookMinutes": 0,
+      "totalMinutes": 8,
+      "baseServings": 1,
+      "tags": [
+        "standby",
+        "make ahead",
+        "breakfast",
+        "vegetarian",
+        "under 30",
+        "no cook",
+        "kid friendly"
+      ],
+      "cookware": [
+        "jar"
+      ],
+      "ingredients": [
+        {
+          "name": "rolled oats",
+          "canonicalItem": "rolled oats",
+          "quantity": 0.5,
+          "unit": "cup"
+        },
+        {
+          "name": "oat milk",
+          "canonicalItem": "oat milk",
+          "quantity": 0.75,
+          "unit": "cup"
+        },
+        {
+          "name": "chia seeds",
+          "canonicalItem": "chia seeds",
+          "quantity": 1,
+          "unit": "tbsp"
+        },
+        {
+          "name": "peanut butter",
+          "canonicalItem": "peanut butter",
+          "quantity": 1,
+          "unit": "tbsp"
+        },
+        {
+          "name": "strawberries, chopped",
+          "canonicalItem": "strawberries",
+          "quantity": 0.5,
+          "unit": "cup"
+        },
+        {
+          "name": "kosher salt",
+          "canonicalItem": "kosher salt",
+          "quantity": 1,
+          "unit": "pinch"
+        },
+        {
+          "name": "vanilla extract",
+          "canonicalItem": "vanilla extract",
+          "quantity": 0.5,
+          "unit": "tsp",
+          "isOptional": true
+        },
+        {
+          "name": "maple syrup",
+          "canonicalItem": "maple syrup",
+          "quantity": 0.5,
+          "unit": "tbsp",
+          "isOptional": true
+        },
+        {
+          "name": "cinnamon",
+          "canonicalItem": "cinnamon",
+          "quantity": 0.25,
+          "unit": "tsp",
+          "isOptional": true
+        },
+        {
+          "name": "greek yogurt",
+          "canonicalItem": "greek yogurt",
+          "quantity": 2,
+          "unit": "tbsp",
+          "isOptional": true
+        },
+        {
+          "name": "flaxseed meal",
+          "canonicalItem": "flaxseed meal",
+          "quantity": 1,
+          "unit": "tsp",
+          "isOptional": true
+        },
+        {
+          "name": "peanuts, chopped",
+          "canonicalItem": "peanuts",
+          "quantity": 1,
+          "unit": "tbsp",
+          "isOptional": true
+        },
+        {
+          "name": "granola",
+          "canonicalItem": "granola",
+          "quantity": 2,
+          "unit": "tbsp",
+          "isOptional": true
+        },
+        {
+          "name": "banana, sliced",
+          "canonicalItem": "banana",
+          "quantity": 0.5,
+          "unit": "count",
+          "isOptional": true
+        }
+      ],
+      "steps": [
+        {
+          "text": "In the jar you mean to eat it out of, whisk the oat milk into the peanut butter until the peanut butter has mostly gone. Do this before anything else goes in: once the oats are in there is nothing to whisk against and the peanut butter stays in a lump at the bottom. The vanilla and the maple syrup go in here too.",
+          "ingredientRefs": [
+            "oat milk",
+            "peanut butter",
+            "vanilla extract",
+            "maple syrup"
+          ]
+        },
+        {
+          "text": "Stir in the oats, the chia seeds and a pinch of salt. The salt is not optional in the way the rest is; without it this tastes flat and sweet rather than of peanut and berry. Cinnamon or flaxseed meal go in at this point if you want them.",
+          "ingredientRefs": [
+            "rolled oats",
+            "chia seeds",
+            "kosher salt",
+            "cinnamon",
+            "flaxseed meal"
+          ]
+        },
+        {
+          "text": "Fold in the strawberries, or lay them along the side of the jar if it is a clear one and you want to look at it. Frozen berries work and give up their juice into the oats as they thaw, which is not a worse result.",
+          "ingredientRefs": [
+            "strawberries"
+          ]
+        },
+        {
+          "text": "Lid on, into the fridge, and leave it alone for at least 6 hours. Overnight is the point. The chia needs that long to set, and oats left only an hour are wet rather than thick.",
+          "ingredientRefs": []
+        },
+        {
+          "text": "In the morning, stir it once. If it has set firmer than you like, loosen it with a splash more oat milk. Yogurt stirred through now makes it creamier, and anything meant to stay crunchy goes on at the table rather than the night before.",
+          "ingredientRefs": [
+            "oat milk",
+            "greek yogurt",
+            "peanuts",
+            "granola",
+            "banana"
+          ]
+        },
+        {
+          "text": "It keeps 4 days covered in the fridge, which is the argument for making several jars at once on a Sunday. It is eaten cold and needs no reheating.",
+          "ingredientRefs": []
+        }
+      ]
     }
   ]
 }

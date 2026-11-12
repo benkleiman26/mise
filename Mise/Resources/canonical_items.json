@@ -303,6 +303,11 @@
       "isStaple": true
     },
     {
+      "name": "chia seeds",
+      "aisle": "bakingAndSpices",
+      "defaultUnit": "package"
+    },
+    {
       "name": "chili powder",
       "aisle": "bakingAndSpices",
       "defaultUnit": "oz",
@@ -427,6 +432,16 @@
         "five-spice blend"
       ],
       "isStaple": true
+    },
+    {
+      "name": "flaxseed meal",
+      "aisle": "bakingAndSpices",
+      "aliases": [
+        "ground flaxseed",
+        "flaxseed",
+        "linseed meal"
+      ],
+      "defaultUnit": "package"
     },
     {
       "name": "garam masala",
@@ -3072,6 +3087,11 @@
       "aisle": "riceGrainsBeans",
       "defaultUnit": "lb",
       "isStaple": true
+    },
+    {
+      "name": "granola",
+      "aisle": "riceGrainsBeans",
+      "defaultUnit": "package"
     },
     {
       "name": "jasmine rice",

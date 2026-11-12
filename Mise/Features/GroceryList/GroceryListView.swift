@@ -288,6 +288,16 @@ struct GroceryListView: View {
 /// Edits are collected here and written once, on Done. Writing per keystroke
 /// would stamp the record twelve times for one correction and hand the other
 /// phone twelve changes to take.
+/// Why a line is here when nothing in the week asked for it.
+private func reasonWithoutAMeal(_ item: GroceryItem) -> String {
+    if item.isManual { return "You added this one yourself." }
+    if item.sourceRecipeIDs.isEmpty && item.quantities.isEmpty {
+        return "The pantry says this is low, so it is on every list until you mark it back in. "
+            + "Change that on the Pantry tab."
+    }
+    return "Nothing in this week's plan, so this came from an earlier list."
+}
+
 private struct GroceryItemDetail: View {
     let item: GroceryItem
     let store: GroceryListStore
@@ -327,9 +337,11 @@ private struct GroceryItemDetail: View {
                 Section("Needed for") {
                     let meals = store.meals(for: item)
                     if meals.isEmpty {
-                        Text(item.isManual
-                             ? "You added this one yourself."
-                             : "Nothing in this week's plan, so this came from an earlier list.")
+                        // Three ways a line can have no meal behind it, and
+                        // they are not the same fact. Saying "an earlier list"
+                        // about the standing order was wrong and read as the
+                        // app inventing groceries.
+                        Text(reasonWithoutAMeal(item))
                             .foregroundStyle(.secondary)
                     } else {
                         ForEach(meals, id: \.self) { meal in

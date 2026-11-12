@@ -147,7 +147,24 @@ struct ListGenerator {
 
     /// - Parameter carryingOver: the previous list, so manual items survive and
     ///   unchanged items keep their check mark.
-    func generate(plan: [PlannedMealInput], carryingOver previous: [GroceryDraftItem] = []) -> GeneratedList {
+    func generate(plan: [PlannedMealInput], carryingOver carried: [GroceryDraftItem] = []) -> GeneratedList {
+        // A finished list means the shop happened. Making it again after that
+        // is the next shop, not a correction to the last one.
+        //
+        // There is one grocery list per household and it is updated in place
+        // forever, so a tick put on a line in a shop stays on it. Carrying
+        // ticks across is right while somebody is still in the shop adding a
+        // meal to the week, and wrong a week later: plan two dinners, make the
+        // list, and every repeated ingredient arrives already crossed off. The
+        // bread you ran out of reads as bought, and the list shows one item.
+        //
+        // Only the ticks go. The manual items stay, because somebody wrote
+        // those down on purpose and surviving a regenerate is the whole reason
+        // they are kept apart.
+        let previous: [GroceryDraftItem] = previousNeedsClearing(carried)
+            ? carried.map { var copy = $0; copy.isChecked = false; return copy }
+            : carried
+
         var groups: [GroupKey: Group] = [:]
         var order: [GroupKey] = []
 
@@ -241,6 +258,11 @@ struct ListGenerator {
         items.append(contentsOf: standaloneManual)
 
         return GeneratedList(sections: sectioned(items))
+    }
+
+    /// Whether the last list was shopped: something on it, and nothing left.
+    private func previousNeedsClearing(_ previous: [GroceryDraftItem]) -> Bool {
+        !previous.isEmpty && previous.allSatisfy(\.isChecked)
     }
 
     // MARK: - Resolving

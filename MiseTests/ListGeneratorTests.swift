@@ -344,6 +344,51 @@ final class ListGeneratorTests: XCTestCase {
         XCTAssertFalse(doubled.items.first?.isChecked == true, "more to buy means it is not done")
     }
 
+    /// Section 4 keeps the tick on an unchanged line, which is right while
+    /// somebody is in the shop adding a meal to the week. A week later it is
+    /// the opposite of right.
+    func testAFinishedListDoesNotCarryItsTicksIntoTheNextShop() {
+        let eggs = Self.candidate("eggs")
+        let bread = Self.candidate("sandwich bread")
+        let recipe = RecipeInput(id: UUID(), title: "Breakfast", baseServings: 4, ingredients: [
+            IngredientInput(name: "eggs", quantity: 6, unit: .count, canonicalItemID: eggs.id),
+            IngredientInput(name: "sandwich bread", quantity: 1, unit: .count, canonicalItemID: bread.id),
+        ])
+        let generator = ListGenerator(matcher: Self.matcher)
+        let plan = [PlannedMealInput(recipe: recipe, servings: 4)]
+
+        // Shopped: every line ticked.
+        var shopped = generator.generate(plan: plan).items
+        XCTAssertEqual(shopped.count, 2)
+        for index in shopped.indices { shopped[index].isChecked = true }
+
+        let nextWeek = generator.generate(plan: plan, carryingOver: shopped).items
+        XCTAssertEqual(nextWeek.count, 2)
+        XCTAssertTrue(
+            nextWeek.allSatisfy { !$0.isChecked },
+            "a shop that finished is over, so the next list starts from nothing bought"
+        )
+    }
+
+    /// The other half, which must keep working: a list still being shopped
+    /// keeps what has been ticked so far.
+    func testAListStillBeingShoppedKeepsItsTicks() {
+        let eggs = Self.candidate("eggs")
+        let bread = Self.candidate("sandwich bread")
+        let recipe = RecipeInput(id: UUID(), title: "Breakfast", baseServings: 4, ingredients: [
+            IngredientInput(name: "eggs", quantity: 6, unit: .count, canonicalItemID: eggs.id),
+            IngredientInput(name: "sandwich bread", quantity: 1, unit: .count, canonicalItemID: bread.id),
+        ])
+        let generator = ListGenerator(matcher: Self.matcher)
+        let plan = [PlannedMealInput(recipe: recipe, servings: 4)]
+
+        var partly = generator.generate(plan: plan).items
+        partly[0].isChecked = true
+
+        let again = generator.generate(plan: plan, carryingOver: partly).items
+        XCTAssertEqual(again.filter(\.isChecked).count, 1, "one thing is still in the trolley")
+    }
+
     // MARK: - Shape
 
     func testSectionsFollowTheHouseholdWalkOrder() {

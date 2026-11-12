@@ -162,7 +162,7 @@ struct GroceryListView: View {
                     Label("Make the list again", systemImage: "arrow.clockwise")
                 }
             } footer: {
-                Text("\(footerText(store)) Press and hold an item to see which meals need it.")
+                Text("\(footerText(store)) Tap the arrow on an item to see which meals need it.")
             }
         }
     }

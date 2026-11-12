@@ -144,7 +144,7 @@ struct GroceryListView: View {
             }
 
             ForEach(store.sections) { section in
-                Section(section.aisle.displayName) {
+                Section {
                     ForEach(section.items, id: \.id) { item in
                         row(item, in: store)
                     }
@@ -152,6 +152,29 @@ struct GroceryListView: View {
                         let doomed = offsets.map { section.items[$0] }
                         for item in doomed { store.delete(item) }
                     }
+                } header: {
+                    Text(section.title)
+                } footer: {
+                    if section.kind == .runningLow {
+                        Text("The pantry says these are low. They are here whether or not anything this week needs them, until you mark them in again.")
+                    }
+                }
+            }
+
+            // Said rather than bought.
+            //
+            // Rule 4 keeps what the pantry has off the list, which is right,
+            // and until now meant a recipe could ask for eight things and the
+            // list show three with no account of the other five.
+            if !store.inThePantry.isEmpty {
+                Section {
+                    Text(store.inThePantry.joined(separator: ", "))
+                        .font(.footnote)
+                        .foregroundStyle(.secondary)
+                } header: {
+                    Text("Already in the pantry")
+                } footer: {
+                    Text("This week's meals need these and the pantry says they are in, so they are not on the shop.")
                 }
             }
 

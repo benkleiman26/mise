@@ -9,9 +9,22 @@ import Foundation
 @Observable
 final class GroceryListStore {
     struct Section: Identifiable {
-        let aisle: Aisle
+        enum Kind: Equatable {
+            /// Standing order: the pantry says these are low or out, whether or
+            /// not anything this week asked for them.
+            case runningLow
+            case aisle(Aisle)
+        }
+
+        let kind: Kind
+        let title: String
         let items: [GroceryItem]
-        var id: String { aisle.rawValue }
+        var id: String {
+            switch kind {
+            case .runningLow: "running-low"
+            case .aisle(let aisle): aisle.rawValue
+            }
+        }
     }
 
     private let lists: any GroceryListRepository
@@ -40,6 +53,15 @@ final class GroceryListStore {
     /// Whether there is a list at all, as opposed to one with nothing left on
     /// it. An empty screen means two very different things.
     private(set) var hasList = false
+
+    /// What this week's meals need that the pantry says is already in.
+    ///
+    /// Rule 4 keeps these off the shopping list, which is right: nobody wants
+    /// to buy salt every week. But dropping them silently means a recipe can
+    /// call for eight things and the list show three, with no way to tell
+    /// whether the other five were covered or lost. So they are said, by name,
+    /// at the bottom, where they answer the question without joining the shop.
+    private(set) var inThePantry: [String] = []
 
     init(
         lists: any GroceryListRepository,
@@ -333,13 +355,69 @@ final class GroceryListStore {
 
         let shown = showsCompleted ? all : all.filter { !$0.isChecked }
         let walk = (try? aisleWalk()) ?? Aisle.allCases
-        let grouped = Dictionary(grouping: shown, by: \.aisle)
 
-        sections = walk.compactMap { aisle in
-            guard let items = grouped[aisle], !items.isEmpty else { return nil }
-            return Section(aisle: aisle, items: items)
+        // The standing order, separated and first.
+        //
+        // A restock row and a row a meal asked for look identical, and they
+        // answer different questions: one is "we are out of bread", the other
+        // is "Thursday needs bread". Mixed together, two dinners produce a
+        // list of forty lines and no way to tell which is which.
+        //
+        // Told apart by what the generator gave them rather than by a flag on
+        // the row: a restock line is the only kind that carries no quantity
+        // and names no recipe, because nobody knows how much olive oil a house
+        // needs and nothing this week asked for it.
+        let isRestock = { (item: GroceryItem) in
+            !item.isManual && item.sourceRecipeIDs.isEmpty && item.quantities.isEmpty
         }
+        let low = shown.filter(isRestock)
+        let rest = shown.filter { !isRestock($0) }
+        let grouped = Dictionary(grouping: rest, by: \.aisle)
+
+        var built: [Section] = []
+        if !low.isEmpty {
+            built.append(Section(
+                kind: .runningLow,
+                title: "Running low",
+                items: low.sorted { walkOrder($0.aisle, before: $1.aisle, in: walk) }
+            ))
+        }
+        built.append(contentsOf: walk.compactMap { aisle in
+            guard let items = grouped[aisle], !items.isEmpty else { return nil }
+            return Section(kind: .aisle(aisle), title: aisle.displayName, items: items)
+        })
+        sections = built
+
+        inThePantry = pantryLines()
         generatedAt = list.generatedAt
+    }
+
+    /// Keeps the standing order in store-walk order inside its own section, so
+    /// it still reads like a route rather than an alphabet.
+    private func walkOrder(_ left: Aisle, before right: Aisle, in walk: [Aisle]) -> Bool {
+        let a = walk.firstIndex(of: left) ?? walk.count
+        let b = walk.firstIndex(of: right) ?? walk.count
+        if a != b { return a < b }
+        return left.rawValue < right.rawValue
+    }
+
+    /// The planned ingredients rule 4 took out, by name.
+    private func pantryLines() -> [String] {
+        guard let plan = try? planInputs(), !plan.isEmpty else { return [] }
+        guard let have = try? pantry.all().filter({ $0.status == .have }) else { return [] }
+        let haveIDs = Set(have.map(\.canonicalItemID))
+        guard !haveIDs.isEmpty else { return [] }
+
+        let matcher = (try? makeMatcher()) ?? CanonicalMatcher(items: [])
+        var names: Set<String> = []
+        for meal in plan {
+            for ingredient in meal.recipe.ingredients {
+                let id = ingredient.canonicalItemID ?? matcher.match(ingredient.name).item?.id
+                guard let id, haveIDs.contains(id) else { continue }
+                names.insert(matcher.item(id: id)?.name ?? ingredient.name)
+            }
+        }
+        return names.sorted { $0.localizedCaseInsensitiveCompare($1) == .orderedAscending }
     }
 
     /// The row a hand typed item belongs on, by canonical item when both have

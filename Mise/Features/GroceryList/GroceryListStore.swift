@@ -61,7 +61,15 @@ final class GroceryListStore {
     /// call for eight things and the list show three, with no way to tell
     /// whether the other five were covered or lost. So they are said, by name,
     /// at the bottom, where they answer the question without joining the shop.
-    private(set) var inThePantry: [String] = []
+    private(set) var inThePantry: [PantryLine] = []
+
+    /// A planned ingredient the pantry is holding back, and the item behind it
+    /// so the shopper can disagree.
+    struct PantryLine: Identifiable, Equatable {
+        let canonicalItemID: UUID
+        let name: String
+        var id: UUID { canonicalItemID }
+    }
 
     init(
         lists: any GroceryListRepository,
@@ -401,23 +409,48 @@ final class GroceryListStore {
         return left.rawValue < right.rawValue
     }
 
-    /// The planned ingredients rule 4 took out, by name.
-    private func pantryLines() -> [String] {
+    /// The planned ingredients rule 4 took out.
+    private func pantryLines() -> [PantryLine] {
         guard let plan = try? planInputs(), !plan.isEmpty else { return [] }
         guard let have = try? pantry.all().filter({ $0.status == .have }) else { return [] }
         let haveIDs = Set(have.map(\.canonicalItemID))
         guard !haveIDs.isEmpty else { return [] }
 
         let matcher = (try? makeMatcher()) ?? CanonicalMatcher(items: [])
-        var names: Set<String> = []
+        var found: [UUID: String] = [:]
         for meal in plan {
             for ingredient in meal.recipe.ingredients {
                 let id = ingredient.canonicalItemID ?? matcher.match(ingredient.name).item?.id
-                guard let id, haveIDs.contains(id) else { continue }
-                names.insert(matcher.item(id: id)?.name ?? ingredient.name)
+                guard let id, haveIDs.contains(id), found[id] == nil else { continue }
+                found[id] = matcher.item(id: id)?.name ?? ingredient.name
             }
         }
-        return names.sorted { $0.localizedCaseInsensitiveCompare($1) == .orderedAscending }
+        return found
+            .map { PantryLine(canonicalItemID: $0.key, name: $0.value) }
+            .sorted { $0.name.localizedCaseInsensitiveCompare($1.name) == .orderedAscending }
+    }
+
+    /// "We do not actually have this."
+    ///
+    /// The pantry is the only reason these are off the shop, and it is a
+    /// record of what somebody last said rather than of what is in the
+    /// cupboard. Eggs marked in three weeks ago are eggs the list will keep
+    /// leaving out. So the line that says why also has to be the place to
+    /// disagree, otherwise noticing costs a trip to another tab.
+    ///
+    /// Marked `out` rather than `low`, because saying so while reading a
+    /// shopping list means it is needed now.
+    func weAreOutOf(_ line: PantryLine) {
+        do {
+            guard let entry = try pantry.all().first(where: { $0.canonicalItemID == line.canonicalItemID })
+            else { return }
+            entry.status = .out
+            entry.updatedAt = .now
+            try pantry.save()
+            regenerate()
+        } catch {
+            problem = "That could not be saved. \(error)"
+        }
     }
 
     /// The row a hand typed item belongs on, by canonical item when both have

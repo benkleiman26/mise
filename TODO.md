@@ -11,6 +11,15 @@ Build 3 is with Apple for the other household.
 
 Open, in the order I would take them:
 
+- [ ] **Rule 4 is switched off in the app.** `ListGenerator` still drops what
+      the pantry says we have, and still has the tests and fixtures for it,
+      but `GroceryListStore.makeGenerator` no longer passes it anything. Every
+      planned ingredient goes on the list and the shopper ticks off what they
+      have. The pantry's remaining job is the standing order: things marked
+      low or out join the list whether or not the week asked for them. If that
+      stays true, the dead half of the rule and its fixtures should go rather
+      than sit there looking like behaviour.
+
 - [ ] **The duplicate recipes are local only.** "Crunchy Roll Bowls" appears
       twice on the owner's phone and not once on the server. Both copies are
       among the 190 recipes the tombstones were blocking, so neither has ever

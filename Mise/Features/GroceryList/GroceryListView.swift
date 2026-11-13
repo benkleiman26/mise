@@ -161,40 +161,6 @@ struct GroceryListView: View {
                 }
             }
 
-            // Said rather than bought.
-            //
-            // Rule 4 keeps what the pantry has off the list, which is right,
-            // and until now meant a recipe could ask for eight things and the
-            // list show three with no account of the other five.
-            if !store.inThePantry.isEmpty {
-                Section {
-                    ForEach(store.inThePantry) { line in
-                        Button {
-                            withAnimation { store.weAreOutOf(line) }
-                        } label: {
-                            HStack {
-                                Text(line.name)
-                                    .foregroundStyle(.secondary)
-                                Spacer()
-                                Image(systemName: "plus.circle")
-                                    .foregroundStyle(Color.accentColor)
-                            }
-                            .contentShape(Rectangle())
-                        }
-                        .buttonStyle(.plain)
-                        .accessibilityLabel("We are out of \(line.name)")
-                    }
-                } header: {
-                    Text("Already in the pantry")
-                } footer: {
-                    // The pantry records what somebody last said, not what is
-                    // in the cupboard, so this list is exactly where a stale
-                    // "have" gets caught. Making it the place to correct one
-                    // costs nothing and saves a trip to another tab.
-                    Text("This week's meals need these and the pantry says they are in, so they are off the shop. Tap one to say you are out of it and it moves onto the list.")
-                }
-            }
-
             Section {
                 Button {
                     store.regenerate()

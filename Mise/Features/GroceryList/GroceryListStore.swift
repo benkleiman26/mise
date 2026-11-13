@@ -54,22 +54,6 @@ final class GroceryListStore {
     /// it. An empty screen means two very different things.
     private(set) var hasList = false
 
-    /// What this week's meals need that the pantry says is already in.
-    ///
-    /// Rule 4 keeps these off the shopping list, which is right: nobody wants
-    /// to buy salt every week. But dropping them silently means a recipe can
-    /// call for eight things and the list show three, with no way to tell
-    /// whether the other five were covered or lost. So they are said, by name,
-    /// at the bottom, where they answer the question without joining the shop.
-    private(set) var inThePantry: [PantryLine] = []
-
-    /// A planned ingredient the pantry is holding back, and the item behind it
-    /// so the shopper can disagree.
-    struct PantryLine: Identifiable, Equatable {
-        let canonicalItemID: UUID
-        let name: String
-        var id: UUID { canonicalItemID }
-    }
 
     init(
         lists: any GroceryListRepository,
@@ -396,7 +380,6 @@ final class GroceryListStore {
         })
         sections = built
 
-        inThePantry = pantryLines()
         generatedAt = list.generatedAt
     }
 
@@ -409,49 +392,6 @@ final class GroceryListStore {
         return left.rawValue < right.rawValue
     }
 
-    /// The planned ingredients rule 4 took out.
-    private func pantryLines() -> [PantryLine] {
-        guard let plan = try? planInputs(), !plan.isEmpty else { return [] }
-        guard let have = try? pantry.all().filter({ $0.status == .have }) else { return [] }
-        let haveIDs = Set(have.map(\.canonicalItemID))
-        guard !haveIDs.isEmpty else { return [] }
-
-        let matcher = (try? makeMatcher()) ?? CanonicalMatcher(items: [])
-        var found: [UUID: String] = [:]
-        for meal in plan {
-            for ingredient in meal.recipe.ingredients {
-                let id = ingredient.canonicalItemID ?? matcher.match(ingredient.name).item?.id
-                guard let id, haveIDs.contains(id), found[id] == nil else { continue }
-                found[id] = matcher.item(id: id)?.name ?? ingredient.name
-            }
-        }
-        return found
-            .map { PantryLine(canonicalItemID: $0.key, name: $0.value) }
-            .sorted { $0.name.localizedCaseInsensitiveCompare($1.name) == .orderedAscending }
-    }
-
-    /// "We do not actually have this."
-    ///
-    /// The pantry is the only reason these are off the shop, and it is a
-    /// record of what somebody last said rather than of what is in the
-    /// cupboard. Eggs marked in three weeks ago are eggs the list will keep
-    /// leaving out. So the line that says why also has to be the place to
-    /// disagree, otherwise noticing costs a trip to another tab.
-    ///
-    /// Marked `out` rather than `low`, because saying so while reading a
-    /// shopping list means it is needed now.
-    func weAreOutOf(_ line: PantryLine) {
-        do {
-            guard let entry = try pantry.all().first(where: { $0.canonicalItemID == line.canonicalItemID })
-            else { return }
-            entry.status = .out
-            entry.updatedAt = .now
-            try pantry.save()
-            regenerate()
-        } catch {
-            problem = "That could not be saved. \(error)"
-        }
-    }
 
     /// The row a hand typed item belongs on, by canonical item when both have
     /// one and by normalized name otherwise. Same test `ListGenerator` uses, so
@@ -477,14 +417,26 @@ final class GroceryListStore {
     }
 
     private func makeGenerator() throws -> ListGenerator {
-        // Section 4: the generator excludes `have` and includes `low` and `out`.
-        // Both halves, read from one fetch so the two cannot disagree.
+        // Rule 4 is off, deliberately.
+        //
+        // Section 5.3 says the generator drops what the pantry says we have,
+        // and the generator still can: the behaviour is intact and tested, and
+        // turning it back on is this one argument. The app does not use it.
+        //
+        // The pantry records what somebody last said rather than what is in
+        // the cupboard, and the gap between those two silently removes things
+        // from a shopping list. Two dinners produced a list that did not
+        // mention spaghetti, because spaghetti is a staple and the pantry
+        // believed there was some. Being told to buy salt you already have
+        // costs one tap. Not being told to buy the pasta costs the dinner.
+        //
+        // So every planned ingredient goes on the list and the shopper ticks
+        // off what they have, which is the thing they can see and the pantry
+        // cannot.
         let entries = try pantry.all()
-        let have = Set(entries.filter { $0.status == .have }.map(\.canonicalItemID))
         let restock = entries.filter { $0.status != .have }.map(\.canonicalItemID)
         return ListGenerator(
             matcher: try makeMatcher(),
-            pantryHave: have,
             pantryRestock: restock,
             aisleOrder: try aisleWalk()
         )

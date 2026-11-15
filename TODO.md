@@ -11,6 +11,11 @@ Build 3 is with Apple for the other household.
 
 Open, in the order I would take them:
 
+- [ ] **The standing order is back to the eight it always was**: butter, eggs,
+      frozen peas, garlic, milk, parmesan, scallions and yellow onion. Those
+      were staples before any of this. Whether garlic and parmesan belong on
+      every list is a question for whoever keeps the pantry, not for a
+      document.
 - [ ] **Rule 4 is switched off in the app.** `ListGenerator` still drops what
       the pantry says we have, and still has the tests and fixtures for it,
       but `GroceryListStore.makeGenerator` no longer passes it anything. Every

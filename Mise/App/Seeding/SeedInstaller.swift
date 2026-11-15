@@ -39,6 +39,7 @@ struct SeedInstaller {
         let itemsByName = try installCanonicalItems(catalog, household: household, report: &report)
         try installRecipes(catalog, household: household, itemsByName: itemsByName, report: &report)
         try installStaplePantryEntries(catalog, household: household, itemsByName: itemsByName, report: &report)
+        try withdrawStaplesNobodyWanted(catalog, itemsByName: itemsByName, report: &report)
         try classifyRecipes(report: &report)
 
         try households.save()
@@ -348,6 +349,45 @@ struct SeedInstaller {
         defaults.set(offered.sorted(), forKey: Self.offeredStaplesKey)
     }
 
+    /// Takes back a staple this app offered and has since thought better of.
+    ///
+    /// Seeding only ever added. A version that marked thirty-five things
+    /// staples put thirty-five rows in everybody's pantry, and unmarking them
+    /// in the catalogue stops new ones being offered while leaving every row
+    /// already created exactly where it was. On a phone that means the mistake
+    /// is permanent, and on two phones it means the other one keeps pushing it
+    /// back.
+    ///
+    /// Only entries nobody has touched. A seeded entry still carries
+    /// `seededAt`, so an `updatedAt` of anything else is somebody having said
+    /// something about that item, and this has no business undoing it.
+    ///
+    /// Deleted through the repository rather than quietly, so the tombstone
+    /// reaches the other phone and the row goes there too.
+    private func withdrawStaplesNobodyWanted(
+        _ catalog: SeedCatalog,
+        itemsByName: [String: CanonicalItem],
+        report: inout SeedReport
+    ) throws {
+        let staples = Set(
+            catalog.canonicalItems
+                .filter(\.isStaple)
+                .compactMap { itemsByName[SeedCatalog.key($0.name)]?.id }
+        )
+        var offered = Set(defaults.stringArray(forKey: Self.offeredStaplesKey) ?? [])
+        guard !offered.isEmpty else { return }
+
+        for entry in try pantry.all() {
+            guard offered.contains(entry.id.uuidString) else { continue }
+            guard !staples.contains(entry.canonicalItemID) else { continue }
+            guard entry.updatedAt == Self.seededAt else { continue }
+            pantry.delete(entry)
+            offered.remove(entry.id.uuidString)
+            report.pantryEntriesWithdrawn += 1
+        }
+        defaults.set(offered.sorted(), forKey: Self.offeredStaplesKey)
+    }
+
     static let offeredStaplesKey = "mise.seed.offeredStaples"
 
     /// Perishable aisles are the ones whose contents have to be rebought.
@@ -368,6 +408,9 @@ struct SeedReport: Sendable, Equatable {
     /// with the resource file. Non-zero after an update that widened the
     /// table, zero on every launch after that.
     var canonicalItemsUpdated = 0
+    /// Pantry rows a previous version seeded and this one has withdrawn,
+    /// because the item is no longer a staple and nobody had touched the row.
+    var pantryEntriesWithdrawn = 0
     /// Recipes that had no dish types and have been given them. Non-zero on
     /// the launch after the classifier lands or after an import, zero after.
     var recipesClassified = 0

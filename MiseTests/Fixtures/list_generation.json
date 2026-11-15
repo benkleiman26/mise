@@ -31,6 +31,12 @@
           "sources": 1
         },
         {
+          "item": "lemon",
+          "aisle": "produce",
+          "formatted": "1",
+          "sources": 1
+        },
+        {
           "item": "salmon",
           "aisle": "seafood",
           "formatted": "3 lb",
@@ -42,8 +48,7 @@
         "garlic",
         "kosher salt",
         "soy sauce",
-        "white rice",
-        "lemon"
+        "white rice"
       ]
     },
     {
@@ -122,6 +127,12 @@
           "sources": 1
         },
         {
+          "item": "lemon",
+          "aisle": "produce",
+          "formatted": "2",
+          "sources": 1
+        },
+        {
           "item": "salmon",
           "aisle": "seafood",
           "formatted": "3 lb",
@@ -129,8 +140,7 @@
         }
       ],
       "expectAbsent": [
-        "olive oil",
-        "lemon"
+        "olive oil"
       ]
     },
     {

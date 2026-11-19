@@ -11,11 +11,17 @@ Build 3 is with Apple for the other household.
 
 Open, in the order I would take them:
 
-- [ ] **The standing order is back to the eight it always was**: butter, eggs,
-      frozen peas, garlic, milk, parmesan, scallions and yellow onion. Those
-      were staples before any of this. Whether garlic and parmesan belong on
-      every list is a question for whoever keeps the pantry, not for a
-      document.
+- [ ] **The pantry no longer touches the grocery list, in either direction.**
+      It does not take things off it and it does not put things on it. The
+      list is the ingredients of the planned recipes plus whatever was added
+      by hand, and nothing else. `ListGenerator` still has both halves, with
+      their tests and fixtures, and `GroceryListStore.makeGenerator` passes
+      neither. If this stays true, both halves should be deleted rather than
+      left looking like behaviour.
+
+      What the pantry is for now is an open question. It tracks what a
+      household has and nothing reads it. Either something should, or it
+      should go.
 - [ ] **Rule 4 is switched off in the app.** `ListGenerator` still drops what
       the pantry says we have, and still has the tests and fixtures for it,
       but `GroceryListStore.makeGenerator` no longer passes it anything. Every

@@ -154,10 +154,6 @@ struct GroceryListView: View {
                     }
                 } header: {
                     Text(section.title)
-                } footer: {
-                    if section.kind == .runningLow {
-                        Text("The pantry says these are low. They are here whether or not anything this week needs them, until you mark them in again.")
-                    }
                 }
             }
 
@@ -274,10 +270,6 @@ struct GroceryListView: View {
 /// Why a line is here when nothing in the week asked for it.
 private func reasonWithoutAMeal(_ item: GroceryItem) -> String {
     if item.isManual { return "You added this one yourself." }
-    if item.sourceRecipeIDs.isEmpty && item.quantities.isEmpty {
-        return "The pantry says this is low, so it is on every list until you mark it back in. "
-            + "Change that on the Pantry tab."
-    }
     return "Nothing in this week's plan, so this came from an earlier list."
 }
 

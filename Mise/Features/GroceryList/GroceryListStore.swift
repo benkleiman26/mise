@@ -9,22 +9,10 @@ import Foundation
 @Observable
 final class GroceryListStore {
     struct Section: Identifiable {
-        enum Kind: Equatable {
-            /// Standing order: the pantry says these are low or out, whether or
-            /// not anything this week asked for them.
-            case runningLow
-            case aisle(Aisle)
-        }
-
-        let kind: Kind
-        let title: String
+        let aisle: Aisle
         let items: [GroceryItem]
-        var id: String {
-            switch kind {
-            case .runningLow: "running-low"
-            case .aisle(let aisle): aisle.rawValue
-            }
-        }
+        var title: String { aisle.displayName }
+        var id: String { aisle.rawValue }
     }
 
     private let lists: any GroceryListRepository
@@ -348,49 +336,14 @@ final class GroceryListStore {
         let shown = showsCompleted ? all : all.filter { !$0.isChecked }
         let walk = (try? aisleWalk()) ?? Aisle.allCases
 
-        // The standing order, separated and first.
-        //
-        // A restock row and a row a meal asked for look identical, and they
-        // answer different questions: one is "we are out of bread", the other
-        // is "Thursday needs bread". Mixed together, two dinners produce a
-        // list of forty lines and no way to tell which is which.
-        //
-        // Told apart by what the generator gave them rather than by a flag on
-        // the row: a restock line is the only kind that carries no quantity
-        // and names no recipe, because nobody knows how much olive oil a house
-        // needs and nothing this week asked for it.
-        let isRestock = { (item: GroceryItem) in
-            !item.isManual && item.sourceRecipeIDs.isEmpty && item.quantities.isEmpty
-        }
-        let low = shown.filter(isRestock)
-        let rest = shown.filter { !isRestock($0) }
-        let grouped = Dictionary(grouping: rest, by: \.aisle)
-
-        var built: [Section] = []
-        if !low.isEmpty {
-            built.append(Section(
-                kind: .runningLow,
-                title: "Running low",
-                items: low.sorted { walkOrder($0.aisle, before: $1.aisle, in: walk) }
-            ))
-        }
-        built.append(contentsOf: walk.compactMap { aisle in
+        let grouped = Dictionary(grouping: shown, by: \.aisle)
+        sections = walk.compactMap { aisle in
             guard let items = grouped[aisle], !items.isEmpty else { return nil }
-            return Section(kind: .aisle(aisle), title: aisle.displayName, items: items)
-        })
-        sections = built
-
+            return Section(aisle: aisle, items: items)
+        }
         generatedAt = list.generatedAt
     }
 
-    /// Keeps the standing order in store-walk order inside its own section, so
-    /// it still reads like a route rather than an alphabet.
-    private func walkOrder(_ left: Aisle, before right: Aisle, in walk: [Aisle]) -> Bool {
-        let a = walk.firstIndex(of: left) ?? walk.count
-        let b = walk.firstIndex(of: right) ?? walk.count
-        if a != b { return a < b }
-        return left.rawValue < right.rawValue
-    }
 
 
     /// The row a hand typed item belongs on, by canonical item when both have
@@ -417,7 +370,7 @@ final class GroceryListStore {
     }
 
     private func makeGenerator() throws -> ListGenerator {
-        // Rule 4 is off, deliberately.
+        // The pantry does not touch the list.
         //
         // Section 5.3 says the generator drops what the pantry says we have,
         // and the generator still can: the behaviour is intact and tested, and
@@ -433,11 +386,8 @@ final class GroceryListStore {
         // So every planned ingredient goes on the list and the shopper ticks
         // off what they have, which is the thing they can see and the pantry
         // cannot.
-        let entries = try pantry.all()
-        let restock = entries.filter { $0.status != .have }.map(\.canonicalItemID)
         return ListGenerator(
             matcher: try makeMatcher(),
-            pantryRestock: restock,
             aisleOrder: try aisleWalk()
         )
     }

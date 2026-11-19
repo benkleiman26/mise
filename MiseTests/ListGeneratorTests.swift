@@ -370,6 +370,52 @@ final class ListGeneratorTests: XCTestCase {
         )
     }
 
+    /// Ticking everything off and making the list again brought every manual
+    /// item back, unticked, because manual items survive a regenerate and the
+    /// finished-shop rule only cleared the ticks.
+    func testAFinishedShopDoesNotBringManualItemsBack() {
+        let eggs = Self.candidate("eggs")
+        let recipe = RecipeInput(id: UUID(), title: "Breakfast", baseServings: 4, ingredients: [
+            IngredientInput(name: "eggs", quantity: 6, unit: .count, canonicalItemID: eggs.id),
+        ])
+        let generator = ListGenerator(matcher: Self.matcher)
+        let plan = [PlannedMealInput(recipe: recipe, servings: 4)]
+
+        var shopped = generator.generate(plan: plan).items
+        shopped.append(GroceryDraftItem(
+            displayName: "bananas",
+            quantities: [Quantity(3, .count)],
+            aisle: .produce,
+            isManual: true,
+            manualQuantities: [Quantity(3, .count)]
+        ))
+        for index in shopped.indices { shopped[index].isChecked = true }
+
+        let nextWeek = generator.generate(plan: plan, carryingOver: shopped).items
+        XCTAssertFalse(
+            nextWeek.contains { $0.displayName == "bananas" },
+            "bananas were written down, bought, and ticked off. They are not next week's shopping."
+        )
+        XCTAssertEqual(nextWeek.count, 1)
+    }
+
+    /// A recipe with no ingredients recorded puts a meal on the week and
+    /// nothing on the list, which used to happen in silence.
+    func testAMealThatAddsNothingIsNamed() {
+        let empty = RecipeInput(id: UUID(), title: "Focaccia", baseServings: 4, ingredients: [])
+        let eggs = Self.candidate("eggs")
+        let real = RecipeInput(id: UUID(), title: "Breakfast", baseServings: 4, ingredients: [
+            IngredientInput(name: "eggs", quantity: 6, unit: .count, canonicalItemID: eggs.id),
+        ])
+        let list = ListGenerator(matcher: Self.matcher).generate(plan: [
+            PlannedMealInput(recipe: empty, servings: 4),
+            PlannedMealInput(recipe: real, servings: 4),
+        ])
+
+        XCTAssertEqual(list.mealsWithoutIngredients, ["Focaccia"])
+        XCTAssertEqual(list.items.count, 1)
+    }
+
     /// The other half, which must keep working: a list still being shopped
     /// keeps what has been ticked so far.
     func testAListStillBeingShoppedKeepsItsTicks() {

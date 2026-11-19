@@ -42,6 +42,11 @@ final class GroceryListStore {
     /// it. An empty screen means two very different things.
     private(set) var hasList = false
 
+    /// Meals on the plan that put nothing on the list, because the recipe has
+    /// no ingredients recorded. Said out loud, because the alternative is a
+    /// short list and no reason for it.
+    private(set) var mealsWithoutIngredients: [String] = []
+
 
     init(
         lists: any GroceryListRepository,
@@ -99,6 +104,7 @@ final class GroceryListStore {
             let previous = existing?.orderedItems.map { draft($0) } ?? []
 
             let generated = try makeGenerator().generate(plan: try planInputs(), carryingOver: previous)
+            mealsWithoutIngredients = generated.mealsWithoutIngredients
 
             let list = existing ?? GroceryList(
                 id: StableID.groceryList(householdID: householdID),

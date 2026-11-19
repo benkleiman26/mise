@@ -143,6 +143,22 @@ struct GroceryListView: View {
                     .foregroundStyle(.secondary)
             }
 
+            // A recipe with no ingredients recorded puts a meal on the week
+            // and nothing on the list. Saying nothing about it is how three
+            // recipes planned become one recipe's worth of shopping with no
+            // account of the other two.
+            if !store.mealsWithoutIngredients.isEmpty {
+                Section {
+                    ForEach(store.mealsWithoutIngredients, id: \.self) { title in
+                        Text(title).font(.footnote)
+                    }
+                } header: {
+                    Label("No ingredients recorded", systemImage: "exclamationmark.triangle")
+                } footer: {
+                    Text("These are on the plan and added nothing here. The recipes came in as a title and a photo with no ingredient list, so there is nothing to shop for.")
+                }
+            }
+
             ForEach(store.sections) { section in
                 Section {
                     ForEach(section.items, id: \.id) { item in

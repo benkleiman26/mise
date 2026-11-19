@@ -112,6 +112,14 @@ struct GrocerySection: Equatable, Sendable {
 
 struct GeneratedList: Equatable, Sendable {
     let sections: [GrocerySection]
+    /// Meals on the plan that contributed nothing, because the recipe has no
+    /// ingredients recorded against it.
+    ///
+    /// 55 recipes in this library are a title and a photo and nothing else, so
+    /// planning one puts a meal on the week and nothing on the list. Silently,
+    /// until now: three recipes planned, one recipe's worth of shopping, and
+    /// no account anywhere of the other two.
+    var mealsWithoutIngredients: [String] = []
 
     var items: [GroceryDraftItem] { sections.flatMap(\.items) }
     /// Names that resolved to nothing. The review screen asks about these.
@@ -161,9 +169,17 @@ struct ListGenerator {
         // Only the ticks go. The manual items stay, because somebody wrote
         // those down on purpose and surviving a regenerate is the whole reason
         // they are kept apart.
-        let previous: [GroceryDraftItem] = previousNeedsClearing(carried)
-            ? carried.map { var copy = $0; copy.isChecked = false; return copy }
-            : carried
+        // Nothing survives a finished shop, manual items included.
+        //
+        // They used to, on the grounds that somebody typed them on purpose. So
+        // bananas written down three weeks ago were still on the list three
+        // weeks later, under a heading that said Produce, next to things this
+        // week actually needs. A list of six where five are old is worse than
+        // no list, because it reads as the answer.
+        //
+        // Surviving a regenerate is still right while the shop is happening.
+        // It stops being right once everything on it has been bought.
+        let previous: [GroceryDraftItem] = previousNeedsClearing(carried) ? [] : carried
 
         var groups: [GroupKey: Group] = [:]
         var order: [GroupKey] = []
@@ -257,7 +273,12 @@ struct ListGenerator {
 
         items.append(contentsOf: standaloneManual)
 
-        return GeneratedList(sections: sectioned(items))
+        return GeneratedList(
+            sections: sectioned(items),
+            mealsWithoutIngredients: plan
+                .filter { $0.recipe.ingredients.isEmpty }
+                .map(\.recipe.title)
+        )
     }
 
     /// Whether the last list was shopped: something on it, and nothing left.
